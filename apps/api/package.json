@@ -13,20 +13,22 @@
     "prisma:migrate": "prisma migrate dev --name init"
   },
   "devDependencies": {
+    "@types/bcrypt": "^5.0.2",
     "@types/express": "^5.0.6",
     "@types/jsonwebtoken": "^9.0.10",
     "@types/node": "^25.0.3",
-    "@types/bcrypt": "^5.0.2",
     "prisma": "^6.19.1",
     "tsx": "^4.21.0"
   },
   "dependencies": {
-    "@withyou/shared": "file:../../packages/shared",
     "@prisma/client": "^6.4.1",
+    "@withyou/shared": "file:../../packages/shared",
     "bcrypt": "^5.1.1",
     "dotenv": "^17.2.3",
     "express": "^5.2.1",
+    "express-rate-limit": "^8.2.1",
     "jsonwebtoken": "^9.0.3",
+    "morgan": "^1.10.1",
     "zod": "^4.3.4"
   }
 }
