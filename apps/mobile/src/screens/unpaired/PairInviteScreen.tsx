@@ -1,89 +1,87 @@
 import React, { useState } from "react";
-import { View, StyleSheet } from "react-native";
-import { CONTENT } from "@withyou/shared";
-import { tokens } from "../../ui/tokens";
+import { View } from "react-native";
+import { CONTENT, InviteResponse } from "@withyou/shared";
 import { Screen } from "../../ui/components/Screen";
 import { Text } from "../../ui/components/Text";
 import { Button } from "../../ui/components/Button";
 import { Card } from "../../ui/components/Card";
+import { api } from "../../state/appState";
+import { useAsyncAction } from "../../api/hooks";
+import * as Clipboard from "expo-clipboard";
 
-export function PairInviteScreen() {
-  const [inviteCode, _setInviteCode] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
+type PairInviteScreenProps = {
+  navigation: unknown;
+};
 
-  const handleGenerateCode = async () => {
-    try {
-      setError("");
-      setLoading(true);
+export function PairInviteScreen({ navigation }: PairInviteScreenProps) {
+  const c = CONTENT.pairing.invite;
 
-      console.log("Generating invite code");
+  const [inviteCode, setInviteCode] = useState<string | null>(null);
+  const [expiresAt, setExpiresAt] = useState<string | null>(null);
 
-    } catch (err: unknown) {
-      if (err instanceof Error) {
-        setError(err.message);
-      }
-    } finally {
-      setLoading(false);
-    }
+  const { run, loading, errorText } = useAsyncAction(async () => {
+    const res = await api.request<InviteResponse>("/relationship/invite", {
+      method: "POST",
+    });
+    setInviteCode(res.inviteCode);
+    setExpiresAt(res.expiresAt);
+    return res;
+  });
+
+  const copyLink = async () => {
+    if (!inviteCode) return;
+    const link = `withyou://pair?code=${inviteCode}`;
+    await Clipboard.setStringAsync(link);
   };
 
-  const handleCopyLink = () => {
-    console.log("Copy to clipboard:", inviteCode);
+  const copyCode = async () => {
+    if (!inviteCode) return;
+    await Clipboard.setStringAsync(inviteCode);
   };
 
   return (
     <Screen>
-      <View style={styles.header}>
-        <Text variant="title">{CONTENT.pairing.invite.title}</Text>
-        <Text variant="body" style={styles.body}>
-          {CONTENT.pairing.invite.body}
-        </Text>
-      </View>
+      <View style={{ gap: 16 }}>
+        <Text variant="title">{c.title}</Text>
+        <Text variant="body">{c.body}</Text>
 
-      {inviteCode ? (
-        <Card style={styles.codeCard}>
-          <Text variant="muted">{CONTENT.pairing.invite.fields.inviteCodeLabel}</Text>
-          <Text variant="subtitle" style={styles.codeText}>
-            {inviteCode}
+        {errorText ? (
+          <Text variant="muted" style={{ color: "#B00020" }}>
+            {errorText}
           </Text>
-          <Text variant="muted" style={styles.statusText}>
-            {CONTENT.pairing.invite.status.waiting}
-          </Text>
-        </Card>
-      ) : null}
+        ) : null}
 
-      {error ? (
-        <Text variant="muted" style={styles.errorText}>
-          {error}
-        </Text>
-      ) : null}
-
-      <View style={styles.actions}>
         <Button
-          label={CONTENT.pairing.invite.actions.generateCode}
-          onPress={handleGenerateCode}
+          label={loading ? CONTENT.app.common.loading : c.actions.generateCode}
+          onPress={() => run()}
           disabled={loading}
         />
 
-        {inviteCode && (
-          <Button
-            label={CONTENT.pairing.invite.actions.copyLink}
-            onPress={handleCopyLink}
-            variant="secondary"
-          />
-        )}
+        {inviteCode ? (
+          <Card>
+            <View style={{ gap: 10 }}>
+              <Text variant="subtitle">{c.fields.inviteCodeLabel}</Text>
+              <Text variant="body">{inviteCode}</Text>
+              {expiresAt ? (
+                <Text variant="muted">Expires: {expiresAt}</Text>
+              ) : null}
+
+              <Button label="Copy code" onPress={copyCode} variant="secondary" />
+              <Button label={c.actions.copyLink} onPress={copyLink} variant="secondary" />
+              <Text variant="muted">{c.status.waiting}</Text>
+            </View>
+          </Card>
+        ) : null}
+
+        <Button
+          label="Enter invite code"
+          onPress={() =>
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            (navigation as any)?.navigate?.("PairAccept")
+          }
+          variant="secondary"
+        />
       </View>
     </Screen>
   );
 }
-
-const styles = StyleSheet.create({
-  header: { marginBottom: tokens.space.lg },
-  body: { marginTop: tokens.space.md },
-  codeCard: { marginVertical: tokens.space.lg },
-  codeText: { marginVertical: tokens.space.md, fontWeight: "600" },
-  statusText: { marginTop: tokens.space.sm },
-  errorText: { color: tokens.color.danger, marginVertical: tokens.space.md },
-  actions: { gap: tokens.space.md, marginTop: tokens.space.lg },
-});

@@ -1,74 +1,88 @@
 import React, { useState } from "react";
-import { View, StyleSheet } from "react-native";
-import { CONTENT, inviteAcceptSchema } from "@withyou/shared";
-import { tokens } from "../../ui/tokens";
+import { View } from "react-native";
+import {
+  CONTENT,
+  inviteAcceptSchema,
+  RelationshipAcceptResponse,
+} from "@withyou/shared";
 import { Screen } from "../../ui/components/Screen";
 import { Text } from "../../ui/components/Text";
 import { TextField } from "../../ui/components/TextField";
 import { Button } from "../../ui/components/Button";
+import { api } from "../../state/appState";
+import { useAsyncAction } from "../../api/hooks";
 
-export function PairAcceptScreen() {
+type PairAcceptScreenProps = {
+  navigation: unknown;
+};
+
+export function PairAcceptScreen({ navigation }: PairAcceptScreenProps) {
+  const c = CONTENT.pairing.accept;
+
   const [inviteCode, setInviteCode] = useState("");
-  const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false);
+  const [inviteCodeError, setInviteCodeError] = useState("");
 
-  const handleAccept = async () => {
-    try {
-      setError("");
-      setLoading(true);
+  const { run, loading, errorText } = useAsyncAction(async () => {
+    setInviteCodeError("");
 
-      const payload = inviteAcceptSchema.parse({ inviteCode });
-
-      console.log("Accepting invite:", payload);
-
-    } catch (err: unknown) {
-      if (err instanceof Error) {
-        setError(err.message);
+    const parsed = inviteAcceptSchema.safeParse({ inviteCode });
+    if (!parsed.success) {
+      const fieldErrors = parsed.error.flatten().fieldErrors;
+      if (fieldErrors.inviteCode) {
+        setInviteCodeError(fieldErrors.inviteCode[0]);
       }
-    } finally {
-      setLoading(false);
+      throw new Error("Validation failed");
+    }
+
+    const res = await api.request<RelationshipAcceptResponse>(
+      "/relationship/accept",
+      {
+        method: "POST",
+        body: JSON.stringify({ inviteCode }),
+      }
+    );
+
+    // Success - navigate to dashboard
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (navigation as any)?.navigate?.("Dashboard");
+    return res;
+  });
+
+  const onSubmit = async () => {
+    try {
+      await run();
+    } catch {
+      // Error handled in useAsyncAction
     }
   };
 
   return (
     <Screen>
-      <View style={styles.header}>
-        <Text variant="title">{CONTENT.pairing.accept.title}</Text>
-        <Text variant="muted" style={styles.helper}>
-          {CONTENT.pairing.accept.helper}
-        </Text>
-      </View>
+      <View style={{ gap: 16 }}>
+        <Text variant="title">{c.title}</Text>
+        <Text variant="muted">{c.helper}</Text>
 
-      <View style={styles.form}>
         <TextField
-          label={CONTENT.pairing.accept.fields.inviteCodeLabel}
+          label={c.fields.inviteCodeLabel}
           value={inviteCode}
           onChangeText={setInviteCode}
           placeholder="ABC123"
           autoCapitalize="characters"
+          errorText={inviteCodeError}
         />
 
-        {error ? (
-          <Text variant="muted" style={styles.errorText}>
-            {error}
+        {errorText ? (
+          <Text variant="muted" style={{ color: "#B00020" }}>
+            {errorText}
           </Text>
         ) : null}
 
         <Button
-          label={CONTENT.pairing.accept.actions.primary}
-          onPress={handleAccept}
+          label={loading ? CONTENT.app.common.loading : c.actions.primary}
+          onPress={onSubmit}
           disabled={loading || !inviteCode}
-          style={styles.submitButton}
         />
       </View>
     </Screen>
   );
 }
-
-const styles = StyleSheet.create({
-  header: { marginBottom: tokens.space.lg },
-  helper: { marginTop: tokens.space.md },
-  form: { gap: tokens.space.md },
-  errorText: { color: tokens.color.danger },
-  submitButton: { marginTop: tokens.space.md },
-});
