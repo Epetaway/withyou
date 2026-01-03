@@ -1,0 +1,16 @@
+import React from "react";
+import { SafeAreaView, View, StyleSheet } from "react-native";
+import { tokens } from "../tokens";
+
+export function Screen({ children }: { children: React.ReactNode }) {
+  return (
+    <SafeAreaView style={styles.safe}>
+      <View style={styles.container}>{children}</View>
+    </SafeAreaView>
+  );
+}
+
+const styles = StyleSheet.create({
+  safe: { flex: 1, backgroundColor: tokens.color.bg },
+  container: { flex: 1, padding: tokens.space.lg },
+});

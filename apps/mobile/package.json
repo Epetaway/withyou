@@ -1,0 +1,12 @@
+{
+  "name": "@withyou/mobile",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "lint": "eslint ."
+  },
+  "dependencies": {
+    "@withyou/shared": "file:../../packages/shared"
+  }
+}

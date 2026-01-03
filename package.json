@@ -1,0 +1,32 @@
+{
+  "name": "withyou-monorepo",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Monorepo for WithYou app (api, mobile, shared)",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "main": "index.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "lint": "eslint .",
+    "format": "prettier --write .",
+    "dev:api": "npm run dev --workspace apps/api",
+    "build:api": "npm run build --workspace apps/api"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@eslint/js": "^9.39.2",
+    "eslint": "^9.39.2",
+    "eslint-plugin-react": "^7.37.5",
+    "globals": "^17.0.0",
+    "prettier": "^3.7.4",
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.51.0"
+  }
+}
