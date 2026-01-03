@@ -47,6 +47,7 @@ model User {
   relationshipsA Relationship[] @relation("UserARelationships")
   relationshipsB Relationship[] @relation("UserBRelationships")
   invites      RelationshipInvite[] @relation("UserInvites")
+  inviteeInvites RelationshipInvite[] @relation("Invitee")
   checkins     Checkin[]
   preferences  Preference?
   savedIdeas   SavedIdea[]

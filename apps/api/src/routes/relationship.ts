@@ -1,7 +1,7 @@
 import { Router } from "express";
-import { prisma } from "../../utils/prisma.js";
-import { AppError } from "../../errors/app-error.js";
-import { jwtMiddleware } from "../../middleware/jwt-middleware.js";
+import { prisma } from "../utils/prisma.js";
+import { AppError } from "../errors/app-error.js";
+import { jwtMiddleware } from "../middleware/jwt-middleware.js";
 import { randomBytes } from "crypto";
 
 const router = Router();

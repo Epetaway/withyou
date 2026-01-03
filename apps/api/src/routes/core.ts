@@ -1,8 +1,8 @@
 import { Router } from "express";
 import { checkinCreateSchema, preferencesSchema } from "@withyou/shared";
-import { prisma } from "../../utils/prisma.js";
-import { AppError } from "../../errors/app-error.js";
-import { jwtMiddleware } from "../../middleware/jwt-middleware.js";
+import { prisma } from "../utils/prisma.js";
+import { AppError } from "../errors/app-error.js";
+import { jwtMiddleware } from "../middleware/jwt-middleware.js";
 import { z } from "zod";
 
 const router = Router();
