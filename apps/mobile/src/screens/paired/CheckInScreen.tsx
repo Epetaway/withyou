@@ -84,7 +84,7 @@ export function CheckInScreen({ navigation }: CheckInScreenProps) {
           {[1, 2, 3, 4, 5].map((level) => (
             <View key={level} style={{ alignItems: "center" }}>
               <Button
-                label={String(level)}
+                label={moodLevel === level ? `✓ ${level}` : String(level)}
                 onPress={() =>
                   setMoodLevel(level as 1 | 2 | 3 | 4 | 5)
                 }
