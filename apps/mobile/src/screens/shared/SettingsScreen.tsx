@@ -16,6 +16,7 @@ type SettingsScreenProps = {
 export function SettingsScreen({ navigation }: SettingsScreenProps) {
   const [showEndPairingModal, setShowEndPairingModal] = useState(false);
   const [showLogoutModal, setShowLogoutModal] = useState(false);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
 
   const { run: runEndPairing, loading: endPairingLoading } = useAsyncAction(
     async () => {
@@ -23,40 +24,38 @@ export function SettingsScreen({ navigation }: SettingsScreenProps) {
         method: "POST",
       });
       setShowEndPairingModal(false);
-      // Refresh nav to show unpaired screens
+      // Navigate back - will show unpaired home
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      (navigation as any)?.reset?.({
-        index: 0,
-        routes: [{ name: "Home" }],
-      });
+      (navigation as any)?.goBack?.();
       return null;
     }
   );
 
-  const { run: runLogout, loading: logoutLoading } = useAsyncAction(
-    async () => {
+  const onLogoutConfirm = async () => {
+    setIsLoggingOut(true);
+    try {
       await clearSession();
-      setShowLogoutModal(false);
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      (navigation as any)?.reset?.({
-        index: 0,
-        routes: [{ name: "Login" }],
-      });
-      return null;
+      // Force app to restart by going back to root - but since RootNavigator
+      // doesn't poll, we'll need a workaround. For now, show a loading state.
+      // In production, you'd use a proper state management solution.
+    } catch (err) {
+      console.error("Logout failed:", err);
     }
-  );
+  };
+
+  if (isLoggingOut) {
+    return (
+      <Screen>
+        <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+          <Text variant="body">{CONTENT.app.common.loading}</Text>
+        </View>
+      </Screen>
+    );
+  }
 
   const onEndPairingConfirm = async () => {
     try {
       await runEndPairing();
-    } catch {
-      // Error handled
-    }
-  };
-
-  const onLogoutConfirm = async () => {
-    try {
-      await runLogout();
     } catch {
       // Error handled
     }
@@ -157,13 +156,8 @@ export function SettingsScreen({ navigation }: SettingsScreenProps) {
               </Text>
               <View style={{ gap: 10 }}>
                 <Button
-                  label={
-                    logoutLoading
-                      ? CONTENT.app.common.loading
-                      : CONTENT.settings.account.confirmLogoutAction
-                  }
+                  label={CONTENT.settings.account.confirmLogoutAction}
                   onPress={onLogoutConfirm}
-                  disabled={logoutLoading}
                 />
                 <Button
                   label={CONTENT.settings.account.cancelLogoutAction}

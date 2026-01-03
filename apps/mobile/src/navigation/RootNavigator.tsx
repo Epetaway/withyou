@@ -3,7 +3,7 @@ import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { getSession, clearSession } from "../state/session";
 import { DashboardResponse } from "@withyou/shared";
-import { api } from "../state/appState";
+import { api, setToken } from "../state/appState";
 import { LoginScreen } from "../screens/auth/LoginScreen";
 import { RegisterScreen } from "../screens/auth/RegisterScreen";
 import { UnpairedHomeScreen } from "../screens/unpaired/UnpairedHomeScreen";
@@ -28,6 +28,7 @@ export function RootNavigator() {
         setAuthStatus("signedOut");
         return;
       }
+      setToken(session.token);
       setAuthStatus("signedIn");
     })();
   }, []);
@@ -41,6 +42,7 @@ export function RootNavigator() {
         setPairingStatus(dash.relationshipStage ? "paired" : "unpaired");
       } catch (_e) {
         await clearSession();
+        setToken(null);
         setAuthStatus("signedOut");
         setPairingStatus("unknown");
       }
@@ -51,7 +53,16 @@ export function RootNavigator() {
 
   return (
     <NavigationContainer>
-      <Stack.Navigator screenOptions={{ headerShown: false }}>
+      <Stack.Navigator
+        screenOptions={{ headerShown: false }}
+        initialRouteName={
+          authStatus === "signedOut"
+            ? "Login"
+            : pairingStatus === "paired"
+              ? "Paired"
+              : "UnpairedHome"
+        }
+      >
         {authStatus === "signedOut" ? (
           <>
             <Stack.Screen name="Login" component={LoginScreen} />
@@ -60,6 +71,7 @@ export function RootNavigator() {
         ) : pairingStatus === "paired" ? (
           <>
             <Stack.Screen name="Paired" component={PairedTabs} />
+            <Stack.Screen name="Settings" component={SettingsScreen} />
           </>
         ) : (
           <>
