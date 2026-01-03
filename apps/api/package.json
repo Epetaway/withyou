@@ -10,7 +10,8 @@
     "lint": "eslint .",
     "prisma": "prisma",
     "prisma:generate": "prisma generate",
-    "prisma:migrate": "prisma migrate dev --name init"
+    "prisma:migrate": "prisma migrate dev --name init",
+    "prisma:seed": "tsx prisma/seed.ts"
   },
   "devDependencies": {
     "@types/bcrypt": "^5.0.2",
