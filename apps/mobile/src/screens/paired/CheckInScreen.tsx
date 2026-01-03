@@ -1,102 +1,130 @@
 import React, { useState } from "react";
-import { View, ScrollView, StyleSheet, Switch } from "react-native";
+import { View, ScrollView, Switch } from "react-native";
 import { CONTENT, checkinCreateSchema } from "@withyou/shared";
-import { tokens } from "../../ui/tokens";
 import { Screen } from "../../ui/components/Screen";
 import { Text } from "../../ui/components/Text";
 import { Button } from "../../ui/components/Button";
 import { TextField } from "../../ui/components/TextField";
+import { api } from "../../state/appState";
+import { useAsyncAction } from "../../api/hooks";
 
-export function CheckInScreen() {
+type CheckInScreenProps = {
+  navigation: unknown;
+};
+
+export function CheckInScreen({ navigation }: CheckInScreenProps) {
+  const c = CONTENT.checkIn.create;
+
   const [moodLevel, setMoodLevel] = useState<1 | 2 | 3 | 4 | 5 | null>(null);
   const [note, setNote] = useState("");
   const [shared, setShared] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
+  const [moodError, setMoodError] = useState("");
 
-  const handleSave = async () => {
-    try {
-      setError("");
-      setLoading(true);
+  const { run, loading, errorText } = useAsyncAction(async () => {
+    setMoodError("");
 
-      if (!moodLevel) {
-        setError(CONTENT.checkIn.create.validation.moodRequired);
-        return;
-      }
-
-      const payload = checkinCreateSchema.parse({
-        mood_level: moodLevel,
-        note: note || null,
-        shared,
-      });
-
-      console.log("Saving check-in:", payload);
-
-    } catch (err: unknown) {
-      if (err instanceof Error) {
-        setError(err.message);
-      }
-    } finally {
-      setLoading(false);
+    if (!moodLevel) {
+      setMoodError(c.validation.moodRequired);
+      throw new Error(c.validation.moodRequired);
     }
+
+    const parsed = checkinCreateSchema.safeParse({
+      mood_level: moodLevel,
+      note: note || null,
+      shared,
+    });
+
+    if (!parsed.success) {
+      throw new Error("Validation failed");
+    }
+
+    await api.request("/checkins", {
+      method: "POST",
+      body: JSON.stringify(parsed.data),
+    });
+
+    // Success - navigate back to dashboard
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (navigation as any)?.goBack?.();
+    return null;
+  });
+
+  const onSubmit = async () => {
+    try {
+      await run();
+    } catch {
+      // Error handled in useAsyncAction
+    }
+  };
+
+  const onCancel = () => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (navigation as any)?.goBack?.();
   };
 
   return (
     <Screen>
-      <ScrollView showsVerticalScrollIndicator={false}>
-        <Text variant="title">{CONTENT.checkIn.create.title}</Text>
-        <Text variant="body" style={styles.prompt}>
-          {CONTENT.checkIn.create.prompt}
-        </Text>
+      <ScrollView showsVerticalScrollIndicator={false} style={{ gap: 16 }}>
+        <Text variant="title">{c.title}</Text>
+        <Text variant="body">{c.prompt}</Text>
 
-        <View style={styles.moodContainer}>
+        {moodError ? (
+          <Text variant="muted" style={{ color: "#B00020" }}>
+            {moodError}
+          </Text>
+        ) : null}
+
+        <View
+          style={{
+            flexDirection: "row",
+            justifyContent: "space-around",
+            marginVertical: 16,
+          }}
+        >
           {[1, 2, 3, 4, 5].map((level) => (
-            <View key={level} style={styles.moodButton}>
+            <View key={level} style={{ alignItems: "center" }}>
               <Button
                 label={String(level)}
-                onPress={() => setMoodLevel(level as 1 | 2 | 3 | 4 | 5)}
+                onPress={() =>
+                  setMoodLevel(level as 1 | 2 | 3 | 4 | 5)
+                }
                 variant={moodLevel === level ? "primary" : "secondary"}
               />
-              <Text
-                variant="muted"
-                style={styles.moodLabel}
-              >
-                {CONTENT.checkIn.create.moodLabels[level as 1 | 2 | 3 | 4 | 5]}
+              <Text variant="muted" style={{ marginTop: 4, fontSize: 11, textAlign: "center" }}>
+                {c.moodLabels[level as 1 | 2 | 3 | 4 | 5]}
               </Text>
             </View>
           ))}
         </View>
 
         <TextField
-          label={CONTENT.checkIn.create.fields.noteLabel}
+          label={c.fields.noteLabel}
           value={note}
           onChangeText={setNote}
           placeholder="How are you feeling?"
         />
 
-        <View style={styles.toggleContainer}>
-          <Text variant="body">{CONTENT.checkIn.create.fields.shareToggleLabel}</Text>
+        <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
+          <Text variant="body">{c.fields.shareToggleLabel}</Text>
           <Switch value={shared} onValueChange={setShared} />
         </View>
-        <Text variant="muted" style={styles.shareHelper}>
-          {CONTENT.checkIn.create.fields.shareHelper}
-        </Text>
+        <Text variant="muted">{c.fields.shareHelper}</Text>
 
-        {error ? (
-          <Text variant="muted" style={styles.errorText}>
-            {error}
+        {errorText ? (
+          <Text variant="muted" style={{ color: "#B00020" }}>
+            {errorText}
           </Text>
         ) : null}
 
-        <View style={styles.actions}>
+        <View style={{ gap: 10, marginTop: 16 }}>
           <Button
-            label={CONTENT.checkIn.create.actions.primary}
-            onPress={handleSave}
+            label={loading ? CONTENT.app.common.loading : c.actions.primary}
+            onPress={onSubmit}
             disabled={loading || !moodLevel}
           />
           <Button
-            label={CONTENT.checkIn.create.actions.secondary}
-            onPress={() => console.log("Cancel")}
+            label={c.actions.secondary}
+            onPress={onCancel}
             variant="secondary"
           />
         </View>
@@ -104,14 +132,3 @@ export function CheckInScreen() {
     </Screen>
   );
 }
-
-const styles = StyleSheet.create({
-  prompt: { marginVertical: tokens.space.lg },
-  moodContainer: { flexDirection: "row", justifyContent: "space-around", marginVertical: tokens.space.lg },
-  moodButton: { alignItems: "center" },
-  moodLabel: { marginTop: tokens.space.xs, textAlign: "center", fontSize: 11 },
-  toggleContainer: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginVertical: tokens.space.md },
-  shareHelper: { marginBottom: tokens.space.lg },
-  errorText: { color: tokens.color.danger, marginVertical: tokens.space.md },
-  actions: { gap: tokens.space.md, marginTop: tokens.space.lg },
-});

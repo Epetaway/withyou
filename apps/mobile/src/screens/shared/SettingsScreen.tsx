@@ -1,81 +1,126 @@
 import React, { useState } from "react";
-import { View, ScrollView, StyleSheet } from "react-native";
+import { View, ScrollView, Modal } from "react-native";
 import { CONTENT } from "@withyou/shared";
-import { tokens } from "../../ui/tokens";
 import { Screen } from "../../ui/components/Screen";
 import { Text } from "../../ui/components/Text";
 import { Button } from "../../ui/components/Button";
 import { Card } from "../../ui/components/Card";
+import { api } from "../../state/appState";
+import { clearSession } from "../../state/session";
+import { useAsyncAction } from "../../api/hooks";
 
-export function SettingsScreen() {
+type SettingsScreenProps = {
+  navigation: unknown;
+};
+
+export function SettingsScreen({ navigation }: SettingsScreenProps) {
   const [showEndPairingModal, setShowEndPairingModal] = useState(false);
   const [showLogoutModal, setShowLogoutModal] = useState(false);
-  const [loading, setLoading] = useState(false);
 
-  const handleEndPairing = async () => {
-    try {
-      setLoading(true);
-      console.log("Ending pairing");
+  const { run: runEndPairing, loading: endPairingLoading } = useAsyncAction(
+    async () => {
+      await api.request("/relationship/end", {
+        method: "POST",
+      });
       setShowEndPairingModal(false);
-    } finally {
-      setLoading(false);
+      // Refresh nav to show unpaired screens
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (navigation as any)?.reset?.({
+        index: 0,
+        routes: [{ name: "Home" }],
+      });
+      return null;
+    }
+  );
+
+  const { run: runLogout, loading: logoutLoading } = useAsyncAction(
+    async () => {
+      await clearSession();
+      setShowLogoutModal(false);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (navigation as any)?.reset?.({
+        index: 0,
+        routes: [{ name: "Login" }],
+      });
+      return null;
+    }
+  );
+
+  const onEndPairingConfirm = async () => {
+    try {
+      await runEndPairing();
+    } catch {
+      // Error handled
     }
   };
 
-  const handleLogout = async () => {
+  const onLogoutConfirm = async () => {
     try {
-      setLoading(true);
-      console.log("Logging out");
-      setShowLogoutModal(false);
-    } finally {
-      setLoading(false);
+      await runLogout();
+    } catch {
+      // Error handled
     }
   };
 
   return (
     <Screen>
-      <ScrollView showsVerticalScrollIndicator={false}>
+      <ScrollView showsVerticalScrollIndicator={false} style={{ gap: 16 }}>
         <Text variant="title">{CONTENT.settings.title}</Text>
 
-        <Text variant="subtitle" style={styles.sectionTitle}>
-          {CONTENT.settings.sections.relationship}
-        </Text>
-        <Card style={styles.card}>
-          <Text variant="muted">{CONTENT.settings.relationship.stageLabel}</Text>
-          <Text variant="body" style={styles.stageValue}>Dating</Text>
+        <Text variant="subtitle">{CONTENT.settings.sections.relationship}</Text>
+        <Card>
+          <View style={{ gap: 10 }}>
+            <Text variant="muted">{CONTENT.settings.relationship.stageLabel}</Text>
+            <Text variant="body">Dating</Text>
+          </View>
         </Card>
 
         <Button
           label={CONTENT.settings.relationship.endPairing}
           onPress={() => setShowEndPairingModal(true)}
-          variant="danger"
-          style={styles.button}
+          variant="secondary"
         />
 
-        <Text variant="subtitle" style={styles.sectionTitle}>
-          {CONTENT.settings.sections.account}
-        </Text>
+        <Text variant="subtitle">{CONTENT.settings.sections.account}</Text>
 
         <Button
           label={CONTENT.settings.account.logout}
           onPress={() => setShowLogoutModal(true)}
           variant="secondary"
-          style={styles.button}
         />
+      </ScrollView>
 
-        {showEndPairingModal && (
-          <View style={styles.modal}>
-            <Card style={styles.modalContent}>
-              <Text variant="title">{CONTENT.settings.relationship.confirmEndTitle}</Text>
-              <Text variant="body" style={styles.modalText}>
+      <Modal
+        visible={showEndPairingModal}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setShowEndPairingModal(false)}
+      >
+        <View
+          style={{
+            flex: 1,
+            backgroundColor: "rgba(0,0,0,0.5)",
+            justifyContent: "center",
+            padding: 16,
+          }}
+        >
+          <Card>
+            <View style={{ gap: 16 }}>
+              <Text variant="title">
+                {CONTENT.settings.relationship.confirmEndTitle}
+              </Text>
+              <Text variant="body">
                 {CONTENT.settings.relationship.confirmEndBody}
               </Text>
-              <View style={styles.modalActions}>
+              <View style={{ gap: 10 }}>
                 <Button
-                  label={CONTENT.settings.relationship.confirmEndAction}
-                  onPress={handleEndPairing}
-                  variant="danger"
-                  disabled={loading}
+                  label={
+                    endPairingLoading
+                      ? CONTENT.app.common.loading
+                      : CONTENT.settings.relationship.confirmEndAction
+                  }
+                  onPress={onEndPairingConfirm}
+                  disabled={endPairingLoading}
                 />
                 <Button
                   label={CONTENT.settings.relationship.cancelEndAction}
@@ -83,23 +128,42 @@ export function SettingsScreen() {
                   variant="secondary"
                 />
               </View>
-            </Card>
-          </View>
-        )}
+            </View>
+          </Card>
+        </View>
+      </Modal>
 
-        {showLogoutModal && (
-          <View style={styles.modal}>
-            <Card style={styles.modalContent}>
-              <Text variant="title">{CONTENT.settings.account.confirmLogoutTitle}</Text>
-              <Text variant="body" style={styles.modalText}>
+      <Modal
+        visible={showLogoutModal}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setShowLogoutModal(false)}
+      >
+        <View
+          style={{
+            flex: 1,
+            backgroundColor: "rgba(0,0,0,0.5)",
+            justifyContent: "center",
+            padding: 16,
+          }}
+        >
+          <Card>
+            <View style={{ gap: 16 }}>
+              <Text variant="title">
+                {CONTENT.settings.account.confirmLogoutTitle}
+              </Text>
+              <Text variant="body">
                 {CONTENT.settings.account.confirmLogoutBody}
               </Text>
-              <View style={styles.modalActions}>
+              <View style={{ gap: 10 }}>
                 <Button
-                  label={CONTENT.settings.account.confirmLogoutAction}
-                  onPress={handleLogout}
-                  variant="danger"
-                  disabled={loading}
+                  label={
+                    logoutLoading
+                      ? CONTENT.app.common.loading
+                      : CONTENT.settings.account.confirmLogoutAction
+                  }
+                  onPress={onLogoutConfirm}
+                  disabled={logoutLoading}
                 />
                 <Button
                   label={CONTENT.settings.account.cancelLogoutAction}
@@ -107,21 +171,10 @@ export function SettingsScreen() {
                   variant="secondary"
                 />
               </View>
-            </Card>
-          </View>
-        )}
-      </ScrollView>
+            </View>
+          </Card>
+        </View>
+      </Modal>
     </Screen>
   );
 }
-
-const styles = StyleSheet.create({
-  sectionTitle: { marginTop: tokens.space.lg, marginBottom: tokens.space.md },
-  card: { marginBottom: tokens.space.md },
-  stageValue: { marginTop: tokens.space.md },
-  button: { marginVertical: tokens.space.sm },
-  modal: { ...StyleSheet.absoluteFillObject, backgroundColor: "rgba(0,0,0,0.5)", justifyContent: "center", padding: tokens.space.lg },
-  modalContent: { padding: tokens.space.lg },
-  modalText: { marginVertical: tokens.space.md },
-  modalActions: { gap: tokens.space.md, marginTop: tokens.space.lg },
-});

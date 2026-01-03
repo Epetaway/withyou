@@ -1,25 +1,32 @@
 import React, { useEffect, useState } from "react";
-import { View, ScrollView, StyleSheet } from "react-native";
+import { View, ScrollView } from "react-native";
 import { CONTENT, DashboardResponse } from "@withyou/shared";
-import { tokens } from "../../ui/tokens";
 import { Screen } from "../../ui/components/Screen";
 import { Text } from "../../ui/components/Text";
 import { Button } from "../../ui/components/Button";
 import { Card } from "../../ui/components/Card";
+import { api } from "../../state/appState";
 
-export function DashboardScreen() {
-  const [dashboard, _setDashboard] = useState<DashboardResponse | null>(null);
+type DashboardScreenProps = {
+  navigation: unknown;
+};
+
+export function DashboardScreen({ navigation }: DashboardScreenProps) {
+  const [dashboard, setDashboard] = useState<DashboardResponse | null>(null);
   const [loading, setLoading] = useState(true);
+  const [errorText, setErrorText] = useState("");
 
   useEffect(() => {
     const fetchDashboard = async () => {
       try {
         setLoading(true);
-
-        console.log("Fetching dashboard");
-
-      } catch (_err) {
-        console.error("Failed to fetch dashboard");
+        setErrorText("");
+        const res = await api.request<DashboardResponse>("/dashboard");
+        setDashboard(res);
+      } catch (err) {
+        if (err instanceof Error) {
+          setErrorText(err.message);
+        }
       } finally {
         setLoading(false);
       }
@@ -27,18 +34,6 @@ export function DashboardScreen() {
 
     fetchDashboard();
   }, []);
-
-  const handleNewCheckIn = () => {
-    console.log("Navigate to check-in");
-  };
-
-  const handleUpdatePreferences = () => {
-    console.log("Navigate to preferences");
-  };
-
-  const handleGetIdeas = () => {
-    console.log("Navigate to ideas");
-  };
 
   if (loading) {
     return (
@@ -50,53 +45,79 @@ export function DashboardScreen() {
 
   return (
     <Screen>
-      <ScrollView showsVerticalScrollIndicator={false}>
+      <ScrollView showsVerticalScrollIndicator={false} style={{ gap: 16 }}>
         <Text variant="title">{CONTENT.dashboard.paired.title}</Text>
 
-        {dashboard?.relationshipStage && (
-          <Card style={styles.stageCard}>
-            <Text variant="muted">{CONTENT.dashboard.paired.labels.stage}</Text>
-            <Text variant="subtitle" style={styles.stageText}>
-              {CONTENT.preferences.options.stage[dashboard.relationshipStage]}
-            </Text>
+        {errorText ? (
+          <Text variant="muted" style={{ color: "#B00020" }}>
+            {errorText}
+          </Text>
+        ) : null}
+
+        {dashboard?.relationshipStage ? (
+          <Card>
+            <View style={{ gap: 10 }}>
+              <Text variant="muted">{CONTENT.dashboard.paired.labels.stage}</Text>
+              <Text variant="subtitle">
+                {
+                  CONTENT.preferences.options
+                    .stage[dashboard.relationshipStage]
+                }
+              </Text>
+            </View>
           </Card>
-        )}
+        ) : null}
 
         {dashboard?.partnerLastCheckIn ? (
-          <Card style={styles.partnerCard}>
-            <Text variant="muted">
-              {CONTENT.dashboard.paired.labels.partnerCheckInHeader}
-            </Text>
-            <Text variant="body" style={styles.checkInText}>
-              {CONTENT.dashboard.paired.labels.moodLevel}
-              {" "}
-              {CONTENT.checkIn.create.moodLabels[dashboard.partnerLastCheckIn.mood_level]}
-            </Text>
-            <Text variant="muted">
-              {new Date(dashboard.partnerLastCheckIn.timestamp).toLocaleDateString()}
-            </Text>
+          <Card>
+            <View style={{ gap: 10 }}>
+              <Text variant="muted">
+                {CONTENT.dashboard.paired.labels.partnerCheckInHeader}
+              </Text>
+              <Text variant="body">
+                {CONTENT.dashboard.paired.labels.moodLevel}{" "}
+                {
+                  CONTENT.checkIn.create
+                    .moodLabels[dashboard.partnerLastCheckIn.mood_level]
+                }
+              </Text>
+              <Text variant="muted">
+                {new Date(
+                  dashboard.partnerLastCheckIn.timestamp
+                ).toLocaleDateString()}
+              </Text>
+            </View>
           </Card>
         ) : (
-          <Card style={styles.emptyCard}>
+          <Card>
             <Text variant="muted">
               {CONTENT.dashboard.paired.empty.noSharedCheckIns}
             </Text>
           </Card>
         )}
 
-        <View style={styles.actions}>
+        <View style={{ gap: 10, marginTop: 16 }}>
           <Button
             label={CONTENT.dashboard.paired.actions.newCheckIn}
-            onPress={handleNewCheckIn}
+            onPress={() =>
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              (navigation as any)?.navigate?.("CheckIn")
+            }
           />
           <Button
             label={CONTENT.dashboard.paired.actions.updatePreferences}
-            onPress={handleUpdatePreferences}
+            onPress={() =>
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              (navigation as any)?.navigate?.("Preferences")
+            }
             variant="secondary"
           />
           <Button
             label={CONTENT.dashboard.paired.actions.getIdeas}
-            onPress={handleGetIdeas}
+            onPress={() =>
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              (navigation as any)?.navigate?.("Ideas")
+            }
             variant="secondary"
           />
         </View>
@@ -104,12 +125,3 @@ export function DashboardScreen() {
     </Screen>
   );
 }
-
-const styles = StyleSheet.create({
-  stageCard: { marginVertical: tokens.space.md },
-  stageText: { marginTop: tokens.space.sm },
-  partnerCard: { marginVertical: tokens.space.md },
-  checkInText: { marginVertical: tokens.space.sm },
-  emptyCard: { marginVertical: tokens.space.md },
-  actions: { marginTop: tokens.space.lg, gap: tokens.space.md },
-});

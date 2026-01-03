@@ -1,63 +1,55 @@
 import React, { useEffect, useState } from "react";
-import { View, ScrollView, StyleSheet } from "react-native";
-import { CONTENT } from "@withyou/shared";
-import { tokens } from "../../ui/tokens";
+import { View, ScrollView } from "react-native";
+import { CONTENT, IdeasResponse } from "@withyou/shared";
 import { Screen } from "../../ui/components/Screen";
 import { Text } from "../../ui/components/Text";
 import { Button } from "../../ui/components/Button";
 import { Card } from "../../ui/components/Card";
+import { api } from "../../state/appState";
 
-export function IdeasScreen() {
-  const [ideas, _setIdeas] = useState<string[]>([]);
+type IdeasScreenProps = {
+  navigation: unknown;
+};
+
+export function IdeasScreen({ navigation }: IdeasScreenProps) {
+  const [ideas, setIdeas] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
+  const [errorText, setErrorText] = useState("");
 
-  useEffect(() => {
-    const fetchIdeas = async () => {
-      try {
-        setError("");
-        setLoading(true);
-
-        console.log("Fetching ideas");
-
-      } catch (err: unknown) {
-        if (err instanceof Error) {
-          setError(err.message);
-        }
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchIdeas();
-  }, []);
-
-  const handleRefresh = async () => {
+  const fetchIdeas = async () => {
     try {
+      setErrorText("");
       setLoading(true);
-      console.log("Refreshing ideas");
+      const res = await api.request<IdeasResponse>("/ideas");
+      setIdeas(res.ideas || []);
+    } catch (err) {
+      if (err instanceof Error) {
+        setErrorText(err.message);
+      }
     } finally {
       setLoading(false);
     }
   };
 
-  const handleSaveIdea = (idea: string) => {
-    console.log("Saving idea:", idea);
+  useEffect(() => {
+    fetchIdeas();
+  }, []);
+
+  const onGoToPreferences = () => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (navigation as any)?.navigate?.("Preferences");
   };
 
-  const handleGoToPreferences = () => {
-    console.log("Navigate to preferences");
-  };
-
-  if (error) {
+  if (errorText) {
     return (
       <Screen>
-        <View style={styles.center}>
-          <Text variant="body">{error}</Text>
+        <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+          <Text variant="body" style={{ textAlign: "center", marginBottom: 16 }}>
+            {errorText}
+          </Text>
           <Button
             label={CONTENT.ideas.actions.goToPreferences}
-            onPress={handleGoToPreferences}
-            style={styles.button}
+            onPress={onGoToPreferences}
           />
         </View>
       </Screen>
@@ -67,16 +59,22 @@ export function IdeasScreen() {
   if (!ideas.length && !loading) {
     return (
       <Screen>
-        <View style={styles.center}>
-          <Text variant="title" style={styles.centerText}>
+        <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+          <Text
+            variant="title"
+            style={{ textAlign: "center", marginBottom: 16 }}
+          >
             {CONTENT.ideas.empty.needsPreferencesTitle}
           </Text>
-          <Text variant="body" style={[styles.centerText, styles.description]}>
+          <Text
+            variant="body"
+            style={{ textAlign: "center", marginBottom: 16 }}
+          >
             {CONTENT.ideas.empty.needsPreferencesBody}
           </Text>
           <Button
             label={CONTENT.ideas.actions.goToPreferences}
-            onPress={handleGoToPreferences}
+            onPress={onGoToPreferences}
           />
         </View>
       </Screen>
@@ -85,48 +83,35 @@ export function IdeasScreen() {
 
   return (
     <Screen>
-      <ScrollView showsVerticalScrollIndicator={false}>
+      <ScrollView showsVerticalScrollIndicator={false} style={{ gap: 16 }}>
         <Text variant="title">{CONTENT.ideas.title}</Text>
-        <Text variant="body" style={styles.description}>
-          {CONTENT.ideas.body}
-        </Text>
+        <Text variant="body">{CONTENT.ideas.body}</Text>
 
         {loading ? (
           <Text variant="body">{CONTENT.app.common.loading}</Text>
         ) : (
-          <View style={styles.ideasContainer}>
+          <View style={{ gap: 10, marginVertical: 16 }}>
             {ideas.map((idea, idx) => (
-              <Card key={idx} style={styles.ideaCard}>
-                <Text variant="subtitle">{idea}</Text>
-                <Button
-                  label={CONTENT.ideas.actions.save}
-                  onPress={() => handleSaveIdea(idea)}
-                  variant="secondary"
-                  style={styles.saveButton}
-                />
+              <Card key={idx}>
+                <View style={{ gap: 10 }}>
+                  <Text variant="subtitle">{idea}</Text>
+                  <Button
+                    label={CONTENT.ideas.actions.save}
+                    onPress={() => console.log("Saved idea:", idea)}
+                    variant="secondary"
+                  />
+                </View>
               </Card>
             ))}
           </View>
         )}
 
         <Button
-          label={CONTENT.ideas.actions.refresh}
-          onPress={handleRefresh}
+          label={loading ? CONTENT.app.common.loading : CONTENT.ideas.actions.refresh}
+          onPress={fetchIdeas}
           disabled={loading}
-          style={styles.refreshButton}
         />
       </ScrollView>
     </Screen>
   );
 }
-
-const styles = StyleSheet.create({
-  center: { flex: 1, justifyContent: "center", alignItems: "center" },
-  centerText: { textAlign: "center" },
-  description: { marginVertical: tokens.space.lg },
-  ideasContainer: { gap: tokens.space.md, marginVertical: tokens.space.lg },
-  ideaCard: { paddingVertical: tokens.space.md },
-  saveButton: { marginTop: tokens.space.md },
-  refreshButton: { marginTop: tokens.space.lg, marginBottom: tokens.space.xl },
-  button: { marginTop: tokens.space.lg },
-});
