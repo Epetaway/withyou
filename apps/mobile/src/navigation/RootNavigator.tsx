@@ -4,6 +4,12 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { getSession, clearSession } from "../state/session";
 import { createApiClient } from "../api/client";
 import { DashboardResponse } from "@withyou/shared";
+import { LoginScreen } from "../screens/auth/LoginScreen";
+import { RegisterScreen } from "../screens/auth/RegisterScreen";
+import { UnpairedHomeScreen } from "../screens/unpaired/UnpairedHomeScreen";
+import { PairInviteScreen } from "../screens/unpaired/PairInviteScreen";
+import { PairAcceptScreen } from "../screens/unpaired/PairAcceptScreen";
+import { PairedTabs } from "./PairedTabs";
 
 type AuthStatus = "loading" | "signedOut" | "signedIn";
 type PairingStatus = "unknown" | "unpaired" | "paired";
@@ -53,16 +59,16 @@ export function RootNavigator() {
       <Stack.Navigator screenOptions={{ headerShown: false }}>
         {authStatus === "signedOut" ? (
           <>
-            <Stack.Screen name="Login" component={() => null} />
-            <Stack.Screen name="Register" component={() => null} />
+            <Stack.Screen name="Login" component={LoginScreen} />
+            <Stack.Screen name="Register" component={RegisterScreen} />
           </>
         ) : pairingStatus === "paired" ? (
-          <Stack.Screen name="Paired" component={() => null} />
+          <Stack.Screen name="Paired" component={PairedTabs} />
         ) : (
           <>
-            <Stack.Screen name="UnpairedHome" component={() => null} />
-            <Stack.Screen name="PairInvite" component={() => null} />
-            <Stack.Screen name="PairAccept" component={() => null} />
+            <Stack.Screen name="UnpairedHome" component={UnpairedHomeScreen} />
+            <Stack.Screen name="PairInvite" component={PairInviteScreen} />
+            <Stack.Screen name="PairAccept" component={PairAcceptScreen} />
           </>
         )}
       </Stack.Navigator>
