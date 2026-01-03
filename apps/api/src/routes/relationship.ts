@@ -57,8 +57,13 @@ router.post("/relationship/invite", jwtMiddleware, async (req, res, next) => {
   }
 });
 
-router.post("/relationship/accept", async (req, res, next) => {
+router.post("/relationship/accept", jwtMiddleware, async (req, res, next) => {
   try {
+    const userId = req.user?.userId;
+    if (!userId) {
+      return next(new AppError("Unauthorized", 401, "UNAUTHORIZED"));
+    }
+
     const { inviteCode } = req.body;
 
     if (!inviteCode || typeof inviteCode !== "string") {
@@ -87,11 +92,6 @@ router.post("/relationship/accept", async (req, res, next) => {
       return next(
         new AppError("This invite code has expired", 400, "INVITE_EXPIRED")
       );
-    }
-
-    const userId = req.user?.userId;
-    if (!userId) {
-      return next(new AppError("Unauthorized", 401, "UNAUTHORIZED"));
     }
 
     if (invite.inviterId === userId) {
