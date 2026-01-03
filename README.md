@@ -2,12 +2,25 @@
 
 WithYou is a private, mobile-first application designed to help couples communicate needs and plan intentional connection time without pressure, surveillance, or judgment.
 
-Built as a beta-ready v1 to demonstrate full-stack product engineering, WithYou focuses on:
+Built as a **beta-ready v1** to demonstrate full-stack product engineering, WithYou focuses on:
 
 - **Consent-Based Pairing**: Invite codes ensure both partners opt-in
 - **Indirect Communication**: Check-ins and preferences replace direct pressure
 - **Privacy-First**: Data is encrypted, never shared or monetized
 - **Intentional Connection**: Ideas generated from preferences, not algorithms
+
+## ✅ Project Status: Beta v1 - Feature Complete
+
+All 16 core implementation tasks completed:
+- ✅ Database schema and migrations
+- ✅ Mobile frontend (8 screens across 3 flows)
+- ✅ Backend API (5 route groups, 10+ endpoints)
+- ✅ Authentication and authorization
+- ✅ Rate limiting and logging
+- ✅ E2E testing and CI/CD
+- ✅ Comprehensive documentation
+
+See **[BETA_CHECKLIST.md](./BETA_CHECKLIST.md)** for complete implementation details and readiness assessment.
 
 ## Quick Start
 
@@ -24,9 +37,18 @@ npm run dev:api  # Starts on http://localhost:3000
 npm run dev:mobile -- --ios  # or --android
 ```
 
+### Database Setup
+
+```bash
+npx prisma migrate deploy  # Apply migrations
+npm run prisma:seed        # Seed test data
+```
+
 ## Documentation
 
+- **[BETA_CHECKLIST.md](./BETA_CHECKLIST.md)**: Implementation status, known limitations, v2 roadmap
 - **[API Reference](./API.md)**: Complete endpoint documentation with examples
+- **[TESTING.md](./TESTING.md)**: E2E testing guide, manual testing procedures, debugging
 - **[Deployment Guide](./DEPLOYMENT.md)**: Production setup and environment configuration
 - **[Expo Setup](./EXPO_SETUP.md)**: Mobile development environment and testing
 - **[Development Guide](./DEVELOPMENT.md)**: Monorepo structure and workflow
@@ -80,51 +102,155 @@ withyou/
 ### Environment Setup
 
 1. Install Node.js 18+
-2. Copy `.env.example` to `.env`
-3. Configure PostgreSQL database URL
-4. Run `npm install` in root
+2. Install PostgreSQL locally or use a cloud instance
+3. Clone the repository
+4. Install dependencies: `npm install`
+5. Create `.env` file in root and configure:
+   ```
+   DATABASE_URL="postgresql://user:password@localhost:5432/withyou"
+   PORT=3000
+   NODE_ENV="development"
+   ```
+6. Run migrations: `npx prisma migrate deploy`
+7. Seed test data: `npm run prisma:seed`
 
-### Scripts
+### Development Scripts
 
 ```bash
 npm run lint              # Lint all workspaces
 npm run format            # Format with Prettier
-npm run dev:api           # Start API dev server
-npm run dev:mobile        # Start Expo
+npm run type-check        # TypeScript type checking
+npm run dev:api           # Start API dev server (watches for changes)
+npm run dev:mobile        # Start Expo development server
 npm run build:api         # Build API for production
+npm run test              # Run test suite
 npm run prisma:migrate    # Run database migrations
-npm run prisma:studio     # Open Prisma Studio
+npm run prisma:studio     # Open Prisma Studio (visual DB explorer)
+npm run prisma:seed       # Seed database with test data
+```
+
+### Testing
+
+```bash
+# E2E testing
+bash test-e2e.sh              # Run all E2E tests
+bash test-e2e.sh register     # Run specific test group
+
+# See TESTING.md for detailed testing guide
+```
+
+### Project Structure
+
+```
+withyou/
+├── apps/
+│   ├── api/                 # Express.js backend
+│   │   ├── src/
+│   │   │   ├── routes/      # API endpoint definitions
+│   │   │   ├── middleware/  # Auth, rate limiting, error handling
+│   │   │   ├── app.ts       # Express app configuration
+│   │   │   └── index.ts     # Server entry point
+│   │   └── prisma/          # Database schema
+│   │
+│   └── mobile/              # Expo/React Native frontend
+│       ├── src/
+│       │   ├── screens/     # UI screens for app flows
+│       │   ├── navigation/  # React Navigation setup
+│       │   ├── lib/         # Utilities (API client, hooks)
+│       │   └── ui/          # Shared UI components
+│       └── app.json         # Expo configuration
+│
+├── packages/
+│   └── shared/              # Shared code (types, schemas, content)
+│       ├── src/
+│       │   ├── types/       # TypeScript type definitions
+│       │   ├── schemas.ts   # Zod validation schemas
+│       │   └── content.ts   # UI text content
+│       └── index.ts         # Package exports
+│
+├── .github/
+│   └── workflows/
+│       └── ci.yml           # GitHub Actions CI/CD pipeline
+│
+├── BETA_CHECKLIST.md        # Implementation checklist & readiness status
+├── TESTING.md               # Testing guide and procedures
+├── API.md                   # API documentation
+└── README.md                # This file
 ```
 
 ## Security
 
-- Passwords never stored in plaintext (bcrypt)
-- JWTs expire after 7 days (refresh token planned for v1.1)
-- All endpoints validate input with Zod
-- Auth-protected endpoints require valid JWT
-- Invite codes expire after 7 days
-- User data is private by default
+- **Passwords**: Never stored in plaintext (bcrypt with salt rounds: 10)
+- **Sessions**: JWT tokens expire after 7 days, stored in secure storage
+- **Input Validation**: All endpoints validate input with Zod schemas
+- **Authorization**: Auth-protected endpoints require valid JWT in Authorization header
+- **Invite Codes**: Cryptographically random (6-char hex), expire after 7 days
+- **Rate Limiting**: 
+  - General: 100 requests per 15 minutes
+  - Auth: 5 attempts per 15 minutes
+  - Invites: 10 invites per hour
+- **Data Privacy**: User data is private by default, never shared or monetized
+- **CORS**: Configured for development; must be restricted in production
+
+### Security Recommendations for Production
+
+- Enable HTTPS only
+- Use environment-specific secrets manager (AWS Secrets Manager, HashiCorp Vault)
+- Enable database encryption at rest
+- Set up WAF (AWS WAF, Cloudflare)
+- Regular security audits and penetration testing
+- Monitor and log all authentication attempts
+- Implement CSRF protection for web dashboard
+- Set appropriate CORS origins for production domain
 
 ## Roadmap (v1.1+)
 
+### Known Limitations (v1.0)
+- Logout does not immediately reset app state (workaround: force restart)
+- No offline mode (requires internet connection)
+- No push notifications for partner activity
+- No video/audio calling support
+- No file uploads (avatars, photos)
+- Limited analytics and insights
+
+### Planned Features (v2)
 - [ ] Refresh tokens for better session security
 - [ ] Email verification and password reset
 - [ ] Push notifications for partner activity
 - [ ] Activity history and insights
 - [ ] Admin dashboard for support
-- [ ] Rate limiting on auth endpoints
-- [ ] Offline support with sync
+- [ ] Offline support with local persistence
+- [ ] Video calling integration (Twilio/Daily)
+- [ ] Avatar/profile pictures support
+- [ ] Advanced relationship insights
+- [ ] Calendar integration
+- [ ] Custom date templates
+
+See **[BETA_CHECKLIST.md](./BETA_CHECKLIST.md#v2-roadmap)** for detailed v2 feature list.
 
 ## GitHub
 
 https://github.com/Epetaway/withyou
 
+## Support & Feedback
+
+For bugs, feature requests, or questions:
+1. Check **[BETA_CHECKLIST.md](./BETA_CHECKLIST.md)** for known issues
+2. See **[TESTING.md](./TESTING.md)** for debugging tips
+3. Open an issue on GitHub
+
+## Contributors
+
+- **Earl Hickson** - Initial design and implementation
+
 ## License
 
-MIT
+MIT - See LICENSE file for details
 
 ---
 
-**Built by**: Earl Hickson  
-**Created**: January 2024  
-**Status**: Beta v1.0 - Production Ready
+**Project Status**: ✅ Beta v1 - Feature Complete  
+**Last Updated**: January 2025  
+**Next Release**: v1.0 (production deployment)
+
+For detailed implementation status, see **[BETA_CHECKLIST.md](./BETA_CHECKLIST.md)**.
