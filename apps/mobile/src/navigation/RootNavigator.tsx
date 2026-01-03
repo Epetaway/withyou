@@ -37,7 +37,7 @@ export function RootNavigator() {
       try {
         const dash = await api.request<DashboardResponse>("/dashboard");
         setPairingStatus(dash.relationshipStage ? "paired" : "unpaired");
-      } catch (e) {
+      } catch (_e) {
         await clearSession();
         setToken(null);
         setAuthStatus("signedOut");
