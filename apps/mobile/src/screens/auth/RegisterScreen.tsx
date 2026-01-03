@@ -1,106 +1,121 @@
 import React, { useState } from "react";
-import { View, StyleSheet } from "react-native";
-import { CONTENT, registerSchema } from "@withyou/shared";
-import { tokens } from "../../ui/tokens";
+import { View } from "react-native";
+import { CONTENT, registerSchema, AuthResponse } from "@withyou/shared";
 import { Screen } from "../../ui/components/Screen";
 import { Text } from "../../ui/components/Text";
 import { TextField } from "../../ui/components/TextField";
 import { Button } from "../../ui/components/Button";
+import { api } from "../../state/appState";
+import { setSession } from "../../state/session";
+import { setToken } from "../../state/appState";
+import { useAsyncAction } from "../../api/hooks";
 
-export function RegisterScreen() {
+type RegisterScreenProps = {
+  navigation: unknown;
+};
+
+export function RegisterScreen({ navigation }: RegisterScreenProps) {
+  const c = CONTENT.auth.register;
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false);
 
-  const handleRegister = async () => {
-    try {
-      setError("");
-      setLoading(true);
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
 
-      const payload = registerSchema.parse({
-        email,
-        password,
-        confirmPassword,
-      });
+  const { run, loading, errorText, setErrorText } = useAsyncAction(async () => {
+    const parsed = registerSchema.safeParse({ email, password, confirmPassword });
 
-      console.log("Registering with:", payload);
-
-    } catch (err: unknown) {
-      if (err instanceof Error) {
-        setError(err.message);
+    if (!parsed.success) {
+      setErrorText(null);
+      const next: Record<string, string> = {};
+      for (const issue of parsed.error.issues) {
+        const key = String(issue.path[0] ?? "form");
+        if (key === "email") {
+          next.email =
+            issue.code === "invalid_string"
+              ? c.validation.emailInvalid
+              : c.validation.emailRequired;
+        } else if (key === "password") {
+          next.password =
+            issue.code === "too_small"
+              ? c.validation.passwordMinLength
+              : c.validation.passwordRequired;
+        } else if (key === "confirmPassword") {
+          next.confirmPassword = c.validation.passwordMismatch;
+        }
       }
-    } finally {
-      setLoading(false);
+      setFieldErrors(next);
+      throw new Error("Validation failed");
     }
-  };
 
-  const handleBackToLogin = () => {
-    console.log("Navigate to login screen");
+    const res = await api.request<AuthResponse>("/auth/register", {
+      method: "POST",
+      body: JSON.stringify({ email, password }),
+    });
+
+    await setSession(res.token, res.userId);
+    setToken(res.token);
+  });
+
+  const onSubmit = async () => {
+    setFieldErrors({});
+    try {
+      await run();
+    } catch {
+      // Error handled in useAsyncAction
+    }
   };
 
   return (
     <Screen>
-      <View style={styles.header}>
-        <Text variant="title">{CONTENT.auth.register.title}</Text>
-        <Text variant="muted" style={styles.helper}>
-          {CONTENT.auth.register.helper}
-        </Text>
-      </View>
+      <View style={{ gap: 16 }}>
+        <Text variant="title">{c.title}</Text>
+        <Text variant="muted">{c.helper}</Text>
 
-      <View style={styles.form}>
         <TextField
-          label={CONTENT.auth.register.fields.emailLabel}
+          label={c.fields.emailLabel}
           value={email}
           onChangeText={setEmail}
-          placeholder="you@example.com"
           keyboardType="email-address"
+          autoCapitalize="none"
+          errorText={fieldErrors.email}
         />
-
         <TextField
-          label={CONTENT.auth.register.fields.passwordLabel}
+          label={c.fields.passwordLabel}
           value={password}
           onChangeText={setPassword}
-          placeholder="••••••••"
           secureTextEntry
+          autoCapitalize="none"
+          errorText={fieldErrors.password}
         />
-
         <TextField
-          label={CONTENT.auth.register.fields.confirmPasswordLabel}
+          label={c.fields.confirmPasswordLabel}
           value={confirmPassword}
           onChangeText={setConfirmPassword}
-          placeholder="••••••••"
           secureTextEntry
+          autoCapitalize="none"
+          errorText={fieldErrors.confirmPassword}
         />
 
-        {error ? (
-          <Text variant="muted" style={styles.errorText}>
-            {error}
+        {errorText ? (
+          <Text variant="muted" style={{ color: "#B00020" }}>
+            {errorText}
           </Text>
         ) : null}
 
         <Button
-          label={CONTENT.auth.register.actions.primary}
-          onPress={handleRegister}
+          label={loading ? CONTENT.app.common.loading : c.actions.primary}
+          onPress={onSubmit}
           disabled={loading}
-          style={styles.submitButton}
         />
 
         <Button
-          label={CONTENT.auth.register.actions.secondary}
-          onPress={handleBackToLogin}
+          label={c.actions.secondary}
+          onPress={() => navigation.navigate("Login")}
           variant="secondary"
         />
       </View>
     </Screen>
   );
 }
-
-const styles = StyleSheet.create({
-  header: { marginBottom: tokens.space.lg },
-  helper: { marginTop: tokens.space.md },
-  form: { gap: tokens.space.md },
-  errorText: { color: tokens.color.danger },
-  submitButton: { marginTop: tokens.space.md },
-});
