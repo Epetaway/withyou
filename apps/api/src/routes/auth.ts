@@ -1,15 +1,35 @@
 import { z } from "zod";
 import { Router } from "express";
+import type { Request, Response, NextFunction } from "express";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-import { registerSchema, loginSchema } from "@withyou/shared";
 import { prisma } from "../utils/prisma.js";
 import { env } from "../config/env.js";
 import { AppError } from "../errors/app-error.js";
 
+// Define schemas locally to avoid import issues
+const emailSchema = z.string().trim().email();
+const passwordSchema = z.string().min(8);
+
+const registerSchema = z
+  .object({
+    email: emailSchema,
+    password: passwordSchema,
+    confirmPassword: z.string().min(1),
+  })
+  .refine((v) => v.password === v.confirmPassword, {
+    message: "Passwords do not match",
+    path: ["confirmPassword"],
+  });
+
+const loginSchema = z.object({
+  email: emailSchema,
+  password: z.string().min(1),
+});
+
 const router = Router();
 
-router.post("/auth/register", async (req, res, next) => {
+router.post("/auth/register", async (req: Request, res: Response, next: NextFunction) => {
   try {
     const payload = registerSchema.parse(req.body);
 
@@ -44,12 +64,13 @@ router.post("/auth/register", async (req, res, next) => {
     res.status(201).json({ userId: user.id, token });
   } catch (error) {
     if (error instanceof z.ZodError) {
+      const fieldErrors = error.flatten().fieldErrors;
       return next(
         new AppError(
           "Validation error",
           400,
           "VALIDATION_ERROR",
-          error.errors.map((e) => ({ path: e.path.join("."), message: e.message }))
+          Object.entries(fieldErrors).map(([field, messages]) => ({ field, messages: messages || [] }))
         )
       );
     }
@@ -57,7 +78,7 @@ router.post("/auth/register", async (req, res, next) => {
   }
 });
 
-router.post("/auth/login", async (req, res, next) => {
+router.post("/auth/login", async (req: Request, res: Response, next: NextFunction) => {
   try {
     const payload = loginSchema.parse(req.body);
 
@@ -94,12 +115,13 @@ router.post("/auth/login", async (req, res, next) => {
     res.status(200).json({ userId: user.id, token });
   } catch (error) {
     if (error instanceof z.ZodError) {
+      const fieldErrors = error.flatten().fieldErrors;
       return next(
         new AppError(
           "Validation error",
           400,
           "VALIDATION_ERROR",
-          error.errors.map((e) => ({ path: e.path.join("."), message: e.message }))
+          Object.entries(fieldErrors).map(([field, messages]) => ({ field, messages: messages || [] }))
         )
       );
     }

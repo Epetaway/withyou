@@ -1,8 +1,18 @@
 import { Router } from "express";
+import type { Request, Response, NextFunction } from "express";
 import { prisma } from "../utils/prisma.js";
 import { AppError } from "../errors/app-error.js";
 import { jwtMiddleware } from "../middleware/jwt-middleware.js";
 import { randomBytes } from "crypto";
+
+// Type for authenticated requests
+interface AuthenticatedRequest extends Request {
+  user?: {
+    userId: string;
+    claims?: unknown;
+    token: string;
+  };
+}
 
 const router = Router();
 
@@ -11,7 +21,7 @@ function generateInviteCode(): string {
   return randomBytes(3).toString("hex").toUpperCase();
 }
 
-router.post("/relationship/invite", jwtMiddleware, async (req, res, next) => {
+router.post("/relationship/invite", jwtMiddleware, async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
   try {
     const userId = req.user?.userId;
     if (!userId) {
@@ -57,7 +67,7 @@ router.post("/relationship/invite", jwtMiddleware, async (req, res, next) => {
   }
 });
 
-router.post("/relationship/accept", jwtMiddleware, async (req, res, next) => {
+router.post("/relationship/accept", jwtMiddleware, async (req: Request, res: Response, next: NextFunction) => {
   try {
     const userId = req.user?.userId;
     if (!userId) {
@@ -165,7 +175,7 @@ router.post("/relationship/accept", jwtMiddleware, async (req, res, next) => {
   }
 });
 
-router.post("/relationship/end", jwtMiddleware, async (req, res, next) => {
+router.post("/relationship/end", jwtMiddleware, async (req: Request, res: Response, next: NextFunction) => {
   try {
     const userId = req.user?.userId;
     if (!userId) {

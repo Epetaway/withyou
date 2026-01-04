@@ -1,11 +1,21 @@
-import type { NextFunction, Request, Response } from 'express';
+import type { NextFunction, Response } from 'express';
+import type { Request } from 'express';
 import jwt, { type JwtPayload } from 'jsonwebtoken';
 import { AppError } from '../errors/app-error.js';
 import { env } from '../config/env.js';
 
+// Type for authenticated requests
+interface AuthenticatedRequest extends Request {
+  user?: {
+    userId: string;
+    claims?: JwtPayload;
+    token: string;
+  };
+}
+
 // Stub implementation: validates presence of a bearer token and decodes it without enforcing auth.
 // Full verification and user lookup will be added in the auth phase.
-export const jwtMiddleware = (req: Request, _res: Response, next: NextFunction): void => {
+export const jwtMiddleware = (req: AuthenticatedRequest, _res: Response, next: NextFunction): void => {
   const authHeader = req.headers.authorization;
 
   if (!authHeader?.startsWith('Bearer ')) {
