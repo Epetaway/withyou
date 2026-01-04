@@ -52,6 +52,8 @@ npm run prisma:seed        # Seed test data
 - **[Deployment Guide](./DEPLOYMENT.md)**: Production setup and environment configuration
 - **[Expo Setup](./EXPO_SETUP.md)**: Mobile development environment and testing
 - **[Development Guide](./DEVELOPMENT.md)**: Monorepo structure and workflow
+- **[Privacy Policy](./docs/PRIVACY.md)**: How we collect, use, and protect your data
+- **[Terms of Service](./docs/TERMS.md)**: User agreement and acceptable use policy
 
 ## Architecture
 
