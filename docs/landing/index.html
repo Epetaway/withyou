@@ -5,288 +5,445 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="WithYou - A private, mobile-first app to help couples communicate needs and plan intentional connection time without pressure.">
     <title>WithYou - Intentional Connection for Couples</title>
+    <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="styles.css">
+    <style>
+        body {
+            font-family: 'Inter', system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+        }
+        
+        .gradient-dark {
+            background: linear-gradient(135deg, #0B0C0F 0%, #1a1d24 100%);
+        }
+        
+        .gradient-overlay {
+            background: linear-gradient(135deg, rgba(11, 12, 15, 0.85) 0%, rgba(26, 29, 36, 0.75) 100%);
+        }
+        
+        .smooth-transition {
+            transition: all 0.2s ease;
+        }
+    </style>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'wy-surface': '#FFFFFF',
+                        'wy-surface-2': '#F6F7F9',
+                        'wy-border': '#E6E8EE',
+                        'wy-text': '#111318',
+                        'wy-text-muted': '#5B6270',
+                        'wy-accent': '#2E7D57',
+                        'wy-accent-weak': '#E6F3EC',
+                        'wy-danger': '#B42318',
+                    },
+                    fontFamily: {
+                        'sans': ['Inter', 'system-ui', '-apple-system', 'Segoe UI', 'Roboto', 'Arial', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
 </head>
-<body>
-    <header>
-        <nav>
-            <div class="container">
-                <h1 class="logo">WithYou</h1>
-                <ul class="nav-links">
-                    <li><a href="#features">Features</a></li>
-                    <li><a href="#how-it-works">How It Works</a></li>
-                    <li><a href="#download">Download</a></li>
-                </ul>
-            </div>
+<body class="text-wy-text bg-wy-surface">
+    <!-- Header -->
+    <header class="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-wy-border">
+        <nav class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
+            <a href="#" class="text-2xl font-bold text-wy-text">WithYou</a>
+            <ul class="hidden md:flex gap-8 list-none">
+                <li><a href="#features" class="text-wy-text-muted font-500 hover:text-wy-text smooth-transition">Features</a></li>
+                <li><a href="#how-it-works" class="text-wy-text-muted font-500 hover:text-wy-text smooth-transition">How It Works</a></li>
+                <li><a href="#privacy" class="text-wy-text-muted font-500 hover:text-wy-text smooth-transition">Privacy</a></li>
+                <li><a href="#contact" class="text-wy-text-muted font-500 hover:text-wy-text smooth-transition">Contact</a></li>
+            </ul>
         </nav>
     </header>
 
-    <main>
-        <!-- Hero Section -->
-        <section class="hero">
-            <div class="hero-bg"></div>
-            <div class="container">
-                <div class="hero-grid">
-                    <div class="hero-content">
-                        <span class="badge">Beta v1 • Privacy First</span>
-                        <h2>Intentional Connection<br>for Couples</h2>
-                        <p class="subtitle">A private app to help you communicate needs and plan quality time together—without pressure, surveillance, or judgment.</p>
-                        <div class="cta-buttons">
-                            <a href="#download" class="btn btn-primary">Get Beta Access</a>
-                            <a href="https://github.com/Epetaway/withyou" class="btn btn-secondary">
-                                <svg width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
-                                    <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.012 8.012 0 0 0 16 8c0-4.42-3.58-8-8-8z"/>
-                                </svg>
-                                View on GitHub
-                            </a>
-                        </div>
-                        <div class="hero-stats">
-                            <div class="stat">
-                                <div class="stat-icon"></div>
-                                <div class="stat-content">
-                                    <strong>100% Private</strong>
-                                    <span>No data selling</span>
-                                </div>
-                            </div>
-                            <div class="stat">
-                                <div class="stat-icon"></div>
-                                <div class="stat-content">
-                                    <strong>Consent-Based</strong>
-                                    <span>Mutual pairing</span>
-                                </div>
-                            </div>
-                            <div class="stat">
-                                <div class="stat-icon"></div>
-                                <div class="stat-content">
-                                    <strong>No Pressure</strong>
-                                    <span>Indirect signals</span>
-                                </div>
-                            </div>
-                        </div>
+    <!-- Hero Section -->
+    <section class="gradient-dark relative overflow-hidden min-h-screen flex items-center">
+        <div class="gradient-overlay absolute inset-0"></div>
+        <div class="max-w-7xl mx-auto px-6 py-20 relative z-10 w-full">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+                <div>
+                    <div class="inline-block px-4 py-2 bg-white/10 border border-white/15 rounded-full backdrop-blur-sm mb-6">
+                        <span class="text-sm font-500 text-white/90">Beta v1 • Privacy First</span>
                     </div>
-                    <div class="hero-image">
-                        <div class="phone-mockup">
-                            <div class="phone-frame">
-                                <div class="phone-screen">
-                                    <div class="screenshot-placeholder">
-                                        <p>App Screenshot<br><small>Coming Soon</small></p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Features Section -->
-        <section id="features" class="features">
-            <div class="container">
-                <div class="section-header">
-                    <span class="section-badge">Features</span>
-                    <h3>Built for Privacy and Connection</h3>
-                    <p class="section-subtitle">Everything you need to communicate and connect without compromise</p>
-                </div>
-                <div class="features-grid">
-                    <div class="feature-card">
-                        <div class="feature-icon-wrapper">
-                            <div class="feature-icon">🔒</div>
-                        </div>
-                        <h4>Privacy First</h4>
-                        <p>Your data is encrypted, never shared, and never monetized. One partner per account. Full control over what you share.</p>
-                    </div>
-                    <div class="feature-card">
-                        <div class="feature-icon-wrapper">
-                            <div class="feature-icon"></div>
-                        </div>
-                        <h4>Consent-Based Pairing</h4>
-                        <p>Invite codes ensure both partners opt-in. No surveillance, no tracking, no pressure. Either partner can end pairing anytime.</p>
-                    </div>
-                    <div class="feature-card">\n                        <div class="feature-icon-wrapper">
-                            <div class="feature-icon">💬</div>
-                        </div>
-                        <h4>Indirect Communication</h4>
-                        <p>Share mood check-ins and preferences instead of direct requests. Plan connection time based on mutual preferences.</p>
-                    </div>
-                    <div class="feature-card">
-                        <div class="feature-icon-wrapper">
-                            <div class="feature-icon">💡</div>
-                        </div>
-                        <h4>Intentional Ideas</h4>
-                        <p>Get date ideas generated from your preferences—not algorithms or ads. Save ideas you love. Stay intentional.</p>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- How It Works Section -->
-        <section id="how-it-works" class="how-it-works">
-            <div class="container">
-                <div class="section-header">
-                    <span class="section-badge">Simple Process</span>
-                    <h3>How It Works</h3>
-                    <p class="section-subtitle">Get started in five easy steps</p>
-                </div>
-                <div class="steps-container">
-                    <div class="step">
-                        <div class="step-number">1</div>
-                        <div class="step-content">
-                            <h4>Create Your Account</h4>
-                            <p>Sign up with email and password. Your account is private and secure.</p>
-                        </div>
-                    </div>
-                    <div class="step">
-                        <div class="step-number">2</div>
-                        <div class="step-content">
-                            <h4>Pair with Your Partner</h4>
-                            <p>Generate an invite code and share it with your partner. Pairing requires mutual consent.</p>
-                        </div>
-                    </div>
-                    <div class="step">
-                        <div class="step-number">3</div>
-                        <div class="step-content">
-                            <h4>Share Check-Ins</h4>
-                            <p>Log your mood (1-5) and choose whether to share with your partner. No pressure to explain.</p>
-                        </div>
-                    </div>
-                    <div class="step">
-                        <div class="step-number">4</div>
-                        <div class="step-content">
-                            <h4>Set Preferences</h4>
-                            <p>Choose activity styles, food preferences, budget levels, and energy levels.</p>
-                        </div>
-                    </div>
-                    <div class="step">
-                        <div class="step-number">5</div>
-                        <div class="step-content">
-                            <h4>Get Ideas</h4>
-                            <p>Receive date ideas based on your preferences. Save favorites and plan intentional time together.</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Privacy Section -->
-        <section class="privacy-section">
-            <div class="container">
-                <div class="privacy-grid">
-                    <div class="privacy-content">
-                        <span class="section-badge">Your Data, Your Control</span>
-                        <h3>Privacy Matters</h3>
-                        <p class="lead">We built WithYou with privacy at the core. Your relationship data belongs to you, not us.</p>
-                        <div class="privacy-features">
-                            <div class="privacy-feature">
-                                <div class="check-icon"></div>
-                                <div>
-                                    <strong>End-to-end encryption</strong>
-                                    <p>Passwords hashed with bcrypt, all data transmitted via HTTPS</p>
-                                </div>
-                            </div>
-                            <div class="privacy-feature">
-                                <div class="check-icon"></div>
-                                <div>
-                                    <strong>No data selling</strong>
-                                    <p>We will never sell, rent, or trade your personal information</p>
-                                </div>
-                            </div>
-                            <div class="privacy-feature">
-                                <div class="check-icon"></div>
-                                <div>
-                                    <strong>Full control</strong>
-                                    <p>Delete your account and data anytime from settings</p>
-                                </div>
-                            </div>
-                            <div class="privacy-feature">
-                                <div class="check-icon"></div>
-                                <div>
-                                    <strong>Minimal collection</strong>
-                                    <p>No location, contacts, photos, or social media data</p>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="privacy-links">
-                            <a href="../PRIVACY.md" class="link-btn">Read Privacy Policy →</a>
-                            <a href="../TERMS.md" class="link-btn">Read Terms of Service →</a>
-                        </div>
-                    </div>
-                    <div class="privacy-visual">
-                        <div class="privacy-box">
-                            <div class="lock-icon"></div>
-                            <h4>What We Don't Collect</h4>
-                            <ul>
-                                <li>Location or GPS data</li>
-                                <li>Contact lists</li>
-                                <li>Photos or media files</li>
-                                <li>Social media information</li>
-                                <li>Advertising identifiers</li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Download Section -->
-        <section id="download" class="download-section">
-            <div class="container">
-                <div class="download-content">
-                    <div class="section-badge">Get Started</div>
-                    <h2>Join the private beta</h2>
-                    <p class="subtitle">WithYou is currently in invite-only beta. Request access to help shape the future of intentional relationship tools.</p>
-                    <div class="cta-group">
-                        <a href="#contact" class="btn btn-primary">Request Beta Access</a>
-                        <a href="https://github.com/Epetaway/withyou" class="btn btn-secondary" target="_blank" rel="noopener">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-                                <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+                    <h1 class="text-5xl md:text-6xl font-bold text-white mb-6 leading-tight">Intentional Connection for Couples</h1>
+                    <p class="text-xl text-white/80 mb-8 max-w-xl">A private app to help you communicate needs and plan quality time together—without pressure, surveillance, or judgment.</p>
+                    
+                    <div class="flex flex-wrap gap-4 mb-12">
+                        <a href="#contact" class="px-6 py-3 bg-wy-accent text-white font-600 rounded-lg hover:bg-green-800 smooth-transition min-h-11 flex items-center">
+                            Get Beta Access
+                        </a>
+                        <a href="https://github.com/Epetaway/withyou" target="_blank" rel="noopener" class="px-6 py-3 bg-white text-wy-text font-600 rounded-lg border border-wy-border hover:bg-wy-surface-2 smooth-transition flex items-center gap-2 min-h-11">
+                            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 16 16">
+                                <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.012 8.012 0 0 0 16 8c0-4.42-3.58-8-8-8z"/>
                             </svg>
                             View on GitHub
                         </a>
                     </div>
-                </div>
-            </div>
-        </section>
 
-        <!-- Contact Section -->
-        <section id="contact" class="contact-section">
-            <div class="container">
-                <div class="contact-content">
-                    <div class="contact-header">
-                        <div class="section-badge">Beta Access</div>
-                        <h2>Request early access</h2>
-                        <p class="subtitle">Share a bit about yourself and we'll send you an invite code. We review requests within 48 hours.</p>
+                    <!-- Stats -->
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 pt-8 border-t border-white/10">
+                        <div>
+                            <div class="w-6 h-6 mb-3 flex items-center justify-center">
+                                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+                                </svg>
+                            </div>
+                            <p class="font-600 text-white mb-1">100% Private</p>
+                            <p class="text-sm text-white/70">No data selling</p>
+                        </div>
+                        <div>
+                            <div class="w-6 h-6 mb-3 flex items-center justify-center">
+                                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                </svg>
+                            </div>
+                            <p class="font-600 text-white mb-1">Consent-Based</p>
+                            <p class="text-sm text-white/70">Mutual pairing</p>
+                        </div>
+                        <div>
+                            <div class="w-6 h-6 mb-3 flex items-center justify-center">
+                                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                </svg>
+                            </div>
+                            <p class="font-600 text-white mb-1">No Pressure</p>
+                            <p class="text-sm text-white/70">Indirect signals</p>
+                        </div>
                     </div>
-                    <form class="contact-form">
-                        <div class="form-group">
-                            <label for="name">Name</label>
-                            <input type="text" id="name" name="name" placeholder="Your name" required>
+                </div>
+
+                <!-- Phone Mockup -->
+                <div class="hidden lg:flex justify-center items-center">
+                    <div class="relative w-72">
+                        <div class="relative w-72 h-96 bg-gradient-to-br from-gray-700 to-gray-900 rounded-3xl p-3 shadow-2xl">
+                            <div class="w-full h-full bg-white rounded-2xl flex items-center justify-center text-wy-text-muted">
+                                <div class="text-center">
+                                    <p class="font-500">App Screenshot</p>
+                                    <p class="text-sm text-wy-text-muted">Coming Soon</p>
+                                </div>
+                            </div>
                         </div>
-                        <div class="form-group">
-                            <label for="email">Email</label>
-                            <input type="email" id="email" name="email" placeholder="your@email.com" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="message">Why WithYou?</label>
-                            <textarea id="message" name="message" placeholder="Tell us what brought you here (optional)" rows="5"></textarea>
-                        </div>
-                        <button type="submit" class="btn btn-primary">Request Access</button>
-                    </form>
+                    </div>
                 </div>
             </div>
-        </section>
-    </main>
+        </div>
+    </section>
 
-    <footer>
-        <div class="container">
-            <div class="footer-content">
-                <p>&copy; 2026 WithYou. Built with intention.</p>
-                <div class="footer-links">
-                    <a href="../PRIVACY.md">Privacy</a>
-                    <a href="../TERMS.md">Terms</a>
-                    <a href="https://github.com/Epetaway/withyou">GitHub</a>
+    <!-- Features Section -->
+    <section id="features" class="py-16 md:py-24">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="text-center mb-12">
+                <span class="inline-block px-4 py-2 bg-wy-accent-weak text-wy-accent rounded-full text-xs font-600 uppercase tracking-widest mb-4">Core Features</span>
+                <h2 class="text-4xl md:text-5xl font-bold text-wy-text mb-4">Built for Trust</h2>
+                <p class="text-lg text-wy-text-muted max-w-2xl mx-auto">Everything you need to communicate intentionally and connect with purpose.</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Feature 1 -->
+                <div class="p-8 border border-wy-border rounded-2xl hover:shadow-lg smooth-transition hover:border-wy-accent">
+                    <div class="w-12 h-12 bg-wy-accent-weak rounded-lg flex items-center justify-center mb-4">
+                        <svg class="w-6 h-6 text-wy-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-600 text-wy-text mb-2">Private by Design</h3>
+                    <p class="text-wy-text-muted">Your data is encrypted, never shared, and never monetized. One partner per account. Full control over what you share.</p>
+                </div>
+
+                <!-- Feature 2 -->
+                <div class="p-8 border border-wy-border rounded-2xl hover:shadow-lg smooth-transition hover:border-wy-accent">
+                    <div class="w-12 h-12 bg-wy-accent-weak rounded-lg flex items-center justify-center mb-4">
+                        <svg class="w-6 h-6 text-wy-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-600 text-wy-text mb-2">Consent-Based Pairing</h3>
+                    <p class="text-wy-text-muted">Invite codes ensure both partners opt-in. No surveillance, no tracking, no pressure. Either partner can end pairing anytime.</p>
+                </div>
+
+                <!-- Feature 3 -->
+                <div class="p-8 border border-wy-border rounded-2xl hover:shadow-lg smooth-transition hover:border-wy-accent">
+                    <div class="w-12 h-12 bg-wy-accent-weak rounded-lg flex items-center justify-center mb-4">
+                        <svg class="w-6 h-6 text-wy-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-600 text-wy-text mb-2">Indirect Signals</h3>
+                    <p class="text-wy-text-muted">Share moods, preferences, and availability without direct pressure. Let data guide conversation, not demand it.</p>
+                </div>
+
+                <!-- Feature 4 -->
+                <div class="p-8 border border-wy-border rounded-2xl hover:shadow-lg smooth-transition hover:border-wy-accent">
+                    <div class="w-12 h-12 bg-wy-accent-weak rounded-lg flex items-center justify-center mb-4">
+                        <svg class="w-6 h-6 text-wy-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"></path>
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-600 text-wy-text mb-2">Smart Preferences</h3>
+                    <p class="text-wy-text-muted">Set activity styles, food preferences, budget, and energy levels. Get date ideas that actually match both of you.</p>
+                </div>
+
+                <!-- Feature 5 -->
+                <div class="p-8 border border-wy-border rounded-2xl hover:shadow-lg smooth-transition hover:border-wy-accent">
+                    <div class="w-12 h-12 bg-wy-accent-weak rounded-lg flex items-center justify-center mb-4">
+                        <svg class="w-6 h-6 text-wy-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-600 text-wy-text mb-2">Check-In Moods</h3>
+                    <p class="text-wy-text-muted">Log your mood (1-5) and choose whether to share with your partner. No pressure to explain your feelings.</p>
+                </div>
+
+                <!-- Feature 6 -->
+                <div class="p-8 border border-wy-border rounded-2xl hover:shadow-lg smooth-transition hover:border-wy-accent">
+                    <div class="w-12 h-12 bg-wy-accent-weak rounded-lg flex items-center justify-center mb-4">
+                        <svg class="w-6 h-6 text-wy-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-600 text-wy-text mb-2">Date Ideas</h3>
+                    <p class="text-wy-text-muted">Receive curated date ideas based on your shared preferences. Save favorites and plan intentional time together.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- How It Works -->
+    <section id="how-it-works" class="py-16 md:py-24 bg-wy-surface-2">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="text-center mb-12">
+                <span class="inline-block px-4 py-2 bg-wy-accent-weak text-wy-accent rounded-full text-xs font-600 uppercase tracking-widest mb-4">Process</span>
+                <h2 class="text-4xl md:text-5xl font-bold text-wy-text mb-4">How It Works</h2>
+                <p class="text-lg text-wy-text-muted max-w-2xl mx-auto">Simple steps to intentional connection.</p>
+            </div>
+
+            <div class="space-y-8 max-w-3xl mx-auto">
+                <div class="flex gap-6">
+                    <div class="flex-shrink-0">
+                        <div class="flex h-12 w-12 items-center justify-center rounded-lg bg-wy-accent text-white font-700">1</div>
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-600 text-wy-text mb-2">Create & Pair</h3>
+                        <p class="text-wy-text-muted">Sign up, create an account, and generate an invite code. Share it with your partner—they confirm, and you're paired.</p>
+                    </div>
+                </div>
+
+                <div class="flex gap-6">
+                    <div class="flex-shrink-0">
+                        <div class="flex h-12 w-12 items-center justify-center rounded-lg bg-wy-accent text-white font-700">2</div>
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-600 text-wy-text mb-2">Set Preferences</h3>
+                        <p class="text-wy-text-muted">Choose activity styles, food preferences, budget levels, and energy levels. This guides future date ideas.</p>
+                    </div>
+                </div>
+
+                <div class="flex gap-6">
+                    <div class="flex-shrink-0">
+                        <div class="flex h-12 w-12 items-center justify-center rounded-lg bg-wy-accent text-white font-700">3</div>
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-600 text-wy-text mb-2">Check In Together</h3>
+                        <p class="text-wy-text-muted">Log your mood (1-5) and choose whether to share with your partner. No pressure to explain.</p>
+                    </div>
+                </div>
+
+                <div class="flex gap-6">
+                    <div class="flex-shrink-0">
+                        <div class="flex h-12 w-12 items-center justify-center rounded-lg bg-wy-accent text-white font-700">4</div>
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-600 text-wy-text mb-2">Get Ideas & Plan</h3>
+                        <p class="text-wy-text-muted">Receive date ideas based on your mood, preferences, and availability. Save favorites and plan intentional time.</p>
+                    </div>
+                </div>
+
+                <div class="flex gap-6">
+                    <div class="flex-shrink-0">
+                        <div class="flex h-12 w-12 items-center justify-center rounded-lg bg-wy-accent text-white font-700">5</div>
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-600 text-wy-text mb-2">Grow Together</h3>
+                        <p class="text-wy-text-muted">Track your patterns, celebrate shared moments, and discover what actually works for you as a couple.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Privacy Section -->
+    <section id="privacy" class="py-16 md:py-24">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
+                <div>
+                    <span class="inline-block px-4 py-2 bg-wy-accent-weak text-wy-accent rounded-full text-xs font-600 uppercase tracking-widest mb-4">Your Data, Your Control</span>
+                    <h2 class="text-4xl font-bold text-wy-text mb-4">Privacy Matters</h2>
+                    <p class="text-lg text-wy-text-muted mb-8">We built WithYou with privacy at the core. Your relationship data belongs to you, not us.</p>
+
+                    <div class="space-y-6">
+                        <div class="flex gap-4">
+                            <div class="flex-shrink-0">
+                                <div class="flex h-6 w-6 items-center justify-center rounded-full bg-wy-accent-weak">
+                                    <svg class="h-4 w-4 text-wy-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path>
+                                    </svg>
+                                </div>
+                            </div>
+                            <div>
+                                <p class="font-600 text-wy-text">End-to-end encryption</p>
+                                <p class="text-sm text-wy-text-muted">Passwords hashed with bcrypt, all data transmitted via HTTPS</p>
+                            </div>
+                        </div>
+
+                        <div class="flex gap-4">
+                            <div class="flex-shrink-0">
+                                <div class="flex h-6 w-6 items-center justify-center rounded-full bg-wy-accent-weak">
+                                    <svg class="h-4 w-4 text-wy-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path>
+                                    </svg>
+                                </div>
+                            </div>
+                            <div>
+                                <p class="font-600 text-wy-text">No data selling</p>
+                                <p class="text-sm text-wy-text-muted">We will never sell, rent, or trade your personal information</p>
+                            </div>
+                        </div>
+
+                        <div class="flex gap-4">
+                            <div class="flex-shrink-0">
+                                <div class="flex h-6 w-6 items-center justify-center rounded-full bg-wy-accent-weak">
+                                    <svg class="h-4 w-4 text-wy-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path>
+                                    </svg>
+                                </div>
+                            </div>
+                            <div>
+                                <p class="font-600 text-wy-text">Full control</p>
+                                <p class="text-sm text-wy-text-muted">Delete your account and data anytime from settings</p>
+                            </div>
+                        </div>
+
+                        <div class="flex gap-4">
+                            <div class="flex-shrink-0">
+                                <div class="flex h-6 w-6 items-center justify-center rounded-full bg-wy-accent-weak">
+                                    <svg class="h-4 w-4 text-wy-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path>
+                                    </svg>
+                                </div>
+                            </div>
+                            <div>
+                                <p class="font-600 text-wy-text">Minimal collection</p>
+                                <p class="text-sm text-wy-text-muted">No location, contacts, photos, or social media data</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flex flex-col sm:flex-row gap-4 mt-8">
+                        <a href="../PRIVACY.md" class="text-wy-accent font-500 hover:text-green-800 smooth-transition">Read Privacy Policy →</a>
+                        <a href="../TERMS.md" class="text-wy-accent font-500 hover:text-green-800 smooth-transition">Read Terms of Service →</a>
+                    </div>
+                </div>
+
+                <div class="flex items-center justify-center lg:justify-end">
+                    <div class="p-8 bg-wy-surface-2 border border-wy-border rounded-2xl max-w-sm w-full">
+                        <div class="w-12 h-12 mb-6">
+                            <svg class="w-12 h-12 text-wy-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+                            </svg>
+                        </div>
+                        <h3 class="text-xl font-600 text-wy-text mb-4">What We Don't Collect</h3>
+                        <ul class="space-y-3">
+                            <li class="flex gap-2 text-wy-text-muted">
+                                <span class="text-wy-danger font-700">×</span>
+                                <span>Location or GPS data</span>
+                            </li>
+                            <li class="flex gap-2 text-wy-text-muted">
+                                <span class="text-wy-danger font-700">×</span>
+                                <span>Contact lists</span>
+                            </li>
+                            <li class="flex gap-2 text-wy-text-muted">
+                                <span class="text-wy-danger font-700">×</span>
+                                <span>Photos or media files</span>
+                            </li>
+                            <li class="flex gap-2 text-wy-text-muted">
+                                <span class="text-wy-danger font-700">×</span>
+                                <span>Social media information</span>
+                            </li>
+                            <li class="flex gap-2 text-wy-text-muted">
+                                <span class="text-wy-danger font-700">×</span>
+                                <span>Advertising identifiers</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="py-16 md:py-24 bg-wy-surface-2">
+        <div class="max-w-2xl mx-auto px-6 text-center">
+            <span class="inline-block px-4 py-2 bg-wy-accent-weak text-wy-accent rounded-full text-xs font-600 uppercase tracking-widest mb-4">Get Started</span>
+            <h2 class="text-4xl md:text-5xl font-bold text-wy-text mb-6">Join the private beta</h2>
+            <p class="text-lg text-wy-text-muted mb-8 max-w-xl mx-auto">WithYou is currently in invite-only beta. Request access to help shape the future of intentional relationship tools.</p>
+            <div class="flex flex-wrap justify-center gap-4">
+                <a href="#contact" class="px-6 py-3 bg-wy-accent text-white font-600 rounded-lg hover:bg-green-800 smooth-transition min-h-11 flex items-center">
+                    Request Beta Access
+                </a>
+                <a href="https://github.com/Epetaway/withyou" target="_blank" rel="noopener" class="px-6 py-3 bg-white text-wy-text font-600 rounded-lg border border-wy-border hover:bg-wy-surface-2 smooth-transition flex items-center gap-2 min-h-11">
+                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 16 16">
+                        <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.012 8.012 0 0 0 16 8c0-4.42-3.58-8-8-8z"/>
+                    </svg>
+                    View on GitHub
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Form -->
+    <section id="contact" class="py-16 md:py-24">
+        <div class="max-w-2xl mx-auto px-6">
+            <div class="text-center mb-12">
+                <span class="inline-block px-4 py-2 bg-wy-accent-weak text-wy-accent rounded-full text-xs font-600 uppercase tracking-widest mb-4">Beta Access</span>
+                <h2 class="text-4xl md:text-5xl font-bold text-wy-text mb-4">Request early access</h2>
+                <p class="text-lg text-wy-text-muted">Share a bit about yourself and we'll send you an invite code. We review requests within 48 hours.</p>
+            </div>
+
+            <form class="space-y-6">
+                <div>
+                    <label for="name" class="block text-sm font-600 text-wy-text mb-2">Name</label>
+                    <input type="text" id="name" name="name" placeholder="Your name" required class="w-full px-4 py-3 border border-wy-border rounded-lg text-wy-text placeholder-wy-text-muted focus:outline-none focus:border-wy-accent focus:ring-2 focus:ring-wy-accent/20 smooth-transition min-h-11">
+                </div>
+                <div>
+                    <label for="email" class="block text-sm font-600 text-wy-text mb-2">Email</label>
+                    <input type="email" id="email" name="email" placeholder="your@email.com" required class="w-full px-4 py-3 border border-wy-border rounded-lg text-wy-text placeholder-wy-text-muted focus:outline-none focus:border-wy-accent focus:ring-2 focus:ring-wy-accent/20 smooth-transition min-h-11">
+                </div>
+                <div>
+                    <label for="message" class="block text-sm font-600 text-wy-text mb-2">Why WithYou?</label>
+                    <textarea id="message" name="message" placeholder="Tell us what brought you here (optional)" rows="5" class="w-full px-4 py-3 border border-wy-border rounded-lg text-wy-text placeholder-wy-text-muted focus:outline-none focus:border-wy-accent focus:ring-2 focus:ring-wy-accent/20 smooth-transition"></textarea>
+                </div>
+                <button type="submit" class="w-full px-6 py-3 bg-wy-accent text-white font-600 rounded-lg hover:bg-green-800 smooth-transition min-h-11">
+                    Request Access
+                </button>
+            </form>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-wy-surface-2 border-t border-wy-border py-12">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="flex flex-col sm:flex-row justify-between items-center gap-6 text-sm text-wy-text-muted">
+                <p>© 2026 WithYou. Built with intention.</p>
+                <div class="flex gap-6">
+                    <a href="../PRIVACY.md" class="hover:text-wy-text smooth-transition">Privacy</a>
+                    <a href="../TERMS.md" class="hover:text-wy-text smooth-transition">Terms</a>
+                    <a href="https://github.com/Epetaway/withyou" target="_blank" rel="noopener" class="hover:text-wy-text smooth-transition">GitHub</a>
                 </div>
             </div>
         </div>
