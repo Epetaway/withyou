@@ -7,7 +7,7 @@ import { env } from '../config/env.js';
 // Type for authenticated requests
 interface AuthenticatedRequest extends Request {
   user?: {
-    userId: string;
+    userId?: string;
     claims?: JwtPayload;
     token: string;
   };
@@ -30,9 +30,11 @@ export const jwtMiddleware = (req: AuthenticatedRequest, _res: Response, next: N
 
   try {
     const decoded = jwt.decode(token) as JwtPayload | null;
-    req.user = decoded?.sub
-      ? { userId: String(decoded.sub), claims: decoded, token }
-      : { token };
+    if (decoded?.sub) {
+      req.user = { userId: String(decoded.sub), claims: decoded, token };
+    } else {
+      req.user = { token };
+    }
     // Verification will be added later using jwt.verify with env.jwtSecret.
     return next();
   } catch (error) {
@@ -41,6 +43,8 @@ export const jwtMiddleware = (req: AuthenticatedRequest, _res: Response, next: N
 };
 
 // Helper for future verification once auth is implemented.
+
+export type { AuthenticatedRequest };
 export const verifyJwt = (token: string): JwtPayload => {
   const verified = jwt.verify(token, env.jwtSecret) as JwtPayload;
   return verified;

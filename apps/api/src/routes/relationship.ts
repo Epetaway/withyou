@@ -2,17 +2,8 @@ import { Router } from "express";
 import type { Request, Response, NextFunction } from "express";
 import { prisma } from "../utils/prisma.js";
 import { AppError } from "../errors/app-error.js";
-import { jwtMiddleware } from "../middleware/jwt-middleware.js";
+import { jwtMiddleware, type AuthenticatedRequest } from "../middleware/jwt-middleware.js";
 import { randomBytes } from "crypto";
-
-// Type for authenticated requests
-interface AuthenticatedRequest extends Request {
-  user?: {
-    userId: string;
-    claims?: unknown;
-    token: string;
-  };
-}
 
 const router = Router();
 
@@ -67,7 +58,7 @@ router.post("/relationship/invite", jwtMiddleware, async (req: AuthenticatedRequ
   }
 });
 
-router.post("/relationship/accept", jwtMiddleware, async (req: Request, res: Response, next: NextFunction) => {
+router.post("/relationship/accept", jwtMiddleware, async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
   try {
     const userId = req.user?.userId;
     if (!userId) {
@@ -175,7 +166,7 @@ router.post("/relationship/accept", jwtMiddleware, async (req: Request, res: Res
   }
 });
 
-router.post("/relationship/end", jwtMiddleware, async (req: Request, res: Response, next: NextFunction) => {
+router.post("/relationship/end", jwtMiddleware, async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
   try {
     const userId = req.user?.userId;
     if (!userId) {

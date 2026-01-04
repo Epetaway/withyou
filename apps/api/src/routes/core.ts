@@ -2,17 +2,8 @@ import { Router } from "express";
 import type { Request, Response, NextFunction } from "express";
 import { prisma } from "../utils/prisma.js";
 import { AppError } from "../errors/app-error.js";
-import { jwtMiddleware } from "../middleware/jwt-middleware.js";
+import { jwtMiddleware, type AuthenticatedRequest } from "../middleware/jwt-middleware.js";
 import { z } from "zod";
-
-// Type for authenticated requests
-interface AuthenticatedRequest extends Request {
-  user?: {
-    userId: string;
-    claims?: unknown;
-    token: string;
-  };
-}
 
 // Define schemas locally to avoid import issues
 const moodLevelSchema = z.union([
@@ -108,7 +99,7 @@ router.get("/dashboard", jwtMiddleware, async (req: AuthenticatedRequest, res: R
   }
 });
 
-router.post("/checkins", jwtMiddleware, async (req: Request, res: Response, next: NextFunction) => {
+router.post("/checkins", jwtMiddleware, async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
   try {
     const userId = req.user?.userId;
     if (!userId) {
@@ -154,7 +145,7 @@ router.post("/checkins", jwtMiddleware, async (req: Request, res: Response, next
   }
 });
 
-router.post("/preferences", jwtMiddleware, async (req: Request, res: Response, next: NextFunction) => {
+router.post("/preferences", jwtMiddleware, async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
   try {
     const userId = req.user?.userId;
     if (!userId) {
@@ -198,7 +189,7 @@ router.post("/preferences", jwtMiddleware, async (req: Request, res: Response, n
   }
 });
 
-router.get("/ideas", jwtMiddleware, async (req: Request, res: Response, next: NextFunction) => {
+router.get("/ideas", jwtMiddleware, async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
   try {
     const userId = req.user?.userId;
     if (!userId) {
