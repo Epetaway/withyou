@@ -73,7 +73,7 @@ export function PreferencesScreen({ navigation }: PreferencesScreenProps) {
           {(["chill", "active", "surprise"] as const).map((style) => (
             <Button
               key={style}
-              label={activityStyle === style ? `✓ ${c.options.activityStyle[style]}` : c.options.activityStyle[style]}
+              label={c.options.activityStyle[style]}
               onPress={() => setActivityStyle(style)}
               variant={activityStyle === style ? "primary" : "secondary"}
             />
@@ -86,7 +86,7 @@ export function PreferencesScreen({ navigation }: PreferencesScreenProps) {
           {CONTENT.lists.foodTypes.map((food) => (
             <Button
               key={food}
-              label={foodTypes.includes(food) ? `✓ ${food}` : food}
+              label={food}
               onPress={() => toggleFoodType(food)}
               variant={foodTypes.includes(food) ? "primary" : "secondary"}
             />
@@ -98,7 +98,7 @@ export function PreferencesScreen({ navigation }: PreferencesScreenProps) {
           {(["low", "medium", "high"] as const).map((level) => (
             <Button
               key={level}
-              label={budget === level ? `✓ ${c.options.budget[level]}` : c.options.budget[level]}
+              label={c.options.budget[level]}
               onPress={() => setBudget(level)}
               variant={budget === level ? "primary" : "secondary"}
             />
@@ -111,7 +111,7 @@ export function PreferencesScreen({ navigation }: PreferencesScreenProps) {
           {[1, 2, 3, 4, 5].map((level) => (
             <Button
               key={level}
-              label={energyLevel === level ? `✓ ${level}` : String(level)}
+              label={String(level)}
               onPress={() => setEnergyLevel(level as 1 | 2 | 3 | 4 | 5)}
               variant={energyLevel === level ? "primary" : "secondary"}
             />

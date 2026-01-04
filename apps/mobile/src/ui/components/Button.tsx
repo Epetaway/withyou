@@ -39,7 +39,6 @@ export function Button({
 
 const styles = StyleSheet.create({
   base: {
-    minHeight: 44,
     paddingVertical: tokens.space.md,
     paddingHorizontal: tokens.space.md,
     borderRadius: tokens.radius.md,

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { View, ScrollView, Modal, Linking } from "react-native";
+import { View, ScrollView, Modal } from "react-native";
 import { CONTENT } from "@withyou/shared";
 import { Screen } from "../../ui/components/Screen";
 import { Text } from "../../ui/components/Text";
@@ -81,26 +81,6 @@ export function SettingsScreen({ navigation }: SettingsScreenProps) {
         />
 
         <Text variant="subtitle">{CONTENT.settings.sections.account}</Text>
-
-        <Button
-          label="Privacy Policy"
-          onPress={() =>
-            Linking.openURL(
-              "https://github.com/Epetaway/withyou/blob/main/docs/PRIVACY.md"
-            )
-          }
-          variant="secondary"
-        />
-
-        <Button
-          label="Terms of Service"
-          onPress={() =>
-            Linking.openURL(
-              "https://github.com/Epetaway/withyou/blob/main/docs/TERMS.md"
-            )
-          }
-          variant="secondary"
-        />
 
         <Button
           label={CONTENT.settings.account.logout}

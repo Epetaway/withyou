@@ -1,47 +1,13 @@
 import { Router } from "express";
-import type { Request, Response, NextFunction } from "express";
+import { checkinCreateSchema, preferencesSchema } from "@withyou/shared";
 import { prisma } from "../utils/prisma.js";
 import { AppError } from "../errors/app-error.js";
-import { jwtMiddleware, type AuthenticatedRequest } from "../middleware/jwt-middleware.js";
+import { jwtMiddleware } from "../middleware/jwt-middleware.js";
 import { z } from "zod";
-
-// Define schemas locally to avoid import issues
-const moodLevelSchema = z.union([
-  z.literal(1),
-  z.literal(2),
-  z.literal(3),
-  z.literal(4),
-  z.literal(5),
-]);
-
-const checkinCreateSchema = z.object({
-  mood_level: moodLevelSchema,
-  note: z.string().max(500).optional().nullable(),
-  shared: z.boolean().default(false),
-});
-
-const activityStyleSchema = z.union([
-  z.literal("chill"),
-  z.literal("active"),
-  z.literal("surprise"),
-]);
-
-const budgetLevelSchema = z.union([
-  z.literal("low"),
-  z.literal("medium"),
-  z.literal("high"),
-]);
-
-const preferencesSchema = z.object({
-  activity_style: activityStyleSchema,
-  food_types: z.array(z.string().trim()).default([]),
-  budget_level: budgetLevelSchema,
-  energy_level: moodLevelSchema,
-});
 
 const router = Router();
 
-router.get("/dashboard", jwtMiddleware, async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
+router.get("/dashboard", jwtMiddleware, async (req, res, next) => {
   try {
     const userId = req.user?.userId;
     if (!userId) {
@@ -99,7 +65,7 @@ router.get("/dashboard", jwtMiddleware, async (req: AuthenticatedRequest, res: R
   }
 });
 
-router.post("/checkins", jwtMiddleware, async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
+router.post("/checkins", jwtMiddleware, async (req, res, next) => {
   try {
     const userId = req.user?.userId;
     if (!userId) {
@@ -131,13 +97,15 @@ router.post("/checkins", jwtMiddleware, async (req: AuthenticatedRequest, res: R
     });
   } catch (error) {
     if (error instanceof z.ZodError) {
-      const fieldErrors = error.flatten().fieldErrors;
       return next(
         new AppError(
           "Validation error",
           400,
           "VALIDATION_ERROR",
-          Object.entries(fieldErrors).map(([field, messages]) => ({ field, messages: messages || [] }))
+          error.errors.map((e) => ({
+            path: e.path.join("."),
+            message: e.message,
+          }))
         )
       );
     }
@@ -145,7 +113,7 @@ router.post("/checkins", jwtMiddleware, async (req: AuthenticatedRequest, res: R
   }
 });
 
-router.post("/preferences", jwtMiddleware, async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
+router.post("/preferences", jwtMiddleware, async (req, res, next) => {
   try {
     const userId = req.user?.userId;
     if (!userId) {
@@ -175,13 +143,15 @@ router.post("/preferences", jwtMiddleware, async (req: AuthenticatedRequest, res
     res.status(200).json({ success: true, preferencesId: preferences.id });
   } catch (error) {
     if (error instanceof z.ZodError) {
-      const fieldErrors = error.flatten().fieldErrors;
       return next(
         new AppError(
           "Validation error",
           400,
           "VALIDATION_ERROR",
-          Object.entries(fieldErrors).map(([field, messages]) => ({ field, messages: messages || [] }))
+          error.errors.map((e) => ({
+            path: e.path.join("."),
+            message: e.message,
+          }))
         )
       );
     }
@@ -189,7 +159,7 @@ router.post("/preferences", jwtMiddleware, async (req: AuthenticatedRequest, res
   }
 });
 
-router.get("/ideas", jwtMiddleware, async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
+router.get("/ideas", jwtMiddleware, async (req, res, next) => {
   try {
     const userId = req.user?.userId;
     if (!userId) {

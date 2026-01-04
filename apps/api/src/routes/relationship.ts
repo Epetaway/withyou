@@ -1,8 +1,7 @@
 import { Router } from "express";
-import type { Request, Response, NextFunction } from "express";
 import { prisma } from "../utils/prisma.js";
 import { AppError } from "../errors/app-error.js";
-import { jwtMiddleware, type AuthenticatedRequest } from "../middleware/jwt-middleware.js";
+import { jwtMiddleware } from "../middleware/jwt-middleware.js";
 import { randomBytes } from "crypto";
 
 const router = Router();
@@ -12,7 +11,7 @@ function generateInviteCode(): string {
   return randomBytes(3).toString("hex").toUpperCase();
 }
 
-router.post("/relationship/invite", jwtMiddleware, async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
+router.post("/relationship/invite", jwtMiddleware, async (req, res, next) => {
   try {
     const userId = req.user?.userId;
     if (!userId) {
@@ -58,13 +57,8 @@ router.post("/relationship/invite", jwtMiddleware, async (req: AuthenticatedRequ
   }
 });
 
-router.post("/relationship/accept", jwtMiddleware, async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
+router.post("/relationship/accept", async (req, res, next) => {
   try {
-    const userId = req.user?.userId;
-    if (!userId) {
-      return next(new AppError("Unauthorized", 401, "UNAUTHORIZED"));
-    }
-
     const { inviteCode } = req.body;
 
     if (!inviteCode || typeof inviteCode !== "string") {
@@ -93,6 +87,11 @@ router.post("/relationship/accept", jwtMiddleware, async (req: AuthenticatedRequ
       return next(
         new AppError("This invite code has expired", 400, "INVITE_EXPIRED")
       );
+    }
+
+    const userId = req.user?.userId;
+    if (!userId) {
+      return next(new AppError("Unauthorized", 401, "UNAUTHORIZED"));
     }
 
     if (invite.inviterId === userId) {
@@ -166,7 +165,7 @@ router.post("/relationship/accept", jwtMiddleware, async (req: AuthenticatedRequ
   }
 });
 
-router.post("/relationship/end", jwtMiddleware, async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
+router.post("/relationship/end", jwtMiddleware, async (req, res, next) => {
   try {
     const userId = req.user?.userId;
     if (!userId) {

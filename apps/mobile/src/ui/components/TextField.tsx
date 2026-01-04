@@ -37,8 +37,6 @@ export function TextField({
         autoCapitalize={autoCapitalize}
         keyboardType={keyboardType}
         style={[styles.input, errorText ? styles.inputError : null]}
-        accessibilityLabel={label}
-        accessibilityHint={placeholder}
       />
       {errorText ? (
         <Text variant="muted" style={styles.error}>
