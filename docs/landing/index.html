@@ -5,6 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="WithYou - A private, mobile-first app to help couples communicate needs and plan intentional connection time without pressure.">
     <title>WithYou - Intentional Connection for Couples</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -14,7 +17,7 @@
                 <h1 class="logo">WithYou</h1>
                 <ul class="nav-links">
                     <li><a href="#features">Features</a></li>
-                    <li><a href="#privacy">Privacy</a></li>
+                    <li><a href="#how-it-works">How It Works</a></li>
                     <li><a href="#download">Download</a></li>
                 </ul>
             </div>
@@ -24,14 +27,57 @@
     <main>
         <!-- Hero Section -->
         <section class="hero">
+            <div class="hero-bg"></div>
             <div class="container">
-                <div class="hero-content">
-                    <span class="badge">Beta v1</span>
-                    <h2>Intentional Connection for Couples</h2>
-                    <p class="subtitle">A private app to help you communicate needs and plan quality time together—without pressure, surveillance, or judgment.</p>
-                    <div class="cta-buttons">
-                        <a href="#download" class="btn btn-primary">Get Beta Access</a>
-                        <a href="https://github.com/Epetaway/withyou" class="btn btn-secondary">View on GitHub</a>
+                <div class="hero-grid">
+                    <div class="hero-content">
+                        <span class="badge">Beta v1 • Privacy First</span>
+                        <h2>Intentional Connection<br>for Couples</h2>
+                        <p class="subtitle">A private app to help you communicate needs and plan quality time together—without pressure, surveillance, or judgment.</p>
+                        <div class="cta-buttons">
+                            <a href="#download" class="btn btn-primary">Get Beta Access</a>
+                            <a href="https://github.com/Epetaway/withyou" class="btn btn-secondary">
+                                <svg width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
+                                    <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.012 8.012 0 0 0 16 8c0-4.42-3.58-8-8-8z"/>
+                                </svg>
+                                View on GitHub
+                            </a>
+                        </div>
+                        <div class="hero-stats">
+                            <div class="stat">
+                                <div class="stat-icon">🔒</div>
+                                <div>
+                                    <strong>100% Private</strong>
+                                    <span>No data selling</span>
+                                </div>
+                            </div>
+                            <div class="stat">
+                                <div class="stat-icon">✓</div>
+                                <div>
+                                    <strong>Consent-Based</strong>
+                                    <span>Mutual pairing</span>
+                                </div>
+                            </div>
+                            <div class="stat">
+                                <div class="stat-icon">💬</div>
+                                <div>
+                                    <strong>No Pressure</strong>
+                                    <span>Indirect signals</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="hero-image">
+                        <div class="phone-mockup">
+                            <div class="phone-frame">
+                                <div class="phone-screen">
+                                    <div class="screenshot-placeholder">
+                                        <div class="placeholder-icon">📱</div>
+                                        <p>App Screenshot<br><small>Coming Soon</small></p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -40,25 +86,37 @@
         <!-- Features Section -->
         <section id="features" class="features">
             <div class="container">
-                <h3>Built for Privacy and Connection</h3>
+                <div class="section-header">
+                    <span class="section-badge">Features</span>
+                    <h3>Built for Privacy and Connection</h3>
+                    <p class="section-subtitle">Everything you need to communicate and connect without compromise</p>
+                </div>
                 <div class="features-grid">
                     <div class="feature-card">
-                        <div class="feature-icon">🔒</div>
+                        <div class="feature-icon-wrapper">
+                            <div class="feature-icon">🔒</div>
+                        </div>
                         <h4>Privacy First</h4>
                         <p>Your data is encrypted, never shared, and never monetized. One partner per account. Full control over what you share.</p>
                     </div>
                     <div class="feature-card">
-                        <div class="feature-icon">✓</div>
+                        <div class="feature-icon-wrapper">
+                            <div class="feature-icon">✓</div>
+                        </div>
                         <h4>Consent-Based Pairing</h4>
                         <p>Invite codes ensure both partners opt-in. No surveillance, no tracking, no pressure. Either partner can end pairing anytime.</p>
                     </div>
                     <div class="feature-card">
-                        <div class="feature-icon">💬</div>
+                        <div class="feature-icon-wrapper">
+                            <div class="feature-icon">💬</div>
+                        </div>
                         <h4>Indirect Communication</h4>
                         <p>Share mood check-ins and preferences instead of direct requests. Plan connection time based on mutual preferences.</p>
                     </div>
                     <div class="feature-card">
-                        <div class="feature-icon">💡</div>
+                        <div class="feature-icon-wrapper">
+                            <div class="feature-icon">💡</div>
+                        </div>
                         <h4>Intentional Ideas</h4>
                         <p>Get date ideas generated from your preferences—not algorithms or ads. Save ideas you love. Stay intentional.</p>
                     </div>
@@ -67,68 +125,109 @@
         </section>
 
         <!-- How It Works Section -->
-        <section class="how-it-works">
+        <section id="how-it-works" class="how-it-works">
             <div class="container">
-                <h3>How It Works</h3>
-                <div class="steps">
+                <div class="section-header">
+                    <span class="section-badge">Simple Process</span>
+                    <h3>How It Works</h3>
+                    <p class="section-subtitle">Get started in five easy steps</p>
+                </div>
+                <div class="steps-container">
                     <div class="step">
                         <div class="step-number">1</div>
-                        <h4>Create Your Account</h4>
-                        <p>Sign up with email and password. Your account is private and secure.</p>
+                        <div class="step-content">
+                            <h4>Create Your Account</h4>
+                            <p>Sign up with email and password. Your account is private and secure.</p>
+                        </div>
                     </div>
                     <div class="step">
                         <div class="step-number">2</div>
-                        <h4>Pair with Your Partner</h4>
-                        <p>Generate an invite code and share it with your partner. Pairing requires mutual consent.</p>
+                        <div class="step-content">
+                            <h4>Pair with Your Partner</h4>
+                            <p>Generate an invite code and share it with your partner. Pairing requires mutual consent.</p>
+                        </div>
                     </div>
                     <div class="step">
                         <div class="step-number">3</div>
-                        <h4>Share Check-Ins</h4>
-                        <p>Log your mood (1-5) and choose whether to share with your partner. No pressure to explain.</p>
+                        <div class="step-content">
+                            <h4>Share Check-Ins</h4>
+                            <p>Log your mood (1-5) and choose whether to share with your partner. No pressure to explain.</p>
+                        </div>
                     </div>
                     <div class="step">
                         <div class="step-number">4</div>
-                        <h4>Set Preferences</h4>
-                        <p>Choose activity styles, food preferences, budget levels, and energy levels.</p>
+                        <div class="step-content">
+                            <h4>Set Preferences</h4>
+                            <p>Choose activity styles, food preferences, budget levels, and energy levels.</p>
+                        </div>
                     </div>
                     <div class="step">
                         <div class="step-number">5</div>
-                        <h4>Get Ideas</h4>
-                        <p>Receive date ideas based on your preferences. Save favorites and plan intentional time together.</p>
+                        <div class="step-content">
+                            <h4>Get Ideas</h4>
+                            <p>Receive date ideas based on your preferences. Save favorites and plan intentional time together.</p>
+                        </div>
                     </div>
                 </div>
             </div>
         </section>
 
         <!-- Privacy Section -->
-        <section id="privacy" class="privacy-section">
+        <section class="privacy-section">
             <div class="container">
-                <h3>Your Privacy Matters</h3>
-                <div class="privacy-points">
-                    <div class="privacy-point">
-                        <h4>What We Don't Collect</h4>
-                        <ul>
-                            <li>Location data or GPS</li>
-                            <li>Contact lists</li>
-                            <li>Photos or media</li>
-                            <li>Social media info</li>
-                            <li>Advertising identifiers</li>
-                        </ul>
+                <div class="privacy-grid">
+                    <div class="privacy-content">
+                        <span class="section-badge">Your Data, Your Control</span>
+                        <h3>Privacy Matters</h3>
+                        <p class="lead">We built WithYou with privacy at the core. Your relationship data belongs to you, not us.</p>
+                        <div class="privacy-features">
+                            <div class="privacy-feature">
+                                <div class="check-icon">✓</div>
+                                <div>
+                                    <strong>End-to-end encryption</strong>
+                                    <p>Passwords hashed with bcrypt, all data transmitted via HTTPS</p>
+                                </div>
+                            </div>
+                            <div class="privacy-feature">
+                                <div class="check-icon">✓</div>
+                                <div>
+                                    <strong>No data selling</strong>
+                                    <p>We will never sell, rent, or trade your personal information</p>
+                                </div>
+                            </div>
+                            <div class="privacy-feature">
+                                <div class="check-icon">✓</div>
+                                <div>
+                                    <strong>Full control</strong>
+                                    <p>Delete your account and data anytime from settings</p>
+                                </div>
+                            </div>
+                            <div class="privacy-feature">
+                                <div class="check-icon">✓</div>
+                                <div>
+                                    <strong>Minimal collection</strong>
+                                    <p>No location, contacts, photos, or social media data</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="privacy-links">
+                            <a href="../PRIVACY.md" class="link-btn">Read Privacy Policy →</a>
+                            <a href="../TERMS.md" class="link-btn">Read Terms of Service →</a>
+                        </div>
                     </div>
-                    <div class="privacy-point">
-                        <h4>What We Do</h4>
-                        <ul>
-                            <li>Encrypt your password (bcrypt)</li>
-                            <li>Use HTTPS for all data</li>
-                            <li>Let you delete everything anytime</li>
-                            <li>Never sell your data</li>
-                            <li>Give you full control</li>
-                        </ul>
+                    <div class="privacy-visual">
+                        <div class="privacy-box">
+                            <div class="lock-icon">🔐</div>
+                            <h4>What We Don't Collect</h4>
+                            <ul>
+                                <li>Location or GPS data</li>
+                                <li>Contact lists</li>
+                                <li>Photos or media files</li>
+                                <li>Social media information</li>
+                                <li>Advertising identifiers</li>
+                            </ul>
+                        </div>
                     </div>
-                </div>
-                <div class="privacy-links">
-                    <a href="../PRIVACY.md" class="link">Read Privacy Policy</a>
-                    <a href="../TERMS.md" class="link">Read Terms of Service</a>
                 </div>
             </div>
         </section>
@@ -136,47 +235,47 @@
         <!-- Download Section -->
         <section id="download" class="download-section">
             <div class="container">
-                <h3>Get Beta Access</h3>
-                <p class="beta-notice">WithYou is currently in beta testing. Features may change and bugs may occur. We appreciate your feedback as we build something meaningful.</p>
-                
-                <div class="download-options">
-                    <div class="download-card">
-                        <h4>iOS (TestFlight)</h4>
-                        <p>Coming soon. Request beta access via email.</p>
-                        <a href="mailto:beta@withyou.app?subject=iOS Beta Access Request" class="btn btn-secondary">Request iOS Beta</a>
-                    </div>
-                    <div class="download-card">
-                        <h4>Android (APK)</h4>
-                        <p>Coming soon. Request beta access via email.</p>
-                        <a href="mailto:beta@withyou.app?subject=Android Beta Access Request" class="btn btn-secondary">Request Android Beta</a>
-                    </div>
-                    <div class="download-card">
-                        <h4>Run Locally</h4>
-                        <p>Developers can clone and run from source.</p>
-                        <a href="https://github.com/Epetaway/withyou#quick-start" class="btn btn-secondary">View Setup Guide</a>
+                <div class="download-content">
+                    <div class="section-badge">Get Started</div>
+                    <h2>Join the private beta</h2>
+                    <p class="subtitle">WithYou is currently in invite-only beta. Request access to help shape the future of intentional relationship tools.</p>
+                    <div class="cta-group">
+                        <a href="#contact" class="btn btn-primary">Request Beta Access</a>
+                        <a href="https://github.com/Epetaway/withyou" class="btn btn-secondary" target="_blank" rel="noopener">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+                            </svg>
+                            View on GitHub
+                        </a>
                     </div>
                 </div>
             </div>
         </section>
 
         <!-- Contact Section -->
-        <section class="contact-section">
+        <section id="contact" class="contact-section">
             <div class="container">
-                <h3>Get in Touch</h3>
-                <p>Questions, feedback, or beta testing inquiries?</p>
-                <div class="contact-links">
-                    <a href="mailto:support@withyou.app" class="contact-link">
-                        <strong>Support</strong>
-                        <span>support@withyou.app</span>
-                    </a>
-                    <a href="mailto:privacy@withyou.app" class="contact-link">
-                        <strong>Privacy</strong>
-                        <span>privacy@withyou.app</span>
-                    </a>
-                    <a href="https://github.com/Epetaway/withyou/issues" class="contact-link">
-                        <strong>GitHub</strong>
-                        <span>Report Issues</span>
-                    </a>
+                <div class="contact-content">
+                    <div class="contact-header">
+                        <div class="section-badge">Beta Access</div>
+                        <h2>Request early access</h2>
+                        <p class="subtitle">Share a bit about yourself and we'll send you an invite code. We review requests within 48 hours.</p>
+                    </div>
+                    <form class="contact-form">
+                        <div class="form-group">
+                            <label for="name">Name</label>
+                            <input type="text" id="name" name="name" placeholder="Your name" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="email">Email</label>
+                            <input type="email" id="email" name="email" placeholder="your@email.com" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="message">Why WithYou?</label>
+                            <textarea id="message" name="message" placeholder="Tell us what brought you here (optional)" rows="5"></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Request Access</button>
+                    </form>
                 </div>
             </div>
         </section>
