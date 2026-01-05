@@ -41,7 +41,13 @@ router.post("/auth/register", async (req, res, next) => {
       expiresIn: "7d",
     });
 
-    res.status(201).json({ userId: user.id, token });
+    res.status(201).json({ 
+      ok: true,
+      data: { 
+        token,
+        user: { id: user.id, email: user.email }
+      }
+    });
   } catch (error) {
     if (error instanceof z.ZodError) {
       return next(
@@ -91,7 +97,13 @@ router.post("/auth/login", async (req, res, next) => {
       expiresIn: "7d",
     });
 
-    res.status(200).json({ userId: user.id, token });
+    res.status(200).json({ 
+      ok: true,
+      data: { 
+        token,
+        user: { id: user.id, email: user.email }
+      }
+    });
   } catch (error) {
     if (error instanceof z.ZodError) {
       return next(

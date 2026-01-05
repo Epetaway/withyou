@@ -51,8 +51,11 @@ router.post("/relationship/invite", jwtMiddleware, async (req: AuthedRequest, re
     });
 
     res.status(201).json({
-      inviteCode: invite.code,
-      expiresAt: invite.expiresAt.toISOString(),
+      ok: true,
+      data: {
+        code: invite.code,
+        expiresAt: invite.expiresAt.toISOString(),
+      },
     });
   } catch (error) {
     next(error);
@@ -159,8 +162,13 @@ router.post("/relationship/accept", jwtMiddleware, async (req: AuthedRequest, re
     });
 
     res.status(201).json({
-      relationshipId: relationship.id,
-      status: relationship.status,
+      ok: true,
+      data: {
+        relationship: {
+          id: relationship.id,
+          status: relationship.status,
+        },
+      },
     });
   } catch (error) {
     next(error);
@@ -192,7 +200,10 @@ router.post("/relationship/end", jwtMiddleware, async (req: AuthedRequest, res, 
       data: { status: "ended", endedAt: new Date() },
     });
 
-    res.status(200).json({ success: true });
+    res.status(200).json({ 
+      ok: true,
+      data: {} 
+    });
   } catch (error) {
     next(error);
   }
