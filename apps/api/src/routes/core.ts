@@ -1,6 +1,5 @@
 import { Router } from "express";
 import type { Request } from "express";
-import type { Checkin } from "@prisma/client";
 import { checkinCreateSchema, preferencesSchema } from "@withyou/shared";
 import { prisma } from "../utils/prisma.js";
 import { AppError } from "../errors/app-error.js";
@@ -55,7 +54,7 @@ router.get("/dashboard", jwtMiddleware, async (req: AuthedRequest, res, next) =>
             take: 5,
           })
         )
-          .map((c: Checkin) => `Check-in on ${new Date(c.createdAt).toLocaleDateString()}`)
+          .map((c) => `Check-in on ${new Date(c.createdAt).toLocaleDateString()}`)
       : [];
 
     res.json({

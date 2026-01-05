@@ -1,5 +1,22 @@
 // Explicit .js extensions keep NodeNext module resolution happy when compiled
-export * from "./types.js";
+export type {
+	UUID,
+	RelationshipStage,
+	RelationshipStatus,
+	ActivityStyle,
+	BudgetLevel,
+	MoodLevel,
+	ApiErrorShape,
+	AuthResponse,
+	InviteResponse,
+	RelationshipAcceptResponse,
+	CheckinCreateResponse,
+	DashboardResponse,
+	PreferencesPayload,
+	IdeasResponse,
+	SavedIdeaResponse,
+} from "./types.js";
+
 export {
 	emailSchema,
 	passwordSchema,
@@ -14,4 +31,5 @@ export {
 	relationshipStageSchema,
 	apiErrorSchema,
 } from "./schemas.js";
+
 export { CONTENT } from "./content.js";
