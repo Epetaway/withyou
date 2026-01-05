@@ -42,8 +42,8 @@
     "skipLibCheck": true,
     "baseUrl": "./",
     "paths": {
-      "@withyou/shared": ["packages/shared/src/index.ts"],
-      "@withyou/shared/*": ["packages/shared/src/*"]
+      "@withyou/shared": ["packages/shared/dist/index.d.ts"],
+      "@withyou/shared/*": ["packages/shared/dist/*"]
     }
   }
 }
