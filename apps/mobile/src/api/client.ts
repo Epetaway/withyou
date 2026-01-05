@@ -12,7 +12,7 @@ export class ApiError extends Error {
 }
 
 export function createApiClient(getToken: () => Promise<string | null>) {
-  const baseUrl = process.env.EXPO_PUBLIC_API_BASE_URL;
+  const baseUrl = process.env.EXPO_PUBLIC_API_BASE_URL ?? "https://withyouapi-production.up.railway.app";
 
   async function request<T>(path: string, init?: RequestInit): Promise<T> {
     if (!baseUrl) throw new Error("Missing EXPO_PUBLIC_API_BASE_URL");
