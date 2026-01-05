@@ -1,4 +1,5 @@
 import { Router } from "express";
+import type { Request } from "express";
 import { checkinCreateSchema, preferencesSchema } from "@withyou/shared";
 import { prisma } from "../utils/prisma.js";
 import { AppError } from "../errors/app-error.js";
@@ -6,8 +7,9 @@ import { jwtMiddleware } from "../middleware/jwt-middleware.js";
 import { z } from "zod";
 
 const router = Router();
+type AuthedRequest = Request & { user?: { userId?: string } };
 
-router.get("/dashboard", jwtMiddleware, async (req, res, next) => {
+router.get("/dashboard", jwtMiddleware, async (req: AuthedRequest, res, next) => {
   try {
     const userId = req.user?.userId;
     if (!userId) {
@@ -65,7 +67,7 @@ router.get("/dashboard", jwtMiddleware, async (req, res, next) => {
   }
 });
 
-router.post("/checkins", jwtMiddleware, async (req, res, next) => {
+router.post("/checkins", jwtMiddleware, async (req: AuthedRequest, res, next) => {
   try {
     const userId = req.user?.userId;
     if (!userId) {
@@ -102,9 +104,9 @@ router.post("/checkins", jwtMiddleware, async (req, res, next) => {
           "Validation error",
           400,
           "VALIDATION_ERROR",
-          error.errors.map((e) => ({
-            path: e.path.join("."),
-            message: e.message,
+          error.issues.map((issue: z.ZodIssue) => ({
+            path: issue.path.join("."),
+            message: issue.message,
           }))
         )
       );
@@ -113,7 +115,7 @@ router.post("/checkins", jwtMiddleware, async (req, res, next) => {
   }
 });
 
-router.post("/preferences", jwtMiddleware, async (req, res, next) => {
+router.post("/preferences", jwtMiddleware, async (req: AuthedRequest, res, next) => {
   try {
     const userId = req.user?.userId;
     if (!userId) {
@@ -148,9 +150,9 @@ router.post("/preferences", jwtMiddleware, async (req, res, next) => {
           "Validation error",
           400,
           "VALIDATION_ERROR",
-          error.errors.map((e) => ({
-            path: e.path.join("."),
-            message: e.message,
+          error.issues.map((issue: z.ZodIssue) => ({
+            path: issue.path.join("."),
+            message: issue.message,
           }))
         )
       );
@@ -159,7 +161,7 @@ router.post("/preferences", jwtMiddleware, async (req, res, next) => {
   }
 });
 
-router.get("/ideas", jwtMiddleware, async (req, res, next) => {
+router.get("/ideas", jwtMiddleware, async (req: AuthedRequest, res, next) => {
   try {
     const userId = req.user?.userId;
     if (!userId) {

@@ -49,7 +49,7 @@ router.post("/auth/register", async (req, res, next) => {
           "Validation error",
           400,
           "VALIDATION_ERROR",
-          error.errors.map((e) => ({ path: e.path.join("."), message: e.message }))
+          error.issues.map((issue: z.ZodIssue) => ({ path: issue.path.join("."), message: issue.message }))
         )
       );
     }
@@ -99,7 +99,7 @@ router.post("/auth/login", async (req, res, next) => {
           "Validation error",
           400,
           "VALIDATION_ERROR",
-          error.errors.map((e) => ({ path: e.path.join("."), message: e.message }))
+          error.issues.map((issue: z.ZodIssue) => ({ path: issue.path.join("."), message: issue.message }))
         )
       );
     }

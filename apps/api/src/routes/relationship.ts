@@ -1,17 +1,19 @@
 import { Router } from "express";
+import type { Request } from "express";
 import { prisma } from "../utils/prisma.js";
 import { AppError } from "../errors/app-error.js";
 import { jwtMiddleware } from "../middleware/jwt-middleware.js";
 import { randomBytes } from "crypto";
 
 const router = Router();
+type AuthedRequest = Request & { user?: { userId?: string } };
 
 // Generate a random 6-character alphanumeric invite code
 function generateInviteCode(): string {
   return randomBytes(3).toString("hex").toUpperCase();
 }
 
-router.post("/relationship/invite", jwtMiddleware, async (req, res, next) => {
+router.post("/relationship/invite", jwtMiddleware, async (req: AuthedRequest, res, next) => {
   try {
     const userId = req.user?.userId;
     if (!userId) {
@@ -57,7 +59,7 @@ router.post("/relationship/invite", jwtMiddleware, async (req, res, next) => {
   }
 });
 
-router.post("/relationship/accept", async (req, res, next) => {
+router.post("/relationship/accept", jwtMiddleware, async (req: AuthedRequest, res, next) => {
   try {
     const { inviteCode } = req.body;
 
@@ -165,7 +167,7 @@ router.post("/relationship/accept", async (req, res, next) => {
   }
 });
 
-router.post("/relationship/end", jwtMiddleware, async (req, res, next) => {
+router.post("/relationship/end", jwtMiddleware, async (req: AuthedRequest, res, next) => {
   try {
     const userId = req.user?.userId;
     if (!userId) {
