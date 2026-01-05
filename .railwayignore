@@ -1,0 +1,6 @@
+docs/
+test-e2e.sh
+*.md
+.git/
+.vscode/
+apps/mobile/
