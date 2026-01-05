@@ -54,7 +54,7 @@ router.get("/dashboard", jwtMiddleware, async (req: AuthedRequest, res, next) =>
             take: 5,
           })
         )
-          .map((c) => `Check-in on ${new Date(c.createdAt).toLocaleDateString()}`)
+          .map((c: { createdAt: Date }) => `Check-in on ${new Date(c.createdAt).toLocaleDateString()}`)
       : [];
 
     res.json({

@@ -1,7 +1,3 @@
-export type RelationshipStage = "dating" | "committed" | "engaged" | "married";
-export type ActivityStyle = "chill" | "active" | "surprise";
-export type BudgetLevel = "low" | "medium" | "high";
-
 export const CONTENT = {
   app: {
     name: "WithYou",
