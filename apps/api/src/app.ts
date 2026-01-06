@@ -1,5 +1,7 @@
 import express from 'express';
 import morgan from 'morgan';
+import path from 'path';
+import { fileURLToPath } from 'url';
 import healthRouter from './routes/health.js';
 import authRouter from './routes/auth.js';
 import relationshipRouter from './routes/relationship.js';
@@ -7,12 +9,20 @@ import coreRouter from './routes/core.js';
 import { errorHandler } from './middleware/error-handler.js';
 import { generalLimiter, authLimiter, inviteLimiter } from './middleware/rate-limit.js';
 
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+
 export const app = express();
 
 app.use(express.json());
 
 // Request logging
 app.use(morgan('combined'));
+
+// Serve landing page
+const landingPagePath = path.join(__dirname, '../../..', 'docs/landing/index.html');
+app.get('/', (req, res) => {
+  res.sendFile(landingPagePath);
+});
 
 // General rate limiting
 app.use(generalLimiter);
