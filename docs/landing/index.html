@@ -3,380 +3,946 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="WithYou - A private, mobile-first app to help couples communicate needs and plan intentional connection time without pressure.">
-    <title>WithYou - Intentional Connection for Couples</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <title>WithYou - Intentional connection for couples</title>
+    <meta name="description" content="A private app to help you communicate needs and plan quality time together—without pressure, surveillance, or judgment.">
+    <meta name="theme-color" content="#4A90A4">
+    <meta name="author" content="WithYou">
+    <meta property="og:title" content="WithYou - Intentional Connection">
+    <meta property="og:description" content="Private, consensual communication for couples seeking deeper connection.">
+    <meta property="og:type" content="website">
     <style>
+        :root {
+            --primary: #4A90A4;
+            --accent: #F4AE85;
+            --text: #222222;
+            --text-muted: #666666;
+            --surface: #FFFFFF;
+            --surface-2: #F9F9F9;
+            --border: #E0E0E0;
+            --accent-weak: rgba(244, 174, 133, 0.1);
+            --accent-pale: rgba(74, 144, 164, 0.05);
+            --danger: #C53030;
+            --spacing: 8px;
+            --radius: 8px;
+        }
+        
+        * { 
+            margin: 0; 
+            padding: 0; 
+            box-sizing: border-box; 
+        }
+        
+        html { 
+            scroll-behavior: smooth; 
+        }
+        
         body {
-            font-family: 'Inter', system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            font-size: 16px;
+            line-height: 1.5;
+            color: var(--text);
+            background: var(--surface);
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
         }
         
-        .gradient-dark {
-            background: linear-gradient(135deg, #0B0C0F 0%, #1a1d24 100%);
+        a {
+            color: inherit;
+            text-decoration: none;
         }
         
-        .gradient-overlay {
-            background: linear-gradient(135deg, rgba(11, 12, 15, 0.85) 0%, rgba(26, 29, 36, 0.75) 100%);
+        button {
+            font: inherit;
+            cursor: pointer;
+            border: none;
+            background: none;
         }
         
-        .smooth-transition {
-            transition: all 0.2s ease;
+        .smooth-transition { 
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); 
         }
-    </style>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        'wy-surface': '#FFFFFF',
-                        'wy-surface-2': '#F6F7F9',
-                        'wy-border': '#E6E8EE',
-                        'wy-text': '#111318',
-                        'wy-text-muted': '#5B6270',
-                        'wy-accent': '#2E7D57',
-                        'wy-accent-weak': '#E6F3EC',
-                        'wy-danger': '#B42318',
-                    },
-                    fontFamily: {
-                        'sans': ['Inter', 'system-ui', '-apple-system', 'Segoe UI', 'Roboto', 'Arial', 'sans-serif'],
-                    }
-                }
+        
+        .container { 
+            max-width: 80rem; 
+            margin: 0 auto; 
+            padding: 0 calc(var(--spacing) * 3);
+        }
+        
+        .container-sm { 
+            max-width: 42rem; 
+            margin: 0 auto; 
+            padding: 0 calc(var(--spacing) * 3);
+        }
+        
+        /* Typography */
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            line-height: 1.2;
+            letter-spacing: -0.02em;
+        }
+        
+        h2 {
+            font-size: 2rem;
+            font-weight: 700;
+            line-height: 1.3;
+            letter-spacing: -0.01em;
+        }
+        
+        h3 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            line-height: 1.4;
+        }
+        
+        p {
+            line-height: 1.6;
+        }
+        
+        @media (min-width: 768px) {
+            h1 {
+                font-size: 3rem;
+            }
+            
+            h2 {
+                font-size: 2.5rem;
             }
         }
-    </script>
+        
+        /* Navigation */
+        nav {
+            position: sticky;
+            top: 0;
+            z-index: 50;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(4px);
+            border-bottom: 1px solid var(--border);
+        }
+        
+        nav .container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: calc(var(--spacing) * 2);
+            padding-bottom: calc(var(--spacing) * 2);
+        }
+        
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+        
+        nav ul {
+            list-style: none;
+            display: none;
+            gap: calc(var(--spacing) * 2);
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: var(--text-muted);
+        }
+        
+        @media (min-width: 768px) {
+            nav ul {
+                display: flex;
+            }
+        }
+        
+        nav a:hover {
+            color: var(--accent);
+        }
+        
+        /* Badge */
+        .badge {
+            display: inline-block;
+            padding: calc(var(--spacing) / 2) calc(var(--spacing) * 1.5);
+            background: var(--accent-weak);
+            color: var(--accent);
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            margin-bottom: calc(var(--spacing) * 2);
+        }
+        
+        /* Buttons */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 44px;
+            padding: calc(var(--spacing) * 1.5) calc(var(--spacing) * 3);
+            border-radius: var(--radius);
+            font-weight: 600;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            user-select: none;
+            gap: calc(var(--spacing) / 2);
+        }
+        
+        .btn-primary {
+            background: var(--accent);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #E89970;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(244, 174, 133, 0.3);
+        }
+        
+        .btn-primary:active {
+            transform: translateY(0);
+        }
+        
+        .btn-primary:focus {
+            outline: 2px solid var(--primary);
+            outline-offset: 2px;
+        }
+        
+        .btn-secondary {
+            background: white;
+            color: var(--text);
+            border: 1px solid var(--border);
+        }
+        
+        .btn-secondary:hover {
+            background: var(--surface-2);
+            border-color: var(--accent);
+        }
+        
+        .btn-secondary:focus {
+            outline: 2px solid var(--primary);
+            outline-offset: 2px;
+        }
+        
+        /* Forms */
+        label {
+            display: block;
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: var(--text);
+            margin-bottom: calc(var(--spacing) / 2);
+        }
+        
+        input,
+        textarea {
+            width: 100%;
+            padding: calc(var(--spacing) * 1.5);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            font-family: inherit;
+            font-size: 1rem;
+            color: var(--text);
+            background: var(--surface);
+            transition: all 0.3s ease;
+        }
+        
+        input::placeholder,
+        textarea::placeholder {
+            color: var(--text-muted);
+        }
+        
+        input:focus,
+        textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px var(--accent-pale);
+        }
+        
+        input:invalid:not(:placeholder-shown),
+        textarea:invalid:not(:placeholder-shown) {
+            border-color: var(--danger);
+        }
+        
+        textarea {
+            resize: vertical;
+            min-height: 120px;
+        }
+        
+        /* Layout sections */
+        section {
+            padding: calc(var(--spacing) * 4) 0;
+        }
+        
+        @media (min-width: 768px) {
+            section {
+                padding: calc(var(--spacing) * 6) 0;
+            }
+        }
+        
+        /* Hero Section */
+        .hero {
+            background: linear-gradient(135deg, var(--primary) 0%, #3d7a92 100%);
+            color: white;
+            padding: calc(var(--spacing) * 6) 0;
+        }
+        
+        .hero .container {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: calc(var(--spacing) * 4);
+            align-items: center;
+        }
+        
+        @media (min-width: 1024px) {
+            .hero .container {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+        
+        .hero h1 {
+            color: white;
+            margin-bottom: calc(var(--spacing) * 2);
+        }
+        
+        .hero p {
+            font-size: 1.125rem;
+            opacity: 0.95;
+            margin-bottom: calc(var(--spacing) * 3);
+            max-width: 500px;
+        }
+        
+        .btn-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: calc(var(--spacing) * 1.5);
+            margin-bottom: calc(var(--spacing) * 4);
+        }
+        
+        .hero-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: calc(var(--spacing) * 3);
+            padding-top: calc(var(--spacing) * 4);
+            border-top: 1px solid rgba(255, 255, 255, 0.2);
+            margin-top: calc(var(--spacing) * 4);
+        }
+        
+        .stat {
+            display: flex;
+            flex-direction: column;
+            gap: calc(var(--spacing) / 2);
+        }
+        
+        .stat-icon {
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .stat-icon svg {
+            width: 24px;
+            height: 24px;
+            stroke: white;
+            stroke-width: 2;
+            fill: none;
+        }
+        
+        .stat-title {
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+        
+        .stat-description {
+            font-size: 0.875rem;
+            opacity: 0.8;
+        }
+        
+        /* Features Grid */
+        .features {
+            background: var(--surface);
+        }
+        
+        .section-header {
+            text-align: center;
+            margin-bottom: calc(var(--spacing) * 4);
+        }
+        
+        .section-header h2 {
+            margin-bottom: calc(var(--spacing) * 1.5);
+        }
+        
+        .section-header p {
+            font-size: 1.125rem;
+            color: var(--text-muted);
+            max-width: 500px;
+            margin: 0 auto;
+        }
+        
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: calc(var(--spacing) * 2);
+        }
+        
+        @media (min-width: 768px) {
+            .features-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        
+        @media (min-width: 1024px) {
+            .features-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+        
+        .feature-card {
+            padding: calc(var(--spacing) * 2);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            background: var(--surface);
+            transition: all 0.3s ease;
+        }
+        
+        .feature-card:hover {
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+            border-color: var(--accent);
+            transform: translateY(-4px);
+        }
+        
+        .feature-card:focus-within {
+            outline: 2px solid var(--primary);
+            outline-offset: 0;
+        }
+        
+        .feature-icon {
+            width: 48px;
+            height: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--accent-weak);
+            border-radius: var(--radius);
+            margin-bottom: calc(var(--spacing) * 1);
+        }
+        
+        .feature-icon svg {
+            width: 24px;
+            height: 24px;
+            stroke: var(--accent);
+            stroke-width: 2;
+            fill: none;
+        }
+        
+        .feature-card h3 {
+            margin-bottom: calc(var(--spacing) * 0.5);
+            color: var(--text);
+        }
+        
+        .feature-card p {
+            font-size: 0.95rem;
+            color: var(--text-muted);
+            line-height: 1.6;
+        }
+        
+        /* How it works */
+        .how-it-works {
+            background: var(--surface-2);
+        }
+        
+        .steps {
+            max-width: 600px;
+            margin: 0 auto;
+            display: grid;
+            gap: calc(var(--spacing) * 3);
+        }
+        
+        .step {
+            display: grid;
+            grid-template-columns: auto 1fr;
+            gap: calc(var(--spacing) * 2);
+        }
+        
+        .step-number {
+            width: 48px;
+            height: 48px;
+            min-width: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--accent);
+            color: white;
+            border-radius: 50%;
+            font-weight: 700;
+            font-size: 1.25rem;
+        }
+        
+        .step-content h3 {
+            margin-bottom: calc(var(--spacing) / 2);
+            color: var(--text);
+        }
+        
+        .step-content p {
+            font-size: 0.95rem;
+            color: var(--text-muted);
+            line-height: 1.6;
+        }
+        
+        /* Privacy Section */
+        .privacy {
+            background: var(--surface);
+        }
+        
+        .privacy-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: calc(var(--spacing) * 4);
+            align-items: start;
+        }
+        
+        @media (min-width: 1024px) {
+            .privacy-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+        
+        .privacy-list {
+            display: grid;
+            gap: calc(var(--spacing) * 2);
+        }
+        
+        .privacy-item {
+            display: grid;
+            grid-template-columns: auto 1fr;
+            gap: calc(var(--spacing) * 1.5);
+        }
+        
+        .checkmark {
+            width: 24px;
+            height: 24px;
+            min-width: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--accent-weak);
+            border-radius: 50%;
+            color: var(--accent);
+            font-weight: 700;
+            font-size: 0.875rem;
+        }
+        
+        .privacy-item h4 {
+            font-weight: 600;
+            font-size: 0.95rem;
+            color: var(--text);
+            margin-bottom: calc(var(--spacing) / 4);
+        }
+        
+        .privacy-item p {
+            font-size: 0.875rem;
+            color: var(--text-muted);
+            line-height: 1.5;
+        }
+        
+        .privacy-card {
+            padding: calc(var(--spacing) * 2.5);
+            background: var(--surface-2);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+        }
+        
+        .privacy-card-icon {
+            width: 48px;
+            height: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: calc(var(--spacing) * 1.5);
+        }
+        
+        .privacy-card-icon svg {
+            width: 32px;
+            height: 32px;
+            stroke: var(--accent);
+            stroke-width: 2;
+            fill: none;
+        }
+        
+        .privacy-card h3 {
+            margin-bottom: calc(var(--spacing) * 1);
+            color: var(--text);
+        }
+        
+        .dont-list {
+            display: grid;
+            gap: calc(var(--spacing) * 1);
+        }
+        
+        .dont-item {
+            display: flex;
+            gap: calc(var(--spacing) * 1);
+            font-size: 0.875rem;
+            color: var(--text-muted);
+        }
+        
+        .dont-icon {
+            font-weight: 700;
+            color: var(--danger);
+        }
+        
+        /* CTA Section */
+        .cta {
+            background: var(--surface-2);
+            text-align: center;
+        }
+        
+        .cta h2 {
+            margin-bottom: calc(var(--spacing) * 1.5);
+        }
+        
+        .cta p {
+            font-size: 1.125rem;
+            color: var(--text-muted);
+            margin-bottom: calc(var(--spacing) * 2);
+            max-width: 500px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        /* Contact Form */
+        .contact {
+            background: var(--surface);
+        }
+        
+        .form-group {
+            margin-bottom: calc(var(--spacing) * 2);
+        }
+        
+        .form-group:last-child {
+            margin-bottom: 0;
+        }
+        
+        /* Footer */
+        footer {
+            background: var(--surface-2);
+            border-top: 1px solid var(--border);
+            padding: calc(var(--spacing) * 3) 0;
+        }
+        
+        .footer-content {
+            display: flex;
+            flex-direction: column;
+            gap: calc(var(--spacing) * 1.5);
+            font-size: 0.875rem;
+            color: var(--text-muted);
+        }
+        
+        @media (min-width: 640px) {
+            .footer-content {
+                flex-direction: row;
+                justify-content: space-between;
+                align-items: center;
+            }
+        }
+        
+        .footer-links {
+            display: flex;
+            gap: calc(var(--spacing) * 2);
+            list-style: none;
+        }
+        
+        .footer-links a {
+            color: var(--text-muted);
+            transition: all 0.3s ease;
+        }
+        
+        .footer-links a:hover {
+            color: var(--text);
+        }
+        
+        .footer-links a:focus {
+            outline: 2px solid var(--primary);
+            outline-offset: 2px;
+        }
+        
+        /* Accessibility */
+        @media (prefers-reduced-motion: reduce) {
+            * {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+        
+        @media (prefers-contrast: more) {
+            .btn-primary {
+                border: 2px solid var(--text);
+            }
+            
+            .feature-card {
+                border-width: 2px;
+            }
+        }
+    </style>
 </head>
-<body class="text-wy-text bg-wy-surface">
-    <!-- Header -->
-    <header class="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-wy-border">
-        <nav class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
-            <a href="#" class="text-2xl font-bold text-wy-text">WithYou</a>
-            <ul class="hidden md:flex gap-8 list-none">
-                <li><a href="#features" class="text-wy-text-muted font-500 hover:text-wy-text smooth-transition">Features</a></li>
-                <li><a href="#how-it-works" class="text-wy-text-muted font-500 hover:text-wy-text smooth-transition">How It Works</a></li>
-                <li><a href="#privacy" class="text-wy-text-muted font-500 hover:text-wy-text smooth-transition">Privacy</a></li>
-                <li><a href="#contact" class="text-wy-text-muted font-500 hover:text-wy-text smooth-transition">Contact</a></li>
+<body>
+    <!-- Navigation -->
+    <nav role="navigation" aria-label="Main navigation">
+        <div class="container">
+            <a href="#" class="logo" aria-label="WithYou home">WithYou</a>
+            <ul role="menubar">
+                <li role="none"><a href="#features" role="menuitem">Features</a></li>
+                <li role="none"><a href="#how-it-works" role="menuitem">How It Works</a></li>
+                <li role="none"><a href="#privacy" role="menuitem">Privacy</a></li>
+                <li role="none"><a href="#contact" role="menuitem">Get Access</a></li>
             </ul>
-        </nav>
-    </header>
+        </div>
+    </nav>
 
     <!-- Hero Section -->
-    <section class="gradient-dark relative overflow-hidden min-h-screen flex items-center">
-        <div class="gradient-overlay absolute inset-0"></div>
-        <div class="max-w-7xl mx-auto px-6 py-20 relative z-10 w-full">
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-                <div>
-                    <div class="inline-block px-4 py-2 bg-white/10 border border-white/15 rounded-full backdrop-blur-sm mb-6">
-                        <span class="text-sm font-500 text-white/90">Beta v1 • Privacy First</span>
-                    </div>
-                    <h1 class="text-5xl md:text-6xl font-bold text-white mb-6 leading-tight">Intentional Connection for Couples</h1>
-                    <p class="text-xl text-white/80 mb-8 max-w-xl">A private app to help you communicate needs and plan quality time together—without pressure, surveillance, or judgment.</p>
-                    
-                    <div class="flex flex-wrap gap-4 mb-12">
-                        <a href="#contact" class="px-6 py-3 bg-wy-accent text-white font-600 rounded-lg hover:bg-green-800 smooth-transition min-h-11 flex items-center">
-                            Get Beta Access
-                        </a>
-                        <a href="https://github.com/Epetaway/withyou" target="_blank" rel="noopener" class="px-6 py-3 bg-white text-wy-text font-600 rounded-lg border border-wy-border hover:bg-wy-surface-2 smooth-transition flex items-center gap-2 min-h-11">
-                            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 16 16">
-                                <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.012 8.012 0 0 0 16 8c0-4.42-3.58-8-8-8z"/>
+    <section class="hero" role="region" aria-label="Hero section">
+        <div class="container">
+            <div>
+                <span class="badge">Intentional Connection</span>
+                <h1>Communicate your needs. Plan your time. Grow together.</h1>
+                <p>A private app to help you communicate needs and plan quality time together—without pressure, surveillance, or judgment.</p>
+                <div class="btn-group">
+                    <a href="#contact" class="btn btn-primary">Get Beta Access</a>
+                    <a href="https://github.com/Epetaway/withyou" target="_blank" rel="noopener" class="btn btn-secondary">View on GitHub</a>
+                </div>
+                <div class="hero-stats">
+                    <div class="stat">
+                        <div class="stat-icon">
+                            <svg viewBox="0 0 24 24">
+                                <path d="M12 1C5.925 1 1 5.925 1 12s4.925 11 11 11 11-4.925 11-11S18.075 1 12 1zm0 20c-4.971 0-9-4.029-9-9s4.029-9 9-9 9 4.029 9 9-4.029 9-9 9z"/>
+                                <path d="M12 5C8.134 5 5 8.134 5 12s3.134 7 7 7 7-3.134 7-7-3.134-7-7-7z"/>
                             </svg>
-                            View on GitHub
-                        </a>
+                        </div>
+                        <p class="stat-title">100% Private</p>
+                        <p class="stat-description">No data selling</p>
                     </div>
-
-                    <!-- Stats -->
-                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 pt-8 border-t border-white/10">
-                        <div>
-                            <div class="w-6 h-6 mb-3 flex items-center justify-center">
-                                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
-                                </svg>
-                            </div>
-                            <p class="font-600 text-white mb-1">100% Private</p>
-                            <p class="text-sm text-white/70">No data selling</p>
+                    <div class="stat">
+                        <div class="stat-icon">
+                            <svg viewBox="0 0 24 24">
+                                <path d="M9 16.2L4.8 12m-0.6 0L3 10.6M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0z"/>
+                            </svg>
                         </div>
-                        <div>
-                            <div class="w-6 h-6 mb-3 flex items-center justify-center">
-                                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                                </svg>
-                            </div>
-                            <p class="font-600 text-white mb-1">Consent-Based</p>
-                            <p class="text-sm text-white/70">Mutual pairing</p>
+                        <p class="stat-title">Consent-Based</p>
+                        <p class="stat-description">Mutual pairing</p>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-icon">
+                            <svg viewBox="0 0 24 24">
+                                <path d="M14.828 14.828a4 4 0 0 1-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0z"/>
+                            </svg>
                         </div>
-                        <div>
-                            <div class="w-6 h-6 mb-3 flex items-center justify-center">
-                                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                                </svg>
-                            </div>
-                            <p class="font-600 text-white mb-1">No Pressure</p>
-                            <p class="text-sm text-white/70">Indirect signals</p>
-                        </div>
+                        <p class="stat-title">No Pressure</p>
+                        <p class="stat-description">Indirect signals</p>
                     </div>
                 </div>
-
-                <!-- Phone Mockup -->
-                <div class="hidden lg:flex justify-center items-center">
-                    <div class="relative w-72">
-                        <div class="relative w-72 h-96 bg-gradient-to-br from-gray-700 to-gray-900 rounded-3xl p-3 shadow-2xl">
-                            <div class="w-full h-full bg-white rounded-2xl flex items-center justify-center text-wy-text-muted">
-                                <div class="text-center">
-                                    <p class="font-500">App Screenshot</p>
-                                    <p class="text-sm text-wy-text-muted">Coming Soon</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+            </div>
+            <div style="display: none;">
+                <!-- Phone mockup placeholder for future implementation -->
             </div>
         </div>
     </section>
 
     <!-- Features Section -->
-    <section id="features" class="py-16 md:py-24">
-        <div class="max-w-7xl mx-auto px-6">
-            <div class="text-center mb-12">
-                <span class="inline-block px-4 py-2 bg-wy-accent-weak text-wy-accent rounded-full text-xs font-600 uppercase tracking-widest mb-4">Core Features</span>
-                <h2 class="text-4xl md:text-5xl font-bold text-wy-text mb-4">Built for Trust</h2>
-                <p class="text-lg text-wy-text-muted max-w-2xl mx-auto">Everything you need to communicate intentionally and connect with purpose.</p>
+    <section class="features" id="features" role="region" aria-label="Features section">
+        <div class="container">
+            <div class="section-header">
+                <span class="badge">Core Features</span>
+                <h2>Built for Trust</h2>
+                <p>Everything you need to communicate intentionally and connect with purpose.</p>
             </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                <!-- Feature 1 -->
-                <div class="p-8 border border-wy-border rounded-2xl hover:shadow-lg smooth-transition hover:border-wy-accent">
-                    <div class="w-12 h-12 bg-wy-accent-weak rounded-lg flex items-center justify-center mb-4">
-                        <svg class="w-6 h-6 text-wy-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+            <div class="features-grid">
+                <article class="feature-card">
+                    <div class="feature-icon">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M12 1C5.925 1 1 5.925 1 12s4.925 11 11 11 11-4.925 11-11S18.075 1 12 1zm0 20c-4.971 0-9-4.029-9-9s4.029-9 9-9 9 4.029 9 9-4.029 9-9 9z"/>
                         </svg>
                     </div>
-                    <h3 class="text-xl font-600 text-wy-text mb-2">Private by Design</h3>
-                    <p class="text-wy-text-muted">Your data is encrypted, never shared, and never monetized. One partner per account. Full control over what you share.</p>
-                </div>
+                    <h3>Private by Design</h3>
+                    <p>Your data is encrypted, never shared, and never monetized. One partner per account. Full control over what you share.</p>
+                </article>
 
-                <!-- Feature 2 -->
-                <div class="p-8 border border-wy-border rounded-2xl hover:shadow-lg smooth-transition hover:border-wy-accent">
-                    <div class="w-12 h-12 bg-wy-accent-weak rounded-lg flex items-center justify-center mb-4">
-                        <svg class="w-6 h-6 text-wy-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                <article class="feature-card">
+                    <div class="feature-icon">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M9 16.2L4.8 12m-0.6 0L3 10.6M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0z"/>
                         </svg>
                     </div>
-                    <h3 class="text-xl font-600 text-wy-text mb-2">Consent-Based Pairing</h3>
-                    <p class="text-wy-text-muted">Invite codes ensure both partners opt-in. No surveillance, no tracking, no pressure. Either partner can end pairing anytime.</p>
-                </div>
+                    <h3>Consent-Based Pairing</h3>
+                    <p>Invite codes ensure both partners opt-in. No surveillance, no tracking, no pressure. Either partner can end pairing anytime.</p>
+                </article>
 
-                <!-- Feature 3 -->
-                <div class="p-8 border border-wy-border rounded-2xl hover:shadow-lg smooth-transition hover:border-wy-accent">
-                    <div class="w-12 h-12 bg-wy-accent-weak rounded-lg flex items-center justify-center mb-4">
-                        <svg class="w-6 h-6 text-wy-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                <article class="feature-card">
+                    <div class="feature-icon">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M14.828 14.828a4 4 0 0 1-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0z"/>
                         </svg>
                     </div>
-                    <h3 class="text-xl font-600 text-wy-text mb-2">Indirect Signals</h3>
-                    <p class="text-wy-text-muted">Share moods, preferences, and availability without direct pressure. Let data guide conversation, not demand it.</p>
-                </div>
+                    <h3>Indirect Signals</h3>
+                    <p>Share moods, preferences, and availability without direct pressure. Let data guide conversation, not demand it.</p>
+                </article>
 
-                <!-- Feature 4 -->
-                <div class="p-8 border border-wy-border rounded-2xl hover:shadow-lg smooth-transition hover:border-wy-accent">
-                    <div class="w-12 h-12 bg-wy-accent-weak rounded-lg flex items-center justify-center mb-4">
-                        <svg class="w-6 h-6 text-wy-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"></path>
+                <article class="feature-card">
+                    <div class="feature-icon">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M12 6V4m0 2a2 2 0 1 0 0 4m0-4a2 2 0 1 1 0 4m-6 8a2 2 0 1 0 0-4m0 4a2 2 0 1 1 0-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 1 0 0-4m0 4a2 2 0 1 1 0-4m0 4v2m0-6V4"/>
                         </svg>
                     </div>
-                    <h3 class="text-xl font-600 text-wy-text mb-2">Smart Preferences</h3>
-                    <p class="text-wy-text-muted">Set activity styles, food preferences, budget, and energy levels. Get date ideas that actually match both of you.</p>
-                </div>
+                    <h3>Smart Preferences</h3>
+                    <p>Set activity styles, food preferences, budget, and energy levels. Get date ideas that actually match both of you.</p>
+                </article>
 
-                <!-- Feature 5 -->
-                <div class="p-8 border border-wy-border rounded-2xl hover:shadow-lg smooth-transition hover:border-wy-accent">
-                    <div class="w-12 h-12 bg-wy-accent-weak rounded-lg flex items-center justify-center mb-4">
-                        <svg class="w-6 h-6 text-wy-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                <article class="feature-card">
+                    <div class="feature-icon">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M9 19v-6a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2a2 2 0 0 0 2-2zm0 0V9a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v10m-6 0a2 2 0 0 0 2 2h2a2 2 0 0 0 2-2m0 0V5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-2a2 2 0 0 1-2-2z"/>
                         </svg>
                     </div>
-                    <h3 class="text-xl font-600 text-wy-text mb-2">Check-In Moods</h3>
-                    <p class="text-wy-text-muted">Log your mood (1-5) and choose whether to share with your partner. No pressure to explain your feelings.</p>
-                </div>
+                    <h3>Check-In Moods</h3>
+                    <p>Log your mood (1-5) and choose whether to share with your partner. No pressure to explain your feelings.</p>
+                </article>
 
-                <!-- Feature 6 -->
-                <div class="p-8 border border-wy-border rounded-2xl hover:shadow-lg smooth-transition hover:border-wy-accent">
-                    <div class="w-12 h-12 bg-wy-accent-weak rounded-lg flex items-center justify-center mb-4">
-                        <svg class="w-6 h-6 text-wy-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                <article class="feature-card">
+                    <div class="feature-icon">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M13 10V3L4 14h7v7l9-11h-7z"/>
                         </svg>
                     </div>
-                    <h3 class="text-xl font-600 text-wy-text mb-2">Date Ideas</h3>
-                    <p class="text-wy-text-muted">Receive curated date ideas based on your shared preferences. Save favorites and plan intentional time together.</p>
-                </div>
+                    <h3>Date Ideas</h3>
+                    <p>Receive curated date ideas based on your shared preferences. Save favorites and plan intentional time together.</p>
+                </article>
             </div>
         </div>
     </section>
 
     <!-- How It Works -->
-    <section id="how-it-works" class="py-16 md:py-24 bg-wy-surface-2">
-        <div class="max-w-7xl mx-auto px-6">
-            <div class="text-center mb-12">
-                <span class="inline-block px-4 py-2 bg-wy-accent-weak text-wy-accent rounded-full text-xs font-600 uppercase tracking-widest mb-4">Process</span>
-                <h2 class="text-4xl md:text-5xl font-bold text-wy-text mb-4">How It Works</h2>
-                <p class="text-lg text-wy-text-muted max-w-2xl mx-auto">Simple steps to intentional connection.</p>
+    <section class="how-it-works" id="how-it-works" role="region" aria-label="How it works section">
+        <div class="container">
+            <div class="section-header">
+                <span class="badge">Process</span>
+                <h2>How It Works</h2>
+                <p>Simple steps to intentional connection.</p>
             </div>
+            <ol class="steps">
+                <li class="step">
+                    <div class="step-number" aria-label="Step 1">1</div>
+                    <div class="step-content">
+                        <h3>Create & Pair</h3>
+                        <p>Sign up, create an account, and generate an invite code. Share it with your partner—they confirm, and you're paired.</p>
+                    </div>
+                </li>
 
-            <div class="space-y-8 max-w-3xl mx-auto">
-                <div class="flex gap-6">
-                    <div class="flex-shrink-0">
-                        <div class="flex h-12 w-12 items-center justify-center rounded-lg bg-wy-accent text-white font-700">1</div>
+                <li class="step">
+                    <div class="step-number" aria-label="Step 2">2</div>
+                    <div class="step-content">
+                        <h3>Set Preferences</h3>
+                        <p>Choose activity styles, food preferences, budget levels, and energy levels. This guides future date ideas.</p>
                     </div>
-                    <div>
-                        <h3 class="text-xl font-600 text-wy-text mb-2">Create & Pair</h3>
-                        <p class="text-wy-text-muted">Sign up, create an account, and generate an invite code. Share it with your partner—they confirm, and you're paired.</p>
-                    </div>
-                </div>
+                </li>
 
-                <div class="flex gap-6">
-                    <div class="flex-shrink-0">
-                        <div class="flex h-12 w-12 items-center justify-center rounded-lg bg-wy-accent text-white font-700">2</div>
+                <li class="step">
+                    <div class="step-number" aria-label="Step 3">3</div>
+                    <div class="step-content">
+                        <h3>Check In Together</h3>
+                        <p>Log your mood (1-5) and choose whether to share with your partner. No pressure to explain.</p>
                     </div>
-                    <div>
-                        <h3 class="text-xl font-600 text-wy-text mb-2">Set Preferences</h3>
-                        <p class="text-wy-text-muted">Choose activity styles, food preferences, budget levels, and energy levels. This guides future date ideas.</p>
-                    </div>
-                </div>
+                </li>
 
-                <div class="flex gap-6">
-                    <div class="flex-shrink-0">
-                        <div class="flex h-12 w-12 items-center justify-center rounded-lg bg-wy-accent text-white font-700">3</div>
+                <li class="step">
+                    <div class="step-number" aria-label="Step 4">4</div>
+                    <div class="step-content">
+                        <h3>Get Ideas & Plan</h3>
+                        <p>Receive date ideas based on your mood, preferences, and availability. Save favorites and plan intentional time.</p>
                     </div>
-                    <div>
-                        <h3 class="text-xl font-600 text-wy-text mb-2">Check In Together</h3>
-                        <p class="text-wy-text-muted">Log your mood (1-5) and choose whether to share with your partner. No pressure to explain.</p>
-                    </div>
-                </div>
+                </li>
 
-                <div class="flex gap-6">
-                    <div class="flex-shrink-0">
-                        <div class="flex h-12 w-12 items-center justify-center rounded-lg bg-wy-accent text-white font-700">4</div>
+                <li class="step">
+                    <div class="step-number" aria-label="Step 5">5</div>
+                    <div class="step-content">
+                        <h3>Grow Together</h3>
+                        <p>Track your patterns, celebrate shared moments, and discover what actually works for you as a couple.</p>
                     </div>
-                    <div>
-                        <h3 class="text-xl font-600 text-wy-text mb-2">Get Ideas & Plan</h3>
-                        <p class="text-wy-text-muted">Receive date ideas based on your mood, preferences, and availability. Save favorites and plan intentional time.</p>
-                    </div>
-                </div>
-
-                <div class="flex gap-6">
-                    <div class="flex-shrink-0">
-                        <div class="flex h-12 w-12 items-center justify-center rounded-lg bg-wy-accent text-white font-700">5</div>
-                    </div>
-                    <div>
-                        <h3 class="text-xl font-600 text-wy-text mb-2">Grow Together</h3>
-                        <p class="text-wy-text-muted">Track your patterns, celebrate shared moments, and discover what actually works for you as a couple.</p>
-                    </div>
-                </div>
-            </div>
+                </li>
+            </ol>
         </div>
     </section>
 
     <!-- Privacy Section -->
-    <section id="privacy" class="py-16 md:py-24">
-        <div class="max-w-7xl mx-auto px-6">
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
+    <section class="privacy" id="privacy" role="region" aria-label="Privacy and security section">
+        <div class="container">
+            <div class="privacy-grid">
                 <div>
-                    <span class="inline-block px-4 py-2 bg-wy-accent-weak text-wy-accent rounded-full text-xs font-600 uppercase tracking-widest mb-4">Your Data, Your Control</span>
-                    <h2 class="text-4xl font-bold text-wy-text mb-4">Privacy Matters</h2>
-                    <p class="text-lg text-wy-text-muted mb-8">We built WithYou with privacy at the core. Your relationship data belongs to you, not us.</p>
+                    <span class="badge">Your Data, Your Control</span>
+                    <h2>Privacy Matters</h2>
+                    <p>We built WithYou with privacy at the core. Your relationship data belongs to you, not us.</p>
 
-                    <div class="space-y-6">
-                        <div class="flex gap-4">
-                            <div class="flex-shrink-0">
-                                <div class="flex h-6 w-6 items-center justify-center rounded-full bg-wy-accent-weak">
-                                    <svg class="h-4 w-4 text-wy-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path>
-                                    </svg>
-                                </div>
-                            </div>
+                    <div class="privacy-list" role="list">
+                        <div class="privacy-item" role="listitem">
+                            <div class="checkmark">✓</div>
                             <div>
-                                <p class="font-600 text-wy-text">End-to-end encryption</p>
-                                <p class="text-sm text-wy-text-muted">Passwords hashed with bcrypt, all data transmitted via HTTPS</p>
+                                <h4>End-to-end encryption</h4>
+                                <p>Passwords hashed with bcrypt, all data transmitted via HTTPS</p>
                             </div>
                         </div>
 
-                        <div class="flex gap-4">
-                            <div class="flex-shrink-0">
-                                <div class="flex h-6 w-6 items-center justify-center rounded-full bg-wy-accent-weak">
-                                    <svg class="h-4 w-4 text-wy-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path>
-                                    </svg>
-                                </div>
-                            </div>
+                        <div class="privacy-item" role="listitem">
+                            <div class="checkmark">✓</div>
                             <div>
-                                <p class="font-600 text-wy-text">No data selling</p>
-                                <p class="text-sm text-wy-text-muted">We will never sell, rent, or trade your personal information</p>
+                                <h4>No data selling</h4>
+                                <p>We will never sell, rent, or trade your personal information</p>
                             </div>
                         </div>
 
-                        <div class="flex gap-4">
-                            <div class="flex-shrink-0">
-                                <div class="flex h-6 w-6 items-center justify-center rounded-full bg-wy-accent-weak">
-                                    <svg class="h-4 w-4 text-wy-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path>
-                                    </svg>
-                                </div>
-                            </div>
+                        <div class="privacy-item" role="listitem">
+                            <div class="checkmark">✓</div>
                             <div>
-                                <p class="font-600 text-wy-text">Full control</p>
-                                <p class="text-sm text-wy-text-muted">Delete your account and data anytime from settings</p>
+                                <h4>Full control</h4>
+                                <p>Delete your account and data anytime from settings</p>
                             </div>
                         </div>
 
-                        <div class="flex gap-4">
-                            <div class="flex-shrink-0">
-                                <div class="flex h-6 w-6 items-center justify-center rounded-full bg-wy-accent-weak">
-                                    <svg class="h-4 w-4 text-wy-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path>
-                                    </svg>
-                                </div>
-                            </div>
+                        <div class="privacy-item" role="listitem">
+                            <div class="checkmark">✓</div>
                             <div>
-                                <p class="font-600 text-wy-text">Minimal collection</p>
-                                <p class="text-sm text-wy-text-muted">No location, contacts, photos, or social media data</p>
+                                <h4>Minimal collection</h4>
+                                <p>No location, contacts, photos, or social media data</p>
                             </div>
                         </div>
                     </div>
 
-                    <div class="flex flex-col sm:flex-row gap-4 mt-8">
-                        <a href="../PRIVACY.md" class="text-wy-accent font-500 hover:text-green-800 smooth-transition">Read Privacy Policy →</a>
-                        <a href="../TERMS.md" class="text-wy-accent font-500 hover:text-green-800 smooth-transition">Read Terms of Service →</a>
+                    <div style="margin-top: calc(var(--spacing) * 2); display: flex; flex-direction: column; gap: calc(var(--spacing) * 1);">
+                        <a href="../PRIVACY.md" style="color: var(--accent); font-weight: 500; text-decoration: underline;">Read Privacy Policy →</a>
+                        <a href="../TERMS.md" style="color: var(--accent); font-weight: 500; text-decoration: underline;">Read Terms of Service →</a>
                     </div>
                 </div>
 
-                <div class="flex items-center justify-center lg:justify-end">
-                    <div class="p-8 bg-wy-surface-2 border border-wy-border rounded-2xl max-w-sm w-full">
-                        <div class="w-12 h-12 mb-6">
-                            <svg class="w-12 h-12 text-wy-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+                <div style="display: flex; align-items: center; justify-content: center;">
+                    <div class="privacy-card" style="max-width: 400px;">
+                        <div class="privacy-card-icon">
+                            <svg viewBox="0 0 24 24">
+                                <path d="M12 1C5.925 1 1 5.925 1 12s4.925 11 11 11 11-4.925 11-11S18.075 1 12 1zm0 20c-4.971 0-9-4.029-9-9s4.029-9 9-9 9 4.029 9 9-4.029 9-9 9z"/>
                             </svg>
                         </div>
-                        <h3 class="text-xl font-600 text-wy-text mb-4">What We Don't Collect</h3>
-                        <ul class="space-y-3">
-                            <li class="flex gap-2 text-wy-text-muted">
-                                <span class="text-wy-danger font-700">×</span>
+                        <h3>What We Don't Collect</h3>
+                        <ul class="dont-list">
+                            <li class="dont-item">
+                                <span class="dont-icon">×</span>
                                 <span>Location or GPS data</span>
                             </li>
-                            <li class="flex gap-2 text-wy-text-muted">
-                                <span class="text-wy-danger font-700">×</span>
+                            <li class="dont-item">
+                                <span class="dont-icon">×</span>
                                 <span>Contact lists</span>
                             </li>
-                            <li class="flex gap-2 text-wy-text-muted">
-                                <span class="text-wy-danger font-700">×</span>
+                            <li class="dont-item">
+                                <span class="dont-icon">×</span>
                                 <span>Photos or media files</span>
                             </li>
-                            <li class="flex gap-2 text-wy-text-muted">
-                                <span class="text-wy-danger font-700">×</span>
+                            <li class="dont-item">
+                                <span class="dont-icon">×</span>
                                 <span>Social media information</span>
                             </li>
-                            <li class="flex gap-2 text-wy-text-muted">
-                                <span class="text-wy-danger font-700">×</span>
+                            <li class="dont-item">
+                                <span class="dont-icon">×</span>
                                 <span>Advertising identifiers</span>
                             </li>
                         </ul>
@@ -387,66 +953,83 @@
     </section>
 
     <!-- CTA Section -->
-    <section class="py-16 md:py-24 bg-wy-surface-2">
-        <div class="max-w-2xl mx-auto px-6 text-center">
-            <span class="inline-block px-4 py-2 bg-wy-accent-weak text-wy-accent rounded-full text-xs font-600 uppercase tracking-widest mb-4">Get Started</span>
-            <h2 class="text-4xl md:text-5xl font-bold text-wy-text mb-6">Join the private beta</h2>
-            <p class="text-lg text-wy-text-muted mb-8 max-w-xl mx-auto">WithYou is currently in invite-only beta. Request access to help shape the future of intentional relationship tools.</p>
-            <div class="flex flex-wrap justify-center gap-4">
-                <a href="#contact" class="px-6 py-3 bg-wy-accent text-white font-600 rounded-lg hover:bg-green-800 smooth-transition min-h-11 flex items-center">
-                    Request Beta Access
-                </a>
-                <a href="https://github.com/Epetaway/withyou" target="_blank" rel="noopener" class="px-6 py-3 bg-white text-wy-text font-600 rounded-lg border border-wy-border hover:bg-wy-surface-2 smooth-transition flex items-center gap-2 min-h-11">
-                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 16 16">
-                        <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.012 8.012 0 0 0 16 8c0-4.42-3.58-8-8-8z"/>
-                    </svg>
-                    View on GitHub
-                </a>
+    <section class="cta" role="region" aria-label="Call to action section">
+        <div class="container-sm">
+            <span class="badge">Get Started</span>
+            <h2>Join the private beta</h2>
+            <p>WithYou is currently in invite-only beta. Request access to help shape the future of intentional relationship tools.</p>
+            <div class="btn-group" style="justify-content: center;">
+                <a href="#contact" class="btn btn-primary">Request Beta Access</a>
+                <a href="https://github.com/Epetaway/withyou" target="_blank" rel="noopener" class="btn btn-secondary">View on GitHub</a>
             </div>
         </div>
     </section>
 
     <!-- Contact Form -->
-    <section id="contact" class="py-16 md:py-24">
-        <div class="max-w-2xl mx-auto px-6">
-            <div class="text-center mb-12">
-                <span class="inline-block px-4 py-2 bg-wy-accent-weak text-wy-accent rounded-full text-xs font-600 uppercase tracking-widest mb-4">Beta Access</span>
-                <h2 class="text-4xl md:text-5xl font-bold text-wy-text mb-4">Request early access</h2>
-                <p class="text-lg text-wy-text-muted">Share a bit about yourself and we'll send you an invite code. We review requests within 48 hours.</p>
+    <section class="contact" id="contact" role="region" aria-label="Contact and beta access form">
+        <div class="container-sm">
+            <div class="section-header">
+                <span class="badge">Beta Access</span>
+                <h2>Request early access</h2>
+                <p>Share a bit about yourself and we'll send you an invite code. We review requests within 48 hours.</p>
             </div>
 
-            <form class="space-y-6">
-                <div>
-                    <label for="name" class="block text-sm font-600 text-wy-text mb-2">Name</label>
-                    <input type="text" id="name" name="name" placeholder="Your name" required class="w-full px-4 py-3 border border-wy-border rounded-lg text-wy-text placeholder-wy-text-muted focus:outline-none focus:border-wy-accent focus:ring-2 focus:ring-wy-accent/20 smooth-transition min-h-11">
+            <form onsubmit="handleContactSubmit(event)" novalidate aria-label="Beta access request form">
+                <div class="form-group">
+                    <label for="contact-name">Name</label>
+                    <input type="text" id="contact-name" name="name" placeholder="Your name" required aria-required="true">
                 </div>
-                <div>
-                    <label for="email" class="block text-sm font-600 text-wy-text mb-2">Email</label>
-                    <input type="email" id="email" name="email" placeholder="your@email.com" required class="w-full px-4 py-3 border border-wy-border rounded-lg text-wy-text placeholder-wy-text-muted focus:outline-none focus:border-wy-accent focus:ring-2 focus:ring-wy-accent/20 smooth-transition min-h-11">
+                <div class="form-group">
+                    <label for="contact-email">Email</label>
+                    <input type="email" id="contact-email" name="email" placeholder="your@email.com" required aria-required="true">
                 </div>
-                <div>
-                    <label for="message" class="block text-sm font-600 text-wy-text mb-2">Why WithYou?</label>
-                    <textarea id="message" name="message" placeholder="Tell us what brought you here (optional)" rows="5" class="w-full px-4 py-3 border border-wy-border rounded-lg text-wy-text placeholder-wy-text-muted focus:outline-none focus:border-wy-accent focus:ring-2 focus:ring-wy-accent/20 smooth-transition"></textarea>
+                <div class="form-group">
+                    <label for="contact-message">Why WithYou?</label>
+                    <textarea id="contact-message" name="message" placeholder="Tell us what brought you here (optional)"></textarea>
                 </div>
-                <button type="submit" class="w-full px-6 py-3 bg-wy-accent text-white font-600 rounded-lg hover:bg-green-800 smooth-transition min-h-11">
-                    Request Access
-                </button>
+                <button type="submit" class="btn btn-primary" style="width: 100%;">Request Access</button>
             </form>
         </div>
     </section>
 
     <!-- Footer -->
-    <footer class="bg-wy-surface-2 border-t border-wy-border py-12">
-        <div class="max-w-7xl mx-auto px-6">
-            <div class="flex flex-col sm:flex-row justify-between items-center gap-6 text-sm text-wy-text-muted">
-                <p>© 2026 WithYou. Built with intention.</p>
-                <div class="flex gap-6">
-                    <a href="../PRIVACY.md" class="hover:text-wy-text smooth-transition">Privacy</a>
-                    <a href="../TERMS.md" class="hover:text-wy-text smooth-transition">Terms</a>
-                    <a href="https://github.com/Epetaway/withyou" target="_blank" rel="noopener" class="hover:text-wy-text smooth-transition">GitHub</a>
-                </div>
+    <footer role="contentinfo">
+        <div class="container">
+            <div class="footer-content">
+                <p>&copy; 2026 WithYou. Built with intention.</p>
+                <ul class="footer-links">
+                    <li><a href="../PRIVACY.md">Privacy</a></li>
+                    <li><a href="../TERMS.md">Terms</a></li>
+                    <li><a href="https://github.com/Epetaway/withyou" target="_blank" rel="noopener">GitHub</a></li>
+                </ul>
             </div>
         </div>
     </footer>
+
+    <script>
+        function handleContactSubmit(event) {
+            event.preventDefault();
+            const form = event.target;
+            const formData = new FormData(form);
+            
+            // Validate form
+            const name = formData.get('name').trim();
+            const email = formData.get('email').trim();
+            
+            if (!name) {
+                alert('Please enter your name');
+                return;
+            }
+            
+            if (!email || !email.includes('@')) {
+                alert('Please enter a valid email address');
+                return;
+            }
+            
+            // Show success message
+            alert('Thank you for your interest! We\'ll review your request and send you an invite code within 48 hours.');
+            form.reset();
+        }
+    </script>
 </body>
 </html>
