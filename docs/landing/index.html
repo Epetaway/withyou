@@ -670,14 +670,24 @@
             }
         }
         
-        @media (prefers-contrast: more) {
-            .btn-primary {
-                border: 2px solid var(--text);
-            }
-            
-            .feature-card {
-                border-width: 2px;
-            }
+        /* Parallax effect */
+        .parallax-bg {
+            background-attachment: fixed;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-size: cover;
+        }
+        
+        .hero-bg {
+            background: linear-gradient(135deg, var(--primary) 0%, #3d7a92 100%);
+        }
+        
+        .features-bg {
+            background: linear-gradient(180deg, var(--surface) 0%, var(--accent-pale) 100%);
+        }
+        
+        .how-it-works-bg {
+            background: linear-gradient(180deg, var(--surface-2) 0%, var(--accent-pale) 100%);
         }
     </style>
 </head>
@@ -696,7 +706,7 @@
     </nav>
 
     <!-- Hero Section -->
-    <section class="hero" role="region" aria-label="Hero section">
+    <section class="hero hero-bg" role="region" aria-label="Hero section">
         <div class="container">
             <div>
                 <span class="badge">Intentional Connection</span>
@@ -737,20 +747,55 @@
                     </div>
                 </div>
             </div>
-            <!-- Phone Mockup -->
+            <!-- App Screenshot: Dashboard -->
             <div style="display: flex; justify-content: center; align-items: center;">
-                <img 
-                    src="https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=600&h=1000&fit=crop" 
-                    alt="WithYou app dashboard showing mood check-in and date suggestions" 
-                    style="max-width: 280px; border-radius: 24px; box-shadow: 0 20px 40px rgba(0,0,0,0.15);"
-                    loading="lazy"
-                />
+                <svg viewBox="0 0 320 640" style="width: 100%; max-width: 300px; filter: drop-shadow(0 20px 60px rgba(0,0,0,0.25));">
+                    <!-- Phone frame -->
+                    <rect x="10" y="0" width="300" height="640" rx="40" fill="#000" stroke="#333" stroke-width="2"/>
+                    <!-- Screen -->
+                    <rect x="20" y="15" width="280" height="610" rx="35" fill="white"/>
+                    <!-- Status bar -->
+                    <rect x="20" y="15" width="280" height="40" rx="35 35 0 0" fill="#4A90A4"/>
+                    <text x="160" y="40" font-size="11" font-weight="600" text-anchor="middle" fill="white" font-family="Arial, sans-serif">9:41</text>
+                    <!-- App content -->
+                    <g transform="translate(35, 75)">
+                        <!-- Header -->
+                        <rect x="0" y="0" width="250" height="60" fill="linear-gradient(135deg, #4A90A4, #3d7a92)" rx="12"/>
+                        <text x="10" y="25" font-size="14" font-weight="700" fill="white" font-family="Arial, sans-serif">Welcome back</text>
+                        <text x="10" y="45" font-size="12" fill="rgba(255,255,255,0.8)" font-family="Arial, sans-serif">Ready to check in?</text>
+                        
+                        <!-- Mood section -->
+                        <text x="0" y="85" font-size="12" font-weight="600" fill="#666" font-family="Arial, sans-serif">How are you feeling?</text>
+                        <g transform="translate(0, 95)">
+                            <!-- Mood circles -->
+                            <circle cx="15" cy="0" r="10" fill="#F4AE85" opacity="0.3"/>
+                            <circle cx="50" cy="0" r="10" fill="#F4AE85" opacity="0.6"/>
+                            <circle cx="85" cy="0" r="10" fill="#F4AE85"/>
+                            <circle cx="120" cy="0" r="10" fill="#F4AE85" opacity="0.6"/>
+                            <circle cx="155" cy="0" r="10" fill="#F4AE85" opacity="0.3"/>
+                        </g>
+                        
+                        <!-- Date idea card -->
+                        <rect x="0" y="130" width="250" height="90" fill="#F0F8FB" stroke="#4A90A4" stroke-width="1.5" rx="12"/>
+                        <text x="15" y="152" font-size="11" font-weight="600" fill="#4A90A4" font-family="Arial, sans-serif">💡 Suggested Date</text>
+                        <text x="15" y="175" font-size="14" font-weight="700" fill="#222" font-family="Arial, sans-serif">Evening Walk & Coffee</text>
+                        <text x="15" y="195" font-size="10" fill="#666" font-family="Arial, sans-serif">Based on your preferences & mood</text>
+                        <circle cx="230" cy="160" r="15" fill="#F4AE85" opacity="0.2"/>
+                        
+                        <!-- Partner status -->
+                        <rect x="0" y="235" width="250" height="50" fill="#F9F9F9" stroke="#E0E0E0" stroke-width="1" rx="8"/>
+                        <circle cx="15" cy="260" r="6" fill="#22863A"/>
+                        <text x="30" y="265" font-size="11" font-weight="600" fill="#222" font-family="Arial, sans-serif">Partner is available</text>
+                    </g>
+                    <!-- Home indicator -->
+                    <rect x="130" y="625" width="60" height="3" rx="1.5" fill="#999"/>
+                </svg>
             </div>
         </div>
     </section>
 
     <!-- Features Section -->
-    <section class="features" id="features" role="region" aria-label="Features section">
+    <section class="features features-bg" id="features" role="region" aria-label="Features section">
         <div class="container">
             <div class="section-header">
                 <span class="badge">Core Features</span>
@@ -760,9 +805,9 @@
             <div class="features-grid">
                 <article class="feature-card">
                     <img 
-                        src="https://images.unsplash.com/photo-1568602471122-7832951cc4c5?w=400&h=300&fit=crop" 
-                        alt="Privacy symbol - secure connection"
-                        style="width: 100%; height: 200px; object-fit: cover; border-radius: var(--radius); margin-bottom: calc(var(--spacing) * 1);"
+                        src="https://images.unsplash.com/photo-1522673607200-164d1b6ce486?w=500&h=300&fit=crop" 
+                        alt="Couple in private intimate moment together"
+                        style="width: 100%; height: 200px; object-fit: cover; border-radius: var(--radius) var(--radius) 0 0; display: block;"
                         loading="lazy"
                     />
                     <h3>Private by Design</h3>
@@ -771,9 +816,9 @@
 
                 <article class="feature-card">
                     <img 
-                        src="https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=400&h=300&fit=crop" 
-                        alt="Two people shaking hands - consent and agreement"
-                        style="width: 100%; height: 200px; object-fit: cover; border-radius: var(--radius); margin-bottom: calc(var(--spacing) * 1);"
+                        src="https://images.unsplash.com/photo-1518568814500-bf0f8d125f46?w=500&h=300&fit=crop" 
+                        alt="Couple connecting and choosing to be together"
+                        style="width: 100%; height: 200px; object-fit: cover; border-radius: var(--radius) var(--radius) 0 0; display: block;"
                         loading="lazy"
                     />
                     <h3>Consent-Based Pairing</h3>
@@ -782,9 +827,9 @@
 
                 <article class="feature-card">
                     <img 
-                        src="https://images.unsplash.com/photo-1552058544-f2b08422138a?w=400&h=300&fit=crop" 
-                        alt="Person reflecting quietly - indirect signals and moods"
-                        style="width: 100%; height: 200px; object-fit: cover; border-radius: var(--radius); margin-bottom: calc(var(--spacing) * 1);"
+                        src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=500&h=300&fit=crop" 
+                        alt="Couple sharing emotions and communicating indirectly"
+                        style="width: 100%; height: 200px; object-fit: cover; border-radius: var(--radius) var(--radius) 0 0; display: block;"
                         loading="lazy"
                     />
                     <h3>Indirect Signals</h3>
@@ -793,9 +838,9 @@
 
                 <article class="feature-card">
                     <img 
-                        src="https://images.unsplash.com/photo-1552664730-d307ca884978?w=400&h=300&fit=crop" 
-                        alt="Couple discussing preferences and planning"
-                        style="width: 100%; height: 200px; object-fit: cover; border-radius: var(--radius); margin-bottom: calc(var(--spacing) * 1);"
+                        src="https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=500&h=300&fit=crop" 
+                        alt="Couple planning together and communicating"
+                        style="width: 100%; height: 200px; object-fit: cover; border-radius: var(--radius) var(--radius) 0 0; display: block;"
                         loading="lazy"
                     />
                     <h3>Smart Preferences</h3>
@@ -804,9 +849,9 @@
 
                 <article class="feature-card">
                     <img 
-                        src="https://images.unsplash.com/photo-1506126613408-eca07ce68773?w=400&h=300&fit=crop" 
-                        alt="Person journaling and reflecting on emotions"
-                        style="width: 100%; height: 200px; object-fit: cover; border-radius: var(--radius); margin-bottom: calc(var(--spacing) * 1);"
+                        src="https://images.unsplash.com/photo-1495954380655-ab5b57f95ea6?w=500&h=300&fit=crop" 
+                        alt="Couple checking in and sharing their feelings"
+                        style="width: 100%; height: 200px; object-fit: cover; border-radius: var(--radius) var(--radius) 0 0; display: block;"
                         loading="lazy"
                     />
                     <h3>Check-In Moods</h3>
@@ -815,9 +860,9 @@
 
                 <article class="feature-card">
                     <img 
-                        src="https://images.unsplash.com/photo-1488747807830-63789f68bb65?w=400&h=300&fit=crop" 
-                        alt="Couple planning a date together"
-                        style="width: 100%; height: 200px; object-fit: cover; border-radius: var(--radius); margin-bottom: calc(var(--spacing) * 1);"
+                        src="https://images.unsplash.com/photo-1511632765486-a01980e01a18?w=500&h=300&fit=crop" 
+                        alt="Couple enjoying quality time and connection together"
+                        style="width: 100%; height: 200px; object-fit: cover; border-radius: var(--radius) var(--radius) 0 0; display: block;"
                         loading="lazy"
                     />
                     <h3>Date Ideas</h3>
@@ -828,7 +873,7 @@
     </section>
 
     <!-- How It Works -->
-    <section class="how-it-works" id="how-it-works" role="region" aria-label="How it works section">
+    <section class="how-it-works how-it-works-bg" id="how-it-works" role="region" aria-label="How it works section">
         <div class="container">
             <div class="section-header">
                 <span class="badge">Process</span>
@@ -931,7 +976,7 @@
                 <div style="display: flex; align-items: center; justify-content: center; padding: calc(var(--spacing) * 2); border-radius: var(--radius); overflow: hidden; background: var(--surface-2);">
                     <img 
                         src="https://images.unsplash.com/photo-1516627145497-ae6968895b2f?w=600&h=400&fit=crop" 
-                        alt="Couple having a genuine moment together at home"
+                        alt="Couple enjoying a private and secure moment together"
                         style="width: 100%; max-width: 380px; height: auto; display: block; border-radius: var(--radius);"
                         loading="lazy"
                     />
