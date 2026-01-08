@@ -3,8 +3,8 @@ import { View } from "react-native";
 import { CONTENT, registerSchema, AuthResponse } from "@withyou/shared";
 import { Screen } from "../../ui/components/Screen";
 import { Text } from "../../ui/components/Text";
-import { TextField } from "../../ui/components/TextField";
-import { Button } from "../../ui/components/Button";
+import { TextFieldNew } from "../../ui/components/TextFieldNew";
+import { ButtonNew } from "../../ui/components/ButtonNew";
 import { api } from "../../state/appState";
 import { setSession } from "../../state/session";
 import { setToken } from "../../state/appState";
@@ -73,29 +73,29 @@ export function RegisterScreen({ navigation }: RegisterScreenProps) {
         <Text variant="title">{c.title}</Text>
         <Text variant="muted">{c.helper}</Text>
 
-        <TextField
+        <TextFieldNew
           label={c.fields.emailLabel}
           value={email}
           onChangeText={setEmail}
           keyboardType="email-address"
           autoCapitalize="none"
-          errorText={fieldErrors.email}
+          error={fieldErrors.email}
         />
-        <TextField
+        <TextFieldNew
           label={c.fields.passwordLabel}
           value={password}
           onChangeText={setPassword}
           secureTextEntry
           autoCapitalize="none"
-          errorText={fieldErrors.password}
+          error={fieldErrors.password}
         />
-        <TextField
+        <TextFieldNew
           label={c.fields.confirmPasswordLabel}
           value={confirmPassword}
           onChangeText={setConfirmPassword}
           secureTextEntry
           autoCapitalize="none"
-          errorText={fieldErrors.confirmPassword}
+          error={fieldErrors.confirmPassword}
         />
 
         {errorText ? (
@@ -104,13 +104,13 @@ export function RegisterScreen({ navigation }: RegisterScreenProps) {
           </Text>
         ) : null}
 
-        <Button
+        <ButtonNew
           label={loading ? CONTENT.app.common.loading : c.actions.primary}
           onPress={onSubmit}
           disabled={loading}
         />
 
-        <Button
+        <ButtonNew
           label={c.actions.secondary}
           onPress={() => navigation.navigate("Login")}
           variant="secondary"

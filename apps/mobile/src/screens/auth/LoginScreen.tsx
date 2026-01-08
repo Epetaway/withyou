@@ -3,8 +3,8 @@ import { View } from "react-native";
 import { CONTENT, loginSchema, AuthResponse } from "@withyou/shared";
 import { Screen } from "../../ui/components/Screen";
 import { Text } from "../../ui/components/Text";
-import { TextField } from "../../ui/components/TextField";
-import { Button } from "../../ui/components/Button";
+import { TextFieldNew } from "../../ui/components/TextFieldNew";
+import { ButtonNew } from "../../ui/components/ButtonNew";
 import { api } from "../../state/appState";
 import { setSession } from "../../state/session";
 import { setToken } from "../../state/appState";
@@ -70,21 +70,21 @@ export function LoginScreen({ navigation }: LoginScreenProps) {
         <Text variant="title">{c.title}</Text>
         <Text variant="muted">{c.helper}</Text>
 
-        <TextField
+        <TextFieldNew
           label={c.fields.emailLabel}
           value={email}
           onChangeText={setEmail}
           keyboardType="email-address"
           autoCapitalize="none"
-          errorText={emailError}
+          error={emailError}
         />
-        <TextField
+        <TextFieldNew
           label={c.fields.passwordLabel}
           value={password}
           onChangeText={setPassword}
           secureTextEntry
           autoCapitalize="none"
-          errorText={passwordError}
+          error={passwordError}
         />
 
         {errorText ? (
@@ -93,13 +93,13 @@ export function LoginScreen({ navigation }: LoginScreenProps) {
           </Text>
         ) : null}
 
-        <Button
+        <ButtonNew
           label={loading ? CONTENT.app.common.loading : c.actions.primary}
           onPress={onSubmit}
           disabled={loading}
         />
 
-        <Button
+        <ButtonNew
           label={c.actions.secondary}
           onPress={() => navigation.navigate("Register")}
           variant="secondary"

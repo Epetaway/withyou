@@ -2,16 +2,15 @@ import React, { useEffect, useState } from 'react';
 import { StatusBar } from 'expo-status-bar';
 import { ActivityIndicator, View } from 'react-native';
 import { RootNavigator } from './navigation/RootNavigator';
-import { tokens } from './ui/tokens';
+import { ThemeProvider, useTheme } from './ui/theme/ThemeProvider';
 
-export default function App() {
+function AppInner() {
   const [isLoading, setIsLoading] = useState(true);
+  const { colors, mode } = useTheme();
 
   useEffect(() => {
-    // Initialize app state here (font loading, etc)
     const prepare = async () => {
       try {
-        // Add any async initialization here
         await new Promise(resolve => setTimeout(resolve, 100));
       } catch (e) {
         console.warn(e);
@@ -30,18 +29,26 @@ export default function App() {
           flex: 1,
           justifyContent: 'center',
           alignItems: 'center',
-          backgroundColor: tokens.colors.bg,
+          backgroundColor: colors.background,
         }}
       >
-        <ActivityIndicator size="large" color={tokens.colors.button} />
+        <ActivityIndicator size="large" color={colors.primary} />
       </View>
     );
   }
 
   return (
     <>
-      <StatusBar style="dark" />
+      <StatusBar style={mode === 'dark' ? 'light' : 'dark'} />
       <RootNavigator />
     </>
+  );
+}
+
+export default function App() {
+  return (
+    <ThemeProvider>
+      <AppInner />
+    </ThemeProvider>
   );
 }

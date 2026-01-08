@@ -1,6 +1,7 @@
 import React from 'react';
-import { View, TextInput, Text, StyleSheet, ViewStyle, TextStyle, TextInputProps } from 'react-native';
-import { LightTheme as Colors, Spacing, BorderRadius, Typography, Animation } from '../tokens';
+import { View, TextInput, Text, StyleSheet, ViewStyle, TextInputProps } from 'react-native';
+import { Spacing, BorderRadius, Typography, Animation } from '../tokens';
+import { useTheme } from '../theme/ThemeProvider';
 
 interface TextFieldProps extends TextInputProps {
   label?: string;
@@ -21,22 +22,24 @@ export const TextFieldNew: React.FC<TextFieldProps> = ({
   style,
   ...inputProps
 }) => {
+  const { colors } = useTheme();
   const [isFocused, setIsFocused] = React.useState(false);
 
   return (
     <View style={[styles.container, containerStyle]}>
-      {label && <Text style={styles.label}>{label}</Text>}
+      {label && <Text style={[styles.label, { color: colors.text }]}>{label}</Text>}
       
       <View style={[
         styles.inputContainer,
-        isFocused && styles.inputFocused,
-        error && styles.inputError,
+        { backgroundColor: colors.surface, borderColor: colors.border },
+        isFocused && { borderColor: colors.primary, borderWidth: 1.5 },
+        error && { borderColor: colors.error },
       ]}>
         {leftIcon && <View style={styles.leftIcon}>{leftIcon}</View>}
         
         <TextInput
-          style={[styles.input, style]}
-          placeholderTextColor={Colors.textMuted}
+          style={[styles.input, { color: colors.text }, style]}
+          placeholderTextColor={colors.textMuted}
           onFocus={() => setIsFocused(true)}
           onBlur={() => setIsFocused(false)}
           {...inputProps}
@@ -45,8 +48,8 @@ export const TextFieldNew: React.FC<TextFieldProps> = ({
         {rightIcon && <View style={styles.rightIcon}>{rightIcon}</View>}
       </View>
       
-      {error && <Text style={styles.error}>{error}</Text>}
-      {helper && !error && <Text style={styles.helper}>{helper}</Text>}
+      {error && <Text style={[styles.error, { color: colors.error }]}>{error}</Text>}
+      {helper && !error && <Text style={[styles.helper, { color: colors.textMuted }]}>{helper}</Text>}
     </View>
   );
 };
@@ -60,36 +63,22 @@ const styles = StyleSheet.create({
   label: {
     fontSize: Typography.size.sm,
     fontWeight: Typography.weight.medium,
-    color: Colors.text,
     marginBottom: Spacing.xxs,
   },
   
   inputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: Colors.surface,
     borderWidth: 1,
-    borderColor: Colors.border,
     borderRadius: BorderRadius.md,
     paddingHorizontal: Spacing.md,
     minHeight: 48,
     transitionDuration: `${Animation.fast}ms`,
   },
   
-  inputFocused: {
-    borderColor: Colors.primary,
-    borderWidth: 1.5,
-    backgroundColor: Colors.surface,
-  },
-  
-  inputError: {
-    borderColor: Colors.error,
-  },
-  
   input: {
     flex: 1,
     fontSize: Typography.size.base,
-    color: Colors.text,
     paddingVertical: Spacing.sm,
     lineHeight: Typography.size.base * Typography.lineHeight.normal,
   },
@@ -104,13 +93,11 @@ const styles = StyleSheet.create({
   
   error: {
     fontSize: Typography.size.xs,
-    color: Colors.error,
     marginTop: Spacing.xxs,
   },
   
   helper: {
     fontSize: Typography.size.xs,
-    color: Colors.textMuted,
     marginTop: Spacing.xxs,
   },
 });

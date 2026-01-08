@@ -1,6 +1,7 @@
 import React from 'react';
 import { TouchableOpacity, Text, StyleSheet, ActivityIndicator, ViewStyle, TextStyle } from 'react-native';
-import { LightTheme as Colors, Spacing, BorderRadius, Typography, Shadows, TouchTarget } from '../tokens';
+import { Spacing, BorderRadius, Typography, Shadows, TouchTarget } from '../tokens';
+import { useTheme } from '../theme/ThemeProvider';
 
 type ButtonVariant = 'primary' | 'secondary' | 'ghost' | 'danger';
 type ButtonSize = 'small' | 'medium' | 'large';
@@ -30,9 +31,25 @@ export const ButtonNew: React.FC<ButtonProps> = ({
   style,
   textStyle,
 }) => {
+  const { colors } = useTheme();
+
+  const variantStyles: Record<ButtonVariant, ViewStyle> = {
+    primary: { backgroundColor: colors.primary },
+    secondary: { backgroundColor: 'transparent', borderWidth: 1.5, borderColor: colors.primary },
+    ghost: { backgroundColor: 'transparent' },
+    danger: { backgroundColor: colors.error },
+  };
+
+  const variantTextColors: Record<ButtonVariant, TextStyle> = {
+    primary: { color: colors.textInverse },
+    secondary: { color: colors.primary },
+    ghost: { color: colors.primary },
+    danger: { color: colors.textInverse },
+  };
+
   const buttonStyles: ViewStyle[] = [
     styles.base,
-    styles[variant],
+    variantStyles[variant],
     styles[`${size}Size`],
     fullWidth && styles.fullWidth,
     disabled && styles.disabled,
@@ -41,7 +58,7 @@ export const ButtonNew: React.FC<ButtonProps> = ({
 
   const textStyles: TextStyle[] = [
     styles.text,
-    styles[`${variant}Text`],
+    variantTextColors[variant],
     styles[`${size}Text`],
     disabled && styles.disabledText,
     textStyle,
@@ -56,7 +73,7 @@ export const ButtonNew: React.FC<ButtonProps> = ({
     >
       {loading ? (
         <ActivityIndicator
-          color={variant === 'primary' || variant === 'danger' ? Colors.textInverse : Colors.primary}
+          color={variant === 'primary' || variant === 'danger' ? colors.textInverse : colors.primary}
           size="small"
         />
       ) : (
@@ -81,21 +98,7 @@ const styles = StyleSheet.create({
     ...Shadows.sm,
   },
   
-  // Variants
-  primary: {
-    backgroundColor: Colors.primary,
-  },
-  secondary: {
-    backgroundColor: 'transparent',
-    borderWidth: 1.5,
-    borderColor: Colors.primary,
-  },
-  ghost: {
-    backgroundColor: 'transparent',
-  },
-  danger: {
-    backgroundColor: Colors.error,
-  },
+  // Variants moved to dynamic theme colors
   
   // Sizes
   smallSize: {
@@ -126,18 +129,6 @@ const styles = StyleSheet.create({
     fontSize: Typography.size.base,
     fontWeight: Typography.weight.semibold,
     lineHeight: Typography.size.base * Typography.lineHeight.normal,
-  },
-  primaryText: {
-    color: Colors.textInverse,
-  },
-  secondaryText: {
-    color: Colors.primary,
-  },
-  ghostText: {
-    color: Colors.primary,
-  },
-  dangerText: {
-    color: Colors.textInverse,
   },
   disabledText: {
     opacity: 0.7,

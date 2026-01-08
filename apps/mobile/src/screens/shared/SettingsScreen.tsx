@@ -1,19 +1,23 @@
 import React, { useState } from "react";
-import { View, ScrollView, Modal } from "react-native";
+import { View, ScrollView } from "react-native";
 import { CONTENT } from "@withyou/shared";
 import { Screen } from "../../ui/components/Screen";
 import { Text } from "../../ui/components/Text";
-import { Button } from "../../ui/components/Button";
-import { Card } from "../../ui/components/Card";
+import { ButtonNew as Button } from "../../ui/components/ButtonNew";
+import { CardNew as Card } from "../../ui/components/CardNew";
 import { api } from "../../state/appState";
 import { clearSession } from "../../state/session";
 import { useAsyncAction } from "../../api/hooks";
+import { ToggleNew } from "../../ui/components/ToggleNew";
+import { ModalNew } from "../../ui/components/ModalNew";
+import { useTheme } from "../../ui/theme/ThemeProvider";
 
 type SettingsScreenProps = {
   navigation: unknown;
 };
 
 export function SettingsScreen({ navigation }: SettingsScreenProps) {
+  const { mode, toggle } = useTheme();
   const [showEndPairingModal, setShowEndPairingModal] = useState(false);
   const [showLogoutModal, setShowLogoutModal] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
@@ -80,6 +84,16 @@ export function SettingsScreen({ navigation }: SettingsScreenProps) {
           variant="secondary"
         />
 
+        <Text variant="subtitle">Appearance</Text>
+        <Card>
+          <ToggleNew
+            label="Dark Mode"
+            helper="Toggle the app theme"
+            value={mode === 'dark'}
+            onValueChange={toggle}
+          />
+        </Card>
+
         <Text variant="subtitle">{CONTENT.settings.sections.account}</Text>
 
         <Button
@@ -89,86 +103,38 @@ export function SettingsScreen({ navigation }: SettingsScreenProps) {
         />
       </ScrollView>
 
-      <Modal
+      <ModalNew
         visible={showEndPairingModal}
-        transparent
-        animationType="fade"
-        onRequestClose={() => setShowEndPairingModal(false)}
-      >
-        <View
-          style={{
-            flex: 1,
-            backgroundColor: "rgba(0,0,0,0.5)",
-            justifyContent: "center",
-            padding: 16,
-          }}
-        >
-          <Card>
-            <View style={{ gap: 16 }}>
-              <Text variant="title">
-                {CONTENT.settings.relationship.confirmEndTitle}
-              </Text>
-              <Text variant="body">
-                {CONTENT.settings.relationship.confirmEndBody}
-              </Text>
-              <View style={{ gap: 10 }}>
-                <Button
-                  label={
-                    endPairingLoading
-                      ? CONTENT.app.common.loading
-                      : CONTENT.settings.relationship.confirmEndAction
-                  }
-                  onPress={onEndPairingConfirm}
-                  disabled={endPairingLoading}
-                />
-                <Button
-                  label={CONTENT.settings.relationship.cancelEndAction}
-                  onPress={() => setShowEndPairingModal(false)}
-                  variant="secondary"
-                />
-              </View>
-            </View>
-          </Card>
-        </View>
-      </Modal>
+        onClose={() => setShowEndPairingModal(false)}
+        title={CONTENT.settings.relationship.confirmEndTitle}
+        message={CONTENT.settings.relationship.confirmEndBody}
+        primaryAction={{
+          label:
+            endPairingLoading
+              ? CONTENT.app.common.loading
+              : CONTENT.settings.relationship.confirmEndAction,
+          onPress: onEndPairingConfirm,
+        }}
+        secondaryAction={{
+          label: CONTENT.settings.relationship.cancelEndAction,
+          onPress: () => setShowEndPairingModal(false),
+        }}
+      />
 
-      <Modal
+      <ModalNew
         visible={showLogoutModal}
-        transparent
-        animationType="fade"
-        onRequestClose={() => setShowLogoutModal(false)}
-      >
-        <View
-          style={{
-            flex: 1,
-            backgroundColor: "rgba(0,0,0,0.5)",
-            justifyContent: "center",
-            padding: 16,
-          }}
-        >
-          <Card>
-            <View style={{ gap: 16 }}>
-              <Text variant="title">
-                {CONTENT.settings.account.confirmLogoutTitle}
-              </Text>
-              <Text variant="body">
-                {CONTENT.settings.account.confirmLogoutBody}
-              </Text>
-              <View style={{ gap: 10 }}>
-                <Button
-                  label={CONTENT.settings.account.confirmLogoutAction}
-                  onPress={onLogoutConfirm}
-                />
-                <Button
-                  label={CONTENT.settings.account.cancelLogoutAction}
-                  onPress={() => setShowLogoutModal(false)}
-                  variant="secondary"
-                />
-              </View>
-            </View>
-          </Card>
-        </View>
-      </Modal>
+        onClose={() => setShowLogoutModal(false)}
+        title={CONTENT.settings.account.confirmLogoutTitle}
+        message={CONTENT.settings.account.confirmLogoutBody}
+        primaryAction={{
+          label: CONTENT.settings.account.confirmLogoutAction,
+          onPress: onLogoutConfirm,
+        }}
+        secondaryAction={{
+          label: CONTENT.settings.account.cancelLogoutAction,
+          onPress: () => setShowLogoutModal(false),
+        }}
+      />
     </Screen>
   );
 }

@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, StyleSheet, ViewStyle, TouchableOpacity } from 'react-native';
-import { LightTheme as Colors, Spacing, BorderRadius, Shadows } from '../tokens';
+import { Spacing, BorderRadius, Shadows } from '../tokens';
+import { useTheme } from '../theme/ThemeProvider';
 
 interface CardProps {
   children: React.ReactNode;
@@ -17,13 +18,20 @@ export const CardNew: React.FC<CardProps> = ({
   onPress,
   style,
 }) => {
+  const { colors } = useTheme();
   const Container = onPress ? TouchableOpacity : View;
+
+  const variantStyles: Record<string, ViewStyle> = {
+    default: { backgroundColor: colors.surface2 },
+    elevated: { backgroundColor: colors.surface },
+    outlined: { backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border },
+  };
   
   return (
     <Container
       style={[
         styles.base,
-        styles[variant],
+        variantStyles[variant],
         { padding: Spacing[padding] },
         style,
       ]}
@@ -38,7 +46,6 @@ export const CardNew: React.FC<CardProps> = ({
 const styles = StyleSheet.create({
   base: {
     borderRadius: BorderRadius.lg,
-    backgroundColor: Colors.surface2,
   },
   
   default: {
@@ -47,12 +54,8 @@ const styles = StyleSheet.create({
   
   elevated: {
     ...Shadows.md,
-    backgroundColor: Colors.surface,
   },
   
   outlined: {
-    borderWidth: 1,
-    borderColor: Colors.border,
-    backgroundColor: Colors.surface,
   },
 });

@@ -7,8 +7,8 @@ import {
 } from "@withyou/shared";
 import { Screen } from "../../ui/components/Screen";
 import { Text } from "../../ui/components/Text";
-import { TextField } from "../../ui/components/TextField";
-import { Button } from "../../ui/components/Button";
+import { TextFieldNew as TextField } from "../../ui/components/TextFieldNew";
+import { ButtonNew as Button } from "../../ui/components/ButtonNew";
 import { api } from "../../state/appState";
 import { useAsyncAction } from "../../api/hooks";
 
@@ -68,7 +68,7 @@ export function PairAcceptScreen({ navigation }: PairAcceptScreenProps) {
           onChangeText={setInviteCode}
           placeholder="ABC123"
           autoCapitalize="characters"
-          errorText={inviteCodeError}
+          error={inviteCodeError}
         />
 
         {errorText ? (
