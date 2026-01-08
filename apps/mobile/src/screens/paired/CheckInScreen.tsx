@@ -1,18 +1,24 @@
 import React, { useState } from "react";
-import { View, ScrollView, Switch } from "react-native";
+import { View, ScrollView } from "react-native";
 import { CONTENT, checkinCreateSchema } from "@withyou/shared";
 import { Screen } from "../../ui/components/Screen";
 import { Text } from "../../ui/components/Text";
-import { Button } from "../../ui/components/Button";
-import { TextField } from "../../ui/components/TextField";
+import { ButtonNew as Button } from "../../ui/components/ButtonNew";
+import { TextFieldNew as TextField } from "../../ui/components/TextFieldNew";
+import { CardNew as Card } from "../../ui/components/CardNew";
+import { ToggleNew } from "../../ui/components/ToggleNew";
+import { MoodPickerNew } from "../../ui/components/MoodPickerNew";
 import { api } from "../../state/appState";
 import { useAsyncAction } from "../../api/hooks";
+import { Spacing } from "../../ui/tokens";
+import { useTheme } from "../../ui/theme/ThemeProvider";
 
 type CheckInScreenProps = {
   navigation: unknown;
 };
 
 export function CheckInScreen({ navigation }: CheckInScreenProps) {
+  const { colors } = useTheme();
   const c = CONTENT.checkIn.create;
 
   const [moodLevel, setMoodLevel] = useState<1 | 2 | 3 | 4 | 5 | null>(null);
@@ -62,70 +68,86 @@ export function CheckInScreen({ navigation }: CheckInScreenProps) {
     (navigation as any)?.goBack?.();
   };
 
+  const moodOptions = [
+    { key: "1", emoji: "😟", label: "Very low" },
+    { key: "2", emoji: "😕", label: "Low" },
+    { key: "3", emoji: "😐", label: "Neutral" },
+    { key: "4", emoji: "🙂", label: "Good" },
+    { key: "5", emoji: "😄", label: "Very good" },
+  ];
+
   return (
     <Screen>
-      <ScrollView showsVerticalScrollIndicator={false} style={{ gap: 16 }}>
-        <Text variant="title">{c.title}</Text>
-        <Text variant="body">{c.prompt}</Text>
-
-        {moodError ? (
-          <Text variant="muted" style={{ color: "#B00020" }}>
-            {moodError}
+      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ gap: Spacing.lg, paddingBottom: Spacing.xl }}>
+        {/* Header */}
+        <View style={{ gap: Spacing.sm }}>
+          <Text variant="title">{c.title}</Text>
+          <Text variant="body" style={{ color: colors.textMuted }}>
+            {c.prompt}
           </Text>
-        ) : null}
-
-        <View
-          style={{
-            flexDirection: "row",
-            justifyContent: "space-around",
-            marginVertical: 16,
-          }}
-        >
-          {[1, 2, 3, 4, 5].map((level) => (
-            <View key={level} style={{ alignItems: "center" }}>
-              <Button
-                label={String(level)}
-                onPress={() =>
-                  setMoodLevel(level as 1 | 2 | 3 | 4 | 5)
-                }
-                variant={moodLevel === level ? "primary" : "secondary"}
-              />
-              <Text variant="muted" style={{ marginTop: 4, fontSize: 11, textAlign: "center" }}>
-                {c.moodLabels[level as 1 | 2 | 3 | 4 | 5]}
-              </Text>
-            </View>
-          ))}
         </View>
 
+        {/* Mood Error */}
+        {moodError ? (
+          <Card variant="outlined">
+            <Text variant="body" style={{ color: colors.error }}>
+              {moodError}
+            </Text>
+          </Card>
+        ) : null}
+
+        {/* Mood Picker */}
+        <Card variant="elevated">
+          <View style={{ gap: Spacing.md }}>
+            <Text variant="subtitle">{c.fields.moodLabel}</Text>
+            <MoodPickerNew
+              options={moodOptions}
+              value={moodLevel ? String(moodLevel) : undefined}
+              onChange={(key) => setMoodLevel(parseInt(key) as 1 | 2 | 3 | 4 | 5)}
+            />
+          </View>
+        </Card>
+
+        {/* Note Input */}
         <TextField
           label={c.fields.noteLabel}
           value={note}
           onChangeText={setNote}
-          placeholder="How are you feeling?"
+          placeholder="What's on your mind?"
         />
 
-        <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
-          <Text variant="body">{c.fields.shareToggleLabel}</Text>
-          <Switch value={shared} onValueChange={setShared} />
-        </View>
-        <Text variant="muted">{c.fields.shareHelper}</Text>
+        {/* Share Toggle */}
+        <Card>
+          <ToggleNew
+            label={c.fields.shareToggleLabel}
+            helper={c.fields.shareHelper}
+            value={shared}
+            onValueChange={setShared}
+          />
+        </Card>
 
+        {/* API Error */}
         {errorText ? (
-          <Text variant="muted" style={{ color: "#B00020" }}>
-            {errorText}
-          </Text>
+          <Card variant="outlined">
+            <Text variant="body" style={{ color: colors.error }}>
+              {errorText}
+            </Text>
+          </Card>
         ) : null}
 
-        <View style={{ gap: 10, marginTop: 16 }}>
+        {/* Action Buttons */}
+        <View style={{ gap: Spacing.sm, marginTop: Spacing.md }}>
           <Button
             label={loading ? CONTENT.app.common.loading : c.actions.primary}
             onPress={onSubmit}
             disabled={loading || !moodLevel}
+            fullWidth
           />
           <Button
             label={c.actions.secondary}
             onPress={onCancel}
             variant="secondary"
+            fullWidth
           />
         </View>
       </ScrollView>
