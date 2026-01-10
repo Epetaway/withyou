@@ -69,11 +69,11 @@ export function CheckInScreen({ navigation }: CheckInScreenProps) {
   };
 
   const moodOptions = [
-    { key: "1", emoji: "😟", label: "Very low" },
-    { key: "2", emoji: "😕", label: "Low" },
-    { key: "3", emoji: "😐", label: "Neutral" },
-    { key: "4", emoji: "🙂", label: "Good" },
-    { key: "5", emoji: "😄", label: "Very good" },
+    { key: "1", icon: "frown", label: "Very low" },
+    { key: "2", icon: "meh", label: "Low" },
+    { key: "3", icon: "smile", label: "Neutral" },
+    { key: "4", icon: "smile", label: "Good" },
+    { key: "5", icon: "heart", label: "Very good" },
   ];
 
   return (

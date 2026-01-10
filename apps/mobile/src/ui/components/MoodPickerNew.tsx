@@ -1,11 +1,12 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { Feather } from '@expo/vector-icons';
 import { Spacing, BorderRadius, Typography } from '../tokens';
 import { useTheme } from '../theme/ThemeProvider';
 
 export type MoodOption = {
   key: string;
-  emoji: string;
+  icon: keyof typeof Feather.glyphMap;
   label: string;
 };
 
@@ -34,7 +35,11 @@ export const MoodPickerNew: React.FC<MoodPickerProps> = ({ options, value, onCha
             ]}
             accessibilityRole="button"
           >
-            <Text style={styles.emoji}>{opt.emoji}</Text>
+            <Feather
+              name={opt.icon}
+              size={28}
+              color={selected ? colors.primary : colors.textMuted}
+            />
             <Text
               style={[
                 styles.label,
@@ -63,9 +68,6 @@ const styles = StyleSheet.create({
     paddingVertical: Spacing.md,
     borderRadius: BorderRadius.md,
     borderWidth: 1,
-  },
-  emoji: {
-    fontSize: Typography.size.huge,
   },
   label: {
     marginTop: Spacing.xs,

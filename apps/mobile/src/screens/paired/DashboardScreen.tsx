@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { View, ScrollView } from "react-native";
+import { Feather } from "@expo/vector-icons";
 import { CONTENT, DashboardResponse } from "@withyou/shared";
 import { Screen } from "../../ui/components/Screen";
 import { Text } from "../../ui/components/Text";
@@ -91,11 +92,19 @@ export function DashboardScreen({ navigation }: DashboardScreenProps) {
               </Text>
               <View style={{ gap: Spacing.sm }}>
                 <View style={{ flexDirection: "row", alignItems: "center", gap: Spacing.sm }}>
-                  <Text variant="body" style={{ fontSize: 20 }}>
-                    {["😟", "😕", "😐", "🙂", "😄"][
+                  <Feather
+                    name={["frown", "meh", "smile", "smile", "heart"][
                       (dashboard.partnerLastCheckIn.mood_level as 1 | 2 | 3 | 4 | 5) - 1
                     ]}
-                  </Text>
+                    size={24}
+                    color={
+                      dashboard.partnerLastCheckIn.mood_level === 5
+                        ? colors.secondary
+                        : dashboard.partnerLastCheckIn.mood_level === 1
+                        ? colors.error
+                        : colors.primary
+                    }
+                  />
                   <Text variant="body">
                     {
                       CONTENT.checkIn.create
