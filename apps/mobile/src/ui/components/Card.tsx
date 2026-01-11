@@ -11,12 +11,12 @@ export function Card({
   style?: ViewStyle;
 }) {
   const theme = useTheme();
-  return <View style={[styles.card, { backgroundColor: theme.card, borderColor: theme.border }, style]}>{children}</View>;
+  return <View style={[styles.card, { backgroundColor: theme.card }, style]}>{children}</View>;
 }
 
 const styles = StyleSheet.create({
   card: {
-    borderWidth: 1,
+    borderWidth: 0,
     borderRadius: BorderRadius.card,
     padding: Spacing.md,
   },

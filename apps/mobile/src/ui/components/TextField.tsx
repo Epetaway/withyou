@@ -64,8 +64,8 @@ const styles = StyleSheet.create({
   wrap: { marginBottom: tokens.space.md },
   label: { marginBottom: tokens.space.xs },
   input: {
-    borderWidth: 1,
-    borderColor: tokens.color.border,
+    borderWidth: 0,
+    backgroundColor: tokens.color.surface,
     borderRadius: tokens.radius.md,
     paddingVertical: tokens.space.sm,
     paddingHorizontal: tokens.space.md,

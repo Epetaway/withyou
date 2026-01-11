@@ -11,7 +11,9 @@ import { setToken } from "../../state/appState";
 import { useAsyncAction } from "../../api/hooks";
 
 type RegisterScreenProps = {
-  navigation: unknown;
+  navigation: {
+    navigate: (screen: string) => void;
+  };
 };
 
 export function RegisterScreen({ navigation }: RegisterScreenProps) {

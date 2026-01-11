@@ -152,7 +152,7 @@ function PrimaryButton({ label, onPress }: ButtonProps) {
 
 const styles = StyleSheet.create({
   card: {
-    borderWidth: 1,
+    borderWidth: 0,
     borderRadius: 24,
     padding: 16,
     gap: 8,
@@ -209,8 +209,8 @@ const styles = StyleSheet.create({
     minHeight: 40,
     paddingHorizontal: 12,
     borderRadius: 999,
-    borderWidth: 1,
-    borderColor: "rgba(75,22,76,0.20)",
+    borderWidth: 0,
+    backgroundColor: "rgba(75,22,76,0.08)",
     justifyContent: "center",
   } as ViewStyle,
   ghostLabel: {

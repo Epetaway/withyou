@@ -11,7 +11,9 @@ import { setToken } from "../../state/appState";
 import { useAsyncAction } from "../../api/hooks";
 
 type LoginScreenProps = {
-  navigation: unknown;
+  navigation: {
+    navigate: (screen: string) => void;
+  };
 };
 
 export function LoginScreen({ navigation }: LoginScreenProps) {
