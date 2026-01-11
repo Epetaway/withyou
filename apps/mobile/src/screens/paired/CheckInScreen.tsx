@@ -1,6 +1,13 @@
 import React, { useState } from "react";
 import { View, ScrollView, Pressable, StyleSheet } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
+import { 
+  faArrowDown,
+  faMinus,
+  faEquals,
+  faWaveSquare,
+  faArrowUp
+} from "@fortawesome/free-solid-svg-icons";
 import { CONTENT, checkinCreateSchema } from "@withyou/shared";
 import { Screen } from "../../ui/components/Screen";
 import { Text } from "../../ui/components/Text";
@@ -10,7 +17,6 @@ import { Card } from "../../ui/components/Card";
 import { Section } from "../../ui/components/Section";
 import { api } from "../../state/appState";
 import { useAsyncAction } from "../../api/hooks";
-import { Spacing } from "../../ui/tokens";
 import { useTheme } from "../../ui/theme";
 
 type CheckInScreenProps = {
@@ -18,12 +24,15 @@ type CheckInScreenProps = {
 };
 
 const MOODS = [
-  { key: "1", label: "Very low", icon: "sad-outline" },
-  { key: "2", label: "Low", icon: "remove-circle-outline" },
-  { key: "3", label: "Neutral", icon: "ellipse-outline" },
-  { key: "4", label: "Good", icon: "happy-outline" },
-  { key: "5", label: "Very good", icon: "heart-outline" },
+  { key: "1", label: "Very low", icon: faArrowDown },
+  { key: "2", label: "Low", icon: faMinus },
+  { key: "3", label: "Neutral", icon: faEquals },
+  { key: "4", label: "Good", icon: faWaveSquare },
+  { key: "5", label: "Very good", icon: faArrowUp },
 ] as const;
+
+const ACTIVE_COLOR = "#9B8CFF";
+const INACTIVE_COLOR = "#B9B5D0";
 
 function MoodCard({
   selected,
@@ -33,35 +42,30 @@ function MoodCard({
 }: {
   selected: boolean;
   label: string;
-  icon: keyof typeof Ionicons.glyphMap;
+  icon: any;
   onPress: () => void;
 }) {
-  const theme = useTheme();
   return (
     <Pressable
       onPress={onPress}
-      style={{
-        flex: 1,
-        borderRadius: 14,
-        borderWidth: 1,
-        borderColor: selected ? theme.primary : theme.border,
-        backgroundColor: selected ? theme.surface : "transparent",
-        padding: Spacing.sm,
-        alignItems: "center",
-        justifyContent: "center",
-        minHeight: 72,
-      }}
+      style={[
+        styles.moodCard,
+        {
+          backgroundColor: selected ? "#EDE9FE" : "transparent",
+          borderColor: selected ? ACTIVE_COLOR : "#E5E7EB",
+        },
+      ]}
     >
-      <Ionicons
-        name={icon}
-        size={22}
-        color={selected ? theme.primary : theme.text2}
+      <FontAwesomeIcon
+        icon={icon}
+        size={24}
+        color={selected ? ACTIVE_COLOR : INACTIVE_COLOR}
       />
       <Text
         variant="body"
         style={{
-          marginTop: Spacing.xs,
-          color: selected ? theme.text : theme.text2,
+          marginTop: 8,
+          color: selected ? "#1F2937" : "#6B7280",
           fontSize: 12,
           fontWeight: "600",
         }}
@@ -99,169 +103,141 @@ export function CheckInScreen({ navigation }: CheckInScreenProps) {
       throw new Error("Validation failed");
     }
 
-    await api.request("/checkins", {
-      method: "POST",
-      body: JSON.stringify(parsed.data),
-    });
-
-    // Success - navigate back to dashboard
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    (navigation as any)?.goBack?.();
-    return null;
+    await api.request("/check-in", { method: "POST", body: parsed.data });
+    setMoodLevel(null);
+    setNote("");
+    setShared(false);
   });
 
-  const onSubmit = async () => {
-    try {
-      await run();
-    } catch {
-      // Error handled in useAsyncAction
-    }
-  };
-
-  const onCancel = () => {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    (navigation as any)?.goBack?.();
-  };
-
   return (
-    <Screen style={{ paddingHorizontal: Spacing.md, paddingTop: Spacing.lg }}>
-      <ScrollView
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ paddingBottom: Spacing.xl }}
-      >
-        {/* Page Header */}
-        <View style={{ marginBottom: Spacing.xl }}>
-          <Text style={[styles.h1, { color: theme.text }]}>{c.title}</Text>
-          <Text style={[styles.h2, { color: theme.text2 }]}>{c.prompt}</Text>
+    <Screen scrollable>
+      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
+        {/* Header */}
+        <View style={styles.header}>
+          <Text style={styles.h1}>{c.title}</Text>
+          <Text style={styles.h2}>{c.subtitle}</Text>
         </View>
 
-        {/* Mood Error */}
-        {moodError ? (
-          <Section>
-            <Card>
-              <Text variant="body" style={{ color: theme.danger }}>
+        {/* Mood Selection */}
+        <Section title={c.moodLevel.label} subtitle={c.moodLevel.sublabel}>
+          <Card>
+            <View style={styles.moodGrid}>
+              {MOODS.map((mood) => (
+                <MoodCard
+                  key={mood.key}
+                  label={mood.label}
+                  icon={mood.icon}
+                  selected={moodLevel === parseInt(mood.key) as any}
+                  onPress={() => setMoodLevel(parseInt(mood.key) as any)}
+                />
+              ))}
+            </View>
+            {moodError ? (
+              <Text
+                variant="body"
+                style={{ color: "#EF4444", marginTop: 12, fontSize: 14 }}
+              >
                 {moodError}
               </Text>
-            </Card>
-          </Section>
-        ) : null}
-
-        {/* Mood Selector */}
-        <Section title={c.fields.moodLabel}>
-          <View style={{ flexDirection: "row", gap: Spacing.sm }}>
-            {MOODS.map((mood) => (
-              <MoodCard
-                key={mood.key}
-                selected={moodLevel === parseInt(mood.key)}
-                label={mood.label}
-                icon={mood.icon}
-                onPress={() => setMoodLevel(parseInt(mood.key) as 1 | 2 | 3 | 4 | 5)}
-              />
-            ))}
-          </View>
-        </Section>
-
-        {/* Note Input */}
-        <Section title={c.fields.noteLabel}>
-          <Card>
-            <TextField
-              value={note}
-              onChangeText={setNote}
-              placeholder="What's on your mind?"
-              multiline
-              numberOfLines={4}
-              style={{ minHeight: 100 }}
-            />
+            ) : null}
           </Card>
         </Section>
 
-        {/* Share Toggle */}
+        {/* Note */}
+        <Section title={c.note.label} subtitle={c.note.sublabel}>
+          <TextField
+            value={note}
+            onChangeText={setNote}
+            placeholder={c.note.placeholder}
+            multiline
+            numberOfLines={4}
+          />
+        </Section>
+
+        {/* Share Option */}
         <Section>
           <Card>
             <Pressable
               onPress={() => setShared(!shared)}
-              style={styles.toggleRow}
+              style={styles.shareRow}
             >
-              <View style={{ flex: 1 }}>
-                <Text variant="body" style={{ color: theme.text }}>
-                  {c.fields.shareToggleLabel}
-                </Text>
-                <Text
-                  variant="muted"
-                  style={{ color: theme.text2, fontSize: 12, marginTop: Spacing.xs }}
-                >
-                  {c.fields.shareHelper}
-                </Text>
-              </View>
+              <Text variant="body">{c.share}</Text>
               <View
                 style={[
-                  styles.switch,
-                  {
-                    backgroundColor: shared ? theme.primary : theme.border,
-                  },
+                  styles.checkbox,
+                  { backgroundColor: shared ? ACTIVE_COLOR : "transparent" },
                 ]}
               >
-                <View
-                  style={[
-                    styles.switchThumb,
-                    {
-                      transform: [{ translateX: shared ? 20 : 0 }],
-                    },
-                  ]}
-                />
+                {shared ? (
+                  <Text style={{ color: "white", fontSize: 12 }}>✓</Text>
+                ) : null}
               </View>
             </Pressable>
           </Card>
         </Section>
 
-        {/* API Error */}
+        {/* Error */}
         {errorText ? (
-          <Section>
-            <Card>
-              <Text variant="body" style={{ color: theme.danger }}>
-                {errorText}
-              </Text>
-            </Card>
-          </Section>
+          <Card>
+            <Text style={{ color: "#EF4444" }}>{errorText}</Text>
+          </Card>
         ) : null}
 
-        {/* Action Buttons */}
-        <View style={{ gap: Spacing.sm, marginTop: Spacing.md }}>
-          <Button
-            label={loading ? CONTENT.app.common.loading : c.actions.primary}
-            onPress={onSubmit}
-            disabled={loading || !moodLevel}
-            variant="primary"
-          />
-          <Button
-            label={c.actions.secondary}
-            onPress={onCancel}
-            variant="secondary"
-          />
-        </View>
+        {/* Submit Button */}
+        <Button
+          label={c.action}
+          onPress={() => run()}
+          disabled={loading}
+          style={{ marginTop: 24 }}
+        />
       </ScrollView>
     </Screen>
   );
 }
 
 const styles = StyleSheet.create({
-  h1: { fontSize: 28, fontWeight: "700" },
-  h2: { fontSize: 16, marginTop: Spacing.sm },
-  toggleRow: {
+  scrollContent: {
+    paddingBottom: 32,
+  },
+  header: {
+    marginBottom: 24,
+  },
+  h1: {
+    fontSize: 28,
+    fontWeight: "700",
+    color: "#1F2937",
+  },
+  h2: {
+    fontSize: 16,
+    color: "#6B7280",
+    marginTop: 8,
+  },
+  moodGrid: {
     flexDirection: "row",
-    alignItems: "center",
-    gap: Spacing.md,
+    gap: 12,
+    marginBottom: 12,
   },
-  switch: {
-    width: 48,
-    height: 28,
-    borderRadius: 14,
-    padding: 2,
-  },
-  switchThumb: {
-    width: 24,
-    height: 24,
+  moodCard: {
+    flex: 1,
     borderRadius: 12,
-    backgroundColor: "#fff",
+    borderWidth: 1,
+    padding: 12,
+    alignItems: "center",
+    justifyContent: "center",
+    minHeight: 80,
+  },
+  shareRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+  checkbox: {
+    width: 20,
+    height: 20,
+    borderRadius: 4,
+    borderWidth: 1,
+    borderColor: INACTIVE_COLOR,
+    alignItems: "center",
+    justifyContent: "center",
   },
 });

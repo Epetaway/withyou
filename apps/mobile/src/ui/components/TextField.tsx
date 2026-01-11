@@ -1,7 +1,6 @@
 import React from "react";
-import { View, TextInput, StyleSheet, TextStyle } from "react-native";
-import { tokens } from "../tokens";
-import { Text } from "./Text";
+import { TextInput as PaperTextInput } from "react-native-paper";
+import { View, StyleSheet, TextStyle } from "react-native";
 
 type Props = {
   label?: string;
@@ -33,13 +32,9 @@ export function TextField({
   style,
 }: Props) {
   return (
-    <View style={styles.wrap}>
-      {label ? (
-        <Text variant="muted" style={styles.label}>
-          {label}
-        </Text>
-      ) : null}
-      <TextInput
+    <View style={styles.container}>
+      <PaperTextInput
+        label={label}
         value={value}
         onChangeText={onChangeText}
         placeholder={placeholder}
@@ -48,32 +43,22 @@ export function TextField({
         keyboardType={keyboardType}
         multiline={multiline}
         numberOfLines={numberOfLines}
-        textAlignVertical={textAlignVertical}
-        style={[styles.input, style, errorText ? styles.inputError : null]}
+        error={!!errorText}
+        mode="outlined"
+        style={[{ backgroundColor: "transparent" }, style]}
+        outlineStyle={{ borderRadius: 12 }}
       />
-      {errorText ? (
-        <Text variant="muted" style={styles.error}>
+      {errorText && (
+        <PaperTextInput.Helper type="error">
           {errorText}
-        </Text>
-      ) : null}
+        </PaperTextInput.Helper>
+      )}
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  wrap: { marginBottom: tokens.space.md },
-  label: { marginBottom: tokens.space.xs },
-  input: {
-    borderWidth: 0,
-    backgroundColor: tokens.color.surface,
-    borderRadius: tokens.radius.md,
-    paddingVertical: tokens.space.sm,
-    paddingHorizontal: tokens.space.md,
-    fontSize: tokens.font.size.md,
-    color: tokens.color.text,
+  container: {
+    marginBottom: 16,
   },
-  inputError: {
-    borderColor: tokens.color.danger,
-  },
-  error: { marginTop: tokens.space.xs, color: tokens.color.danger },
 });

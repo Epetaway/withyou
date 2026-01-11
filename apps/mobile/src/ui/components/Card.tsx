@@ -1,24 +1,16 @@
 import React from "react";
-import { View, StyleSheet, ViewStyle } from "react-native";
-import { BorderRadius, Spacing } from "../tokens";
-import { useTheme } from "../theme";
+import { Card as PaperCard } from "react-native-paper";
+import { ViewStyle } from "react-native";
 
-export function Card({
-  children,
-  style,
-}: {
+type Props = {
   children: React.ReactNode;
   style?: ViewStyle;
-}) {
-  const theme = useTheme();
-  return <View style={[styles.card, { backgroundColor: theme.card }, style]}>{children}</View>;
+};
+
+export function Card({ children, style }: Props) {
+  return (
+    <PaperCard mode="elevated" style={[{ borderRadius: 16 }, style]}>
+      <PaperCard.Content>{children}</PaperCard.Content>
+    </PaperCard>
+  );
 }
-
-const styles = StyleSheet.create({
-  card: {
-    borderWidth: 0,
-    borderRadius: BorderRadius.card,
-    padding: Spacing.md,
-  },
-});
-

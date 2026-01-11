@@ -1,12 +1,15 @@
 import React, { useEffect, useState } from 'react';
 import { StatusBar } from 'expo-status-bar';
 import { ActivityIndicator, View } from 'react-native';
+import { PaperProvider } from 'react-native-paper';
 import { RootNavigator } from './navigation/RootNavigator';
 import { ThemeProvider, useTheme } from './ui/theme/ThemeProvider';
+import { usePaperTheme } from './ui/theme';
 
 function AppInner() {
   const [isLoading, setIsLoading] = useState(true);
   const { colors, mode } = useTheme();
+  const paperTheme = usePaperTheme();
 
   useEffect(() => {
     const prepare = async () => {
@@ -38,10 +41,10 @@ function AppInner() {
   }
 
   return (
-    <>
+    <PaperProvider theme={paperTheme}>
       <StatusBar style={mode === 'dark' ? 'light' : 'dark'} />
       <RootNavigator />
-    </>
+    </PaperProvider>
   );
 }
 

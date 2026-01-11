@@ -1,8 +1,6 @@
 import React from "react";
-import { Pressable, StyleSheet, ViewStyle, TextStyle } from "react-native";
-import { BorderRadius, Size, Spacing } from "../tokens";
-import { useTheme } from "../theme";
-import { Text } from "./Text";
+import { Button as PaperButton } from "react-native-paper";
+import { ViewStyle } from "react-native";
 
 type Props = {
   label: string;
@@ -19,75 +17,29 @@ export function Button({
   disabled,
   style,
 }: Props) {
-  const theme = useTheme();
-
-  const getButtonStyle = (pressed: boolean) => {
-    if (disabled) {
-      return { backgroundColor: theme.border, borderColor: theme.border };
-    }
-
-    switch (variant) {
-      case "primary":
-        return {
-          backgroundColor: pressed ? theme.primaryPressed : theme.primary,
-          borderColor: pressed ? theme.primaryPressed : theme.primary,
-        };
-      case "secondary":
-        return {
-          backgroundColor: pressed ? theme.surface : "transparent",
-          borderColor: theme.primary,
-        };
-      case "danger":
-        return {
-          backgroundColor: "transparent",
-          borderColor: theme.danger,
-        };
-    }
+  const getMode = () => {
+    if (variant === "primary") return "contained";
+    if (variant === "danger") return "outlined";
+    return "outlined";
   };
 
-  const getTextColor = () => {
-    if (disabled) {
-      return theme.text2;
-    }
-
-    switch (variant) {
-      case "primary":
-        return "#fff";
-      case "secondary":
-        return theme.primary;
-      case "danger":
-        return theme.danger;
-    }
+  const getButtonColor = () => {
+    if (variant === "danger") return "#EF4444";
+    return undefined; // Use theme default
   };
 
   return (
-    <Pressable
+    <PaperButton
+      mode={getMode()}
       onPress={onPress}
       disabled={disabled}
-      style={({ pressed }) => [
-        styles.base,
-        getButtonStyle(pressed),
-        style,
-      ]}
-      accessibilityRole="button"
+      buttonColor={getButtonColor()}
+      textColor={variant === "danger" ? "#EF4444" : undefined}
+      style={[{ borderRadius: 12 }, style]}
+      contentStyle={{ paddingVertical: 8 }}
+      labelStyle={{ fontSize: 16, fontWeight: "600" }}
     >
-      <Text variant="body" style={[styles.textBase, { color: getTextColor() }]}>
-        {label}
-      </Text>
-    </Pressable>
+      {label}
+    </PaperButton>
   );
 }
-
-const styles = StyleSheet.create({
-  base: {
-    height: Size.button,
-    paddingHorizontal: Spacing.md,
-    borderRadius: BorderRadius.button,
-    borderWidth: 0,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  textBase: {
-    fontWeight: "600",
-  } as TextStyle,
-});

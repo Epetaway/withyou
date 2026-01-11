@@ -1,37 +1,31 @@
 import React from "react";
-import { Text as RNText, StyleSheet, TextProps } from "react-native";
-import { tokens } from "../tokens";
+import { Text as PaperText } from "react-native-paper";
+import { TextProps as RNTextProps, StyleProp, TextStyle } from "react-native";
 
 type Variant = "title" | "subtitle" | "body" | "muted";
 
-export function Text({
-  variant = "body",
-  style,
-  ...props
-}: TextProps & { variant?: Variant }) {
-  return <RNText style={[styles[variant], style]} {...props} />;
-}
+type TextProps = RNTextProps & {
+  variant?: Variant;
+  style?: StyleProp<TextStyle>;
+};
 
-const styles = StyleSheet.create({
-  title: {
-    fontSize: tokens.font.size.xl,
-    fontWeight: tokens.font.weight.semibold,
-    color: tokens.color.text,
-  },
-  subtitle: {
-    fontSize: tokens.font.size.lg,
-    fontWeight: tokens.font.weight.medium,
-    color: tokens.color.text,
-  },
-  body: {
-    fontSize: tokens.font.size.md,
-    fontWeight: tokens.font.weight.regular,
-    color: tokens.color.text,
-    lineHeight: 22,
-  },
-  muted: {
-    fontSize: tokens.font.size.sm,
-    fontWeight: tokens.font.weight.regular,
-    color: tokens.color.muted,
-  },
-});
+export function Text({ variant = "body", style, children, ...props }: TextProps) {
+  const getPaperVariant = () => {
+    switch (variant) {
+      case "title":
+        return "titleLarge";
+      case "subtitle":
+        return "titleMedium";
+      case "muted":
+        return "bodySmall";
+      default:
+        return "bodyMedium";
+    }
+  };
+
+  return (
+    <PaperText variant={getPaperVariant() as any} style={style} {...props}>
+      {children}
+    </PaperText>
+  );
+}
