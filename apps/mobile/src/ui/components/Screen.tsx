@@ -1,11 +1,11 @@
 import React from "react";
-import { SafeAreaView, View, StyleSheet } from "react-native";
+import { SafeAreaView, View, StyleSheet, ViewStyle } from "react-native";
 import { tokens } from "../tokens";
 
-export function Screen({ children }: { children: React.ReactNode }) {
+export function Screen({ children, style }: { children: React.ReactNode; style?: ViewStyle }) {
   return (
     <SafeAreaView style={styles.safe}>
-      <View style={styles.container}>{children}</View>
+      <View style={[styles.container, style]}>{children}</View>
     </SafeAreaView>
   );
 }
