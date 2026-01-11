@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { View, ScrollView, Pressable, StyleSheet } from "react-native";
+import { View, Pressable, StyleSheet } from "react-native";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import { 
   faArrowDown,
@@ -111,15 +111,14 @@ export function CheckInScreen({ navigation }: CheckInScreenProps) {
 
   return (
     <Screen scrollable>
-      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
-        {/* Header */}
-        <View style={styles.header}>
-          <Text style={styles.h1}>{c.title}</Text>
-          <Text style={styles.h2}>{c.subtitle}</Text>
-        </View>
+      {/* Header */}
+      <View style={styles.header}>
+        <Text style={styles.h1}>{c.title}</Text>
+        <Text style={styles.h2}>{c.subtitle}</Text>
+      </View>
 
         {/* Mood Selection */}
-        <Section title={c.moodLevel.label} subtitle={c.moodLevel.sublabel}>
+        <Section title="How are you feeling?" subtitle="Select your mood level">
           <Card>
             <View style={styles.moodGrid}>
               {MOODS.map((mood) => (
@@ -144,7 +143,7 @@ export function CheckInScreen({ navigation }: CheckInScreenProps) {
         </Section>
 
         {/* Note */}
-        <Section title={c.note.label} subtitle={c.note.sublabel}>
+        <Section title="Add a note" subtitle="Tell your partner more">
           <TextField
             value={note}
             onChangeText={setNote}
@@ -190,15 +189,11 @@ export function CheckInScreen({ navigation }: CheckInScreenProps) {
           disabled={loading}
           style={{ marginTop: 24 }}
         />
-      </ScrollView>
     </Screen>
   );
 }
 
 const styles = StyleSheet.create({
-  scrollContent: {
-    paddingBottom: 32,
-  },
   header: {
     marginBottom: 24,
   },
