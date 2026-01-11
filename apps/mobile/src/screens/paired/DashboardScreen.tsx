@@ -24,7 +24,6 @@ export function DashboardScreen({ navigation }: DashboardScreenProps) {
 
   const handleLogout = async () => {
     await clearSession();
-    (navigation as any).navigate("Login");
   };
 
   useEffect(() => {
@@ -57,7 +56,7 @@ export function DashboardScreen({ navigation }: DashboardScreenProps) {
   }
 
   return (
-    <Screen style={{ paddingHorizontal: Spacing.md, paddingTop: Spacing.lg }}>
+    <Screen>
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: Spacing.xl }}>
         {/* Page Header */}
         <View style={{ marginBottom: Spacing.xl }}>

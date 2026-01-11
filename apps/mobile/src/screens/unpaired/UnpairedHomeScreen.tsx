@@ -20,11 +20,10 @@ export function UnpairedHomeScreen({ navigation }: UnpairedHomeScreenProps) {
 
   const handleLogout = async () => {
     await clearSession();
-    (navigation as any).navigate("Login");
   };
 
   return (
-    <Screen style={{ paddingHorizontal: Spacing.md, paddingTop: Spacing.lg }}>
+    <Screen>
       <View style={{ flex: 1, justifyContent: "center", gap: Spacing.xl }}>
         {/* Hero Section */}
         <Card>
