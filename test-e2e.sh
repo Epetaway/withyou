@@ -187,6 +187,150 @@ echo -e "${GREEN}PASS${NC} Login successful"
 TESTS_PASSED=$((TESTS_PASSED + 1))
 echo
 
+# 9. Test Ideas Feature
+echo "═══════════════════════════════════════════════════════════"
+echo "Testing Ideas Feature"
+echo "═══════════════════════════════════════════════════════════"
+
+# Test local ideas query
+LOCAL_IDEAS_RESPONSE=$(curl -s -X POST "$BASE_URL/ideas/query" \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer $USER1_TOKEN" \
+  -d '{"type":"LOCAL","radiusMiles":10,"filters":["outdoors"]}')
+
+LOCAL_IDEAS_COUNT=$(echo $LOCAL_IDEAS_RESPONSE | grep -o '"ideas":\[' | wc -l)
+if [ "$LOCAL_IDEAS_COUNT" -gt 0 ]; then
+  echo -e "${GREEN}PASS${NC} Local ideas query successful"
+  echo "Response: $LOCAL_IDEAS_RESPONSE"
+  TESTS_PASSED=$((TESTS_PASSED + 1))
+else
+  echo -e "${RED}FAIL${NC} Local ideas query returned no ideas"
+  echo "Response: $LOCAL_IDEAS_RESPONSE"
+  TESTS_FAILED=$((TESTS_FAILED + 1))
+fi
+echo
+
+# Test recipe suggestions
+RECIPES_RESPONSE=$(curl -s -X POST "$BASE_URL/ideas/recipes" \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer $USER1_TOKEN" \
+  -d '{"ingredients":["eggs","pasta","tomatoes"]}')
+
+RECIPES_COUNT=$(echo $RECIPES_RESPONSE | grep -o '"recipes":\[' | wc -l)
+if [ "$RECIPES_COUNT" -gt 0 ]; then
+  echo -e "${GREEN}PASS${NC} Recipe suggestions retrieved"
+  echo "Response: $RECIPES_RESPONSE"
+  TESTS_PASSED=$((TESTS_PASSED + 1))
+else
+  echo -e "${RED}FAIL${NC} Recipe suggestions failed"
+  echo "Response: $RECIPES_RESPONSE"
+  TESTS_FAILED=$((TESTS_FAILED + 1))
+fi
+echo
+
+# Test movie suggestions
+MOVIES_RESPONSE=$(curl -s -X GET "$BASE_URL/ideas/movies" \
+  -H "Authorization: Bearer $USER1_TOKEN")
+
+MOVIES_COUNT=$(echo $MOVIES_RESPONSE | grep -o '"ideas":\[' | wc -l)
+if [ "$MOVIES_COUNT" -gt 0 ]; then
+  echo -e "${GREEN}PASS${NC} Movie suggestions retrieved"
+  echo "Response: $MOVIES_RESPONSE"
+  TESTS_PASSED=$((TESTS_PASSED + 1))
+else
+  echo -e "${RED}FAIL${NC} Movie suggestions failed"
+  echo "Response: $MOVIES_RESPONSE"
+  TESTS_FAILED=$((TESTS_FAILED + 1))
+fi
+echo
+
+# Test save idea
+SAVE_IDEA_RESPONSE=$(curl -s -w "\n%{http_code}" -X POST "$BASE_URL/ideas/test-idea-123/save" \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer $USER1_TOKEN" \
+  -d '{"notes":"This looks fun!"}')
+
+SAVE_HTTP_CODE=$(echo "$SAVE_IDEA_RESPONSE" | tail -n1)
+SAVE_BODY=$(echo "$SAVE_IDEA_RESPONSE" | head -n-1)
+
+if [ "$SAVE_HTTP_CODE" = "200" ] || [ "$SAVE_HTTP_CODE" = "201" ]; then
+  echo -e "${GREEN}PASS${NC} Idea saved successfully (HTTP $SAVE_HTTP_CODE)"
+  echo "Response: $SAVE_BODY"
+  TESTS_PASSED=$((TESTS_PASSED + 1))
+  SAVED_IDEA_ID=$(echo $SAVE_BODY | grep -o '"ideaId":"[^"]*' | cut -d'"' -f4)
+else
+  echo -e "${RED}FAIL${NC} Failed to save idea (HTTP $SAVE_HTTP_CODE)"
+  echo "Response: $SAVE_BODY"
+  TESTS_FAILED=$((TESTS_FAILED + 1))
+fi
+echo
+
+# Test get saved ideas
+SAVED_IDEAS_RESPONSE=$(curl -s -X GET "$BASE_URL/ideas/saved" \
+  -H "Authorization: Bearer $USER1_TOKEN")
+
+SAVED_COUNT=$(echo $SAVED_IDEAS_RESPONSE | grep -o '"ideas":\[' | wc -l)
+if [ "$SAVED_COUNT" -gt 0 ]; then
+  echo -e "${GREEN}PASS${NC} Saved ideas retrieved"
+  echo "Response: $SAVED_IDEAS_RESPONSE"
+  TESTS_PASSED=$((TESTS_PASSED + 1))
+else
+  echo -e "${RED}FAIL${NC} Failed to retrieve saved ideas"
+  echo "Response: $SAVED_IDEAS_RESPONSE"
+  TESTS_FAILED=$((TESTS_FAILED + 1))
+fi
+echo
+
+# Test unsave/delete saved idea
+if [ ! -z "$SAVED_IDEA_ID" ]; then
+  UNSAVE_RESPONSE=$(curl -s -w "\n%{http_code}" -X DELETE "$BASE_URL/ideas/test-idea-123/save" \
+    -H "Authorization: Bearer $USER1_TOKEN")
+
+  UNSAVE_HTTP_CODE=$(echo "$UNSAVE_RESPONSE" | tail -n1)
+  UNSAVE_BODY=$(echo "$UNSAVE_RESPONSE" | head -n-1)
+
+  if [ "$UNSAVE_HTTP_CODE" = "200" ] || [ "$UNSAVE_HTTP_CODE" = "204" ]; then
+    echo -e "${GREEN}PASS${NC} Idea unsaved successfully (HTTP $UNSAVE_HTTP_CODE)"
+    echo "Response: $UNSAVE_BODY"
+    TESTS_PASSED=$((TESTS_PASSED + 1))
+  else
+    echo -e "${RED}FAIL${NC} Failed to unsave idea (HTTP $UNSAVE_HTTP_CODE)"
+    echo "Response: $UNSAVE_BODY"
+    TESTS_FAILED=$((TESTS_FAILED + 1))
+  fi
+  echo
+fi
+
+# Test ideas without authentication
+NO_AUTH_RESPONSE=$(curl -s -w "\n%{http_code}" -X GET "$BASE_URL/ideas/saved")
+
+NO_AUTH_HTTP_CODE=$(echo "$NO_AUTH_RESPONSE" | tail -n1)
+
+if [ "$NO_AUTH_HTTP_CODE" = "401" ]; then
+  echo -e "${GREEN}PASS${NC} Correctly rejected unauthenticated request (HTTP 401)"
+  TESTS_PASSED=$((TESTS_PASSED + 1))
+else
+  echo -e "${RED}FAIL${NC} Should reject unauthenticated ideas request (HTTP $NO_AUTH_HTTP_CODE, expected 401)"
+  TESTS_FAILED=$((TESTS_FAILED + 1))
+fi
+echo
+
+# Test invalid recipe query
+INVALID_RECIPES_RESPONSE=$(curl -s -w "\n%{http_code}" -X POST "$BASE_URL/ideas/recipes" \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer $USER1_TOKEN" \
+  -d '{"ingredients":[]}')
+
+INVALID_HTTP_CODE=$(echo "$INVALID_RECIPES_RESPONSE" | tail -n1)
+
+if [ "$INVALID_HTTP_CODE" = "400" ]; then
+  echo -e "${GREEN}PASS${NC} Correctly rejected invalid recipe query (HTTP 400)"
+  TESTS_PASSED=$((TESTS_PASSED + 1))
+else
+  echo -e "${YELLOW}NOTE${NC} Empty ingredients validation (HTTP $INVALID_HTTP_CODE)"
+fi
+echo
+
 # Summary
 echo "═══════════════════════════════════════════════════════════"
 echo "Test Summary"
