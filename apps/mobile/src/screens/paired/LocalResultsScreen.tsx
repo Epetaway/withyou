@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { Linking, ScrollView, StyleSheet, View, Alert } from "react-native";
+import { Linking, StyleSheet, View, Alert } from "react-native";
 import { Screen } from "../../ui/components/Screen";
 import { Text } from "../../ui/components/Text";
 import { Button } from "../../ui/components/Button";
@@ -86,11 +86,7 @@ export function LocalResultsScreen({ navigation, route }: { navigation: Nav; rou
   const goBack = () => navigation.goBack();
 
   return (
-    <Screen style={styles.screen}>
-      <ScrollView
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={styles.scrollContent}
-      >
+    <Screen style={styles.screen} scrollable>
         <View style={styles.headerRow}>
           <View style={{ flex: 1 }}>
             <Text variant="title" style={styles.h1}>Local results</Text>
@@ -142,7 +138,6 @@ export function LocalResultsScreen({ navigation, route }: { navigation: Nav; rou
             <Button label="Adjust filters" onPress={goBack} variant="primary" />
           </View>
         ) : null}
-      </ScrollView>
     </Screen>
   );
 }

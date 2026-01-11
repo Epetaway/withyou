@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from "react";
-import { ScrollView, StyleSheet, View } from "react-native";
+import { StyleSheet, View } from "react-native";
 import { Screen } from "../../ui/components/Screen";
 import { Text } from "../../ui/components/Text";
 import { Button } from "../../ui/components/Button";
@@ -34,11 +34,7 @@ export function IdeasScreen({ navigation }: { navigation: Navigation }) {
   };
 
   return (
-    <Screen style={styles.screen}>
-      <ScrollView
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={styles.scrollContent}
-      >
+    <Screen style={styles.screen} scrollable>
         <View style={styles.header}>
           <Text variant="title" style={styles.h1}>Ideas</Text>
           <Text variant="body" style={styles.h2}>
@@ -88,7 +84,6 @@ export function IdeasScreen({ navigation }: { navigation: Navigation }) {
             <Button label="Saved ideas" onPress={() => navigation.navigate("SavedIdeas")} variant="secondary" />
           </View>
         </View>
-      </ScrollView>
     </Screen>
   );
 }

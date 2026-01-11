@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Alert, ScrollView, StyleSheet, View } from "react-native";
+import { Alert, StyleSheet, View } from "react-native";
 import { Screen } from "../../ui/components/Screen";
 import { Text } from "../../ui/components/Text";
 import { Button } from "../../ui/components/Button";
@@ -50,8 +50,7 @@ export function MovieModeScreen() {
   };
 
   return (
-    <Screen style={styles.screen}>
-      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scroll}>
+    <Screen style={styles.screen} scrollable>
         <View style={styles.header}>
           <Text variant="title" style={styles.h1}>Movies & Shows</Text>
           <Text variant="body" style={styles.h2}>
@@ -93,7 +92,6 @@ export function MovieModeScreen() {
         )}
 
         <Button label="Refresh" onPress={load} variant="secondary" style={{ marginTop: Spacing.lg }} />
-      </ScrollView>
     </Screen>
   );
 }

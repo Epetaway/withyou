@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { View, ScrollView, StyleSheet } from "react-native";
+import { View, StyleSheet } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { CONTENT, DashboardResponse } from "@withyou/shared";
 import { Screen } from "../../ui/components/Screen";
@@ -56,13 +56,12 @@ export function DashboardScreen({ navigation }: DashboardScreenProps) {
   }
 
   return (
-    <Screen>
-      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: Spacing.xl }}>
-        {/* Page Header */}
-        <View style={{ marginBottom: Spacing.xl }}>
-          <Text style={[styles.h1, { color: theme.text }]}>Dashboard</Text>
-          <Text style={[styles.h2, { color: theme.text2 }]}>Welcome back.</Text>
-        </View>
+    <Screen scrollable>
+      {/* Page Header */}
+      <View style={{ marginBottom: Spacing.xl }}>
+        <Text style={[styles.h1, { color: theme.text }]}>Dashboard</Text>
+        <Text style={[styles.h2, { color: theme.text2 }]}>Welcome back.</Text>
+      </View>
 
         {/* Error State */}
         {errorText ? (
@@ -167,7 +166,6 @@ export function DashboardScreen({ navigation }: DashboardScreenProps) {
             variant="secondary"
           />
         </View>
-      </ScrollView>
     </Screen>
   );
 }

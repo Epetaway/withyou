@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { View, ScrollView, Pressable, StyleSheet } from "react-native";
+import { View, Pressable, StyleSheet } from "react-native";
 import { CONTENT, preferencesSchema } from "@withyou/shared";
 import { Screen } from "../../ui/components/Screen";
 import { Text } from "../../ui/components/Text";
@@ -103,11 +103,7 @@ export function PreferencesScreen({ navigation }: PreferencesScreenProps) {
   };
 
   return (
-    <Screen style={{ paddingHorizontal: Spacing.md, paddingTop: Spacing.lg }}>
-      <ScrollView
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ paddingBottom: Spacing.xl }}
-      >
+    <Screen style={{ paddingHorizontal: Spacing.md, paddingTop: Spacing.lg }} scrollable>
         {/* Page Header */}
         <View style={{ marginBottom: Spacing.xl }}>
           <Text style={[styles.h1, { color: theme.text }]}>{c.title}</Text>

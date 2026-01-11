@@ -48,8 +48,7 @@ export function LocalFiltersScreen({ navigation, route }: { navigation: Nav; rou
   };
 
   return (
-    <Screen style={styles.screen}>
-      <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+    <Screen style={styles.screen} scrollable>
         <Text variant="title" style={styles.h1}>Local filters</Text>
         <Text variant="body" style={styles.body}>Adjust radius and filters to refine nearby ideas.</Text>
 
@@ -63,7 +62,6 @@ export function LocalFiltersScreen({ navigation, route }: { navigation: Nav; rou
           <Button label="See results" onPress={submit} variant="primary" />
           <Button label="Back" onPress={navigation.goBack} variant="secondary" />
         </View>
-      </ScrollView>
     </Screen>
   );
 }
