@@ -5,7 +5,6 @@ import { Text } from "../../ui/components/Text";
 import { Button } from "../../ui/components/Button";
 import { RadiusSelector } from "../../ui/components/RadiusSelector";
 import { FilterChips } from "../../ui/components/FilterChips";
-import { EmptyState } from "../../ui/components/EmptyState";
 import { Spacing } from "../../ui/tokens";
 
 type Navigation = {
@@ -77,12 +76,18 @@ export function IdeasScreen({ navigation }: { navigation: Navigation }) {
           </View>
         </View>
 
-        <EmptyState
-          title="Food & Movie modes"
-          description="Coming in this beta: quick switches for cooking, ordering in, or movie nights at home."
-          actionLabel="Use Local mode"
-          onAction={() => navigation.navigate("LocalResults", { radiusMiles: radius, filters: filtersArray })}
-        />
+        <View style={styles.section}>
+          <Text variant="subtitle" style={styles.sectionTitle}>Try a mode</Text>
+          <Text variant="body" style={styles.sectionBody}>
+            Quick-start ideas for cooking at home or a cozy movie night. Saved ideas live here too.
+          </Text>
+
+          <View style={styles.modeButtons}>
+            <Button label="Food mode" onPress={() => navigation.navigate("FoodMode")} variant="primary" />
+            <Button label="Movie mode" onPress={() => navigation.navigate("MovieMode")} variant="secondary" />
+            <Button label="Saved ideas" onPress={() => navigation.navigate("SavedIdeas")} variant="secondary" />
+          </View>
+        </View>
       </ScrollView>
     </Screen>
   );
@@ -99,4 +104,5 @@ const styles = StyleSheet.create({
   sectionBody: { color: "rgba(34,23,42,0.70)" },
   label: { marginTop: Spacing.xs, color: "rgba(34,23,42,0.70)" },
   actionsRow: { flexDirection: "row", gap: Spacing.sm, marginTop: Spacing.md },
+  modeButtons: { flexDirection: "row", gap: Spacing.sm, flexWrap: "wrap" },
 });

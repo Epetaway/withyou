@@ -58,12 +58,9 @@ router.get("/dashboard", jwtMiddleware, async (req: AuthedRequest, res, next) =>
       : [];
 
     res.json({
-      ok: true,
-      data: {
-        relationshipStage,
-        partnerLastCheckIn,
-        recentActivity,
-      },
+      relationshipStage,
+      partnerLastCheckIn,
+      recentActivity,
     });
   } catch (error) {
     next(error);
@@ -97,11 +94,8 @@ router.post("/checkins", jwtMiddleware, async (req: AuthedRequest, res, next) =>
     });
 
     res.status(201).json({
-      ok: true,
-      data: {
-        checkinId: checkin.id,
-        createdAt: checkin.createdAt.toISOString(),
-      },
+      checkinId: checkin.id,
+      createdAt: checkin.createdAt.toISOString(),
     });
   } catch (error) {
     if (error instanceof z.ZodError) {
@@ -149,10 +143,7 @@ router.post("/preferences", jwtMiddleware, async (req: AuthedRequest, res, next)
     });
 
     res.status(200).json({ 
-      ok: true,
-      data: { 
-        preferencesId: preferences.id 
-      }
+      preferencesId: preferences.id 
     });
   } catch (error) {
     if (error instanceof z.ZodError) {
@@ -222,10 +213,7 @@ router.get("/ideas", jwtMiddleware, async (req: AuthedRequest, res, next) => {
     const ideas = baseIdeas.slice(0, 3);
 
     res.json({ 
-      ok: true,
-      data: { 
-        ideas 
-      }
+      ideas 
     });
   } catch (error) {
     next(error);

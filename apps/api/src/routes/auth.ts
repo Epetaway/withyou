@@ -42,11 +42,8 @@ router.post("/auth/register", async (req, res, next) => {
     });
 
     res.status(201).json({ 
-      ok: true,
-      data: { 
-        token,
-        user: { id: user.id, email: user.email }
-      }
+      token,
+      userId: user.id
     });
   } catch (error) {
     if (error instanceof z.ZodError) {
@@ -98,11 +95,8 @@ router.post("/auth/login", async (req, res, next) => {
     });
 
     res.status(200).json({ 
-      ok: true,
-      data: { 
-        token,
-        user: { id: user.id, email: user.email }
-      }
+      token,
+      userId: user.id
     });
   } catch (error) {
     if (error instanceof z.ZodError) {

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { View } from "react-native";
+import { View, ScrollView, StyleSheet } from "react-native";
 import {
   CONTENT,
   inviteAcceptSchema,
@@ -7,16 +7,21 @@ import {
 } from "@withyou/shared";
 import { Screen } from "../../ui/components/Screen";
 import { Text } from "../../ui/components/Text";
-import { TextFieldNew as TextField } from "../../ui/components/TextFieldNew";
-import { ButtonNew as Button } from "../../ui/components/ButtonNew";
+import { TextField } from "../../ui/components/TextField";
+import { Button } from "../../ui/components/Button";
+import { Card } from "../../ui/components/Card";
+import { Section } from "../../ui/components/Section";
 import { api } from "../../state/appState";
 import { useAsyncAction } from "../../api/hooks";
+import { Spacing } from "../../ui/tokens";
+import { useTheme } from "../../ui/theme";
 
 type PairAcceptScreenProps = {
   navigation: unknown;
 };
 
 export function PairAcceptScreen({ navigation }: PairAcceptScreenProps) {
+  const theme = useTheme();
   const c = CONTENT.pairing.accept;
 
   const [inviteCode, setInviteCode] = useState("");
@@ -57,32 +62,62 @@ export function PairAcceptScreen({ navigation }: PairAcceptScreenProps) {
   };
 
   return (
-    <Screen>
-      <View style={{ gap: 16 }}>
-        <Text variant="title">{c.title}</Text>
-        <Text variant="muted">{c.helper}</Text>
+    <Screen style={{ paddingHorizontal: Spacing.md, paddingTop: Spacing.lg }}>
+      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: Spacing.xl }}>
+        {/* Page Header */}
+        <View style={{ marginBottom: Spacing.xl }}>
+          <Text style={[styles.h1, { color: theme.text }]}>{c.title}</Text>
+          <Text style={[styles.h2, { color: theme.text2 }]}>{c.helper}</Text>
+        </View>
 
-        <TextField
-          label={c.fields.inviteCodeLabel}
-          value={inviteCode}
-          onChangeText={setInviteCode}
-          placeholder="ABC123"
-          autoCapitalize="characters"
-          error={inviteCodeError}
-        />
+        {/* Input Section */}
+        <Section title={c.fields.inviteCodeLabel}>
+          <Card>
+            <TextField
+              value={inviteCode}
+              onChangeText={setInviteCode}
+              placeholder="ABC123"
+              autoCapitalize="characters"
+            />
+            {inviteCodeError ? (
+              <Text style={{ color: theme.danger, fontSize: 12, marginTop: Spacing.xs }}>
+                {inviteCodeError}
+              </Text>
+            ) : null}
+          </Card>
+        </Section>
 
+        {/* Error State */}
         {errorText ? (
-          <Text variant="muted" style={{ color: "#B00020" }}>
-            {errorText}
-          </Text>
+          <Section>
+            <Card>
+              <Text variant="body" style={{ color: theme.danger }}>
+                {errorText}
+              </Text>
+            </Card>
+          </Section>
         ) : null}
 
-        <Button
-          label={loading ? CONTENT.app.common.loading : c.actions.primary}
-          onPress={onSubmit}
-          disabled={loading || !inviteCode}
-        />
-      </View>
+        {/* Submit Button */}
+        <View style={{ gap: Spacing.sm, marginTop: Spacing.lg }}>
+          <Button
+            label={loading ? CONTENT.app.common.loading : c.actions.primary}
+            onPress={onSubmit}
+            disabled={loading || !inviteCode}
+            variant="primary"
+          />
+          <Button
+            label={c.actions.back}
+            onPress={() => (navigation as any)?.goBack?.()}
+            variant="secondary"
+          />
+        </View>
+      </ScrollView>
     </Screen>
   );
 }
+
+const styles = StyleSheet.create({
+  h1: { fontSize: 28, fontWeight: "700" },
+  h2: { fontSize: 16, marginTop: Spacing.sm },
+});

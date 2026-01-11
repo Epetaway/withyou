@@ -48,9 +48,9 @@ export const LightTheme = {
 } as const;
 
 export const DarkTheme = {
-  // Primary & Brand Colors (slightly desaturated for dark)
+  // Primary & Brand Colors
   primary: '#A78BFA',
-  primaryDark: '#7C3AED',
+  primaryDark: '#8B5CF6',
   primaryLight: '#C4B5FD',
   
   // Secondary & Accent
@@ -58,31 +58,31 @@ export const DarkTheme = {
   secondaryLight: '#FDE68A',
   accent: '#F4AE85',
   accentWeak: '#E8D5C4',
-  accentPale: '#1F2937',
+  accentPale: '#1A1F2E',
   
-  // Neutrals & Backgrounds (deep charcoal, not pure black)
-  background: '#111827', // Deep charcoal
-  surface: '#1F2937', // Cards
-  surface2: '#374151', // Elevated cards
-  surface3: '#4B5563', // Subtle sections
+  // Neutrals & Backgrounds
+  background: '#0F1115',
+  surface: '#181B22',
+  surface2: '#1F2329',
+  surface3: '#282C34',
   
   // Text
-  text: '#F9FAFB', // Near white (not pure)
-  textSecondary: '#D1D5DB',
-  textMuted: '#9CA3AF',
+  text: '#E5E7EB',
+  textSecondary: '#9CA3AF',
+  textMuted: '#6B7280',
   textInverse: '#1F2937',
   
   // Borders & Dividers
-  border: '#374151',
-  borderLight: '#4B5563',
-  divider: '#374151',
+  border: '#2A2F3A',
+  borderLight: '#374151',
+  divider: '#2A2F3A',
   
-  // Semantic Colors (muted for dark)
-  success: '#34D399',
+  // Semantic Colors
+  success: '#10B981',
   successLight: '#064E3B',
   error: '#F87171',
   errorLight: '#7F1D1D',
-  warning: '#FBBF24',
+  warning: '#F59E0B',
   warningLight: '#78350F',
   info: '#60A5FA',
   infoLight: '#1E3A8A',
@@ -92,10 +92,9 @@ export const DarkTheme = {
   shadow: 'rgba(0, 0, 0, 0.3)',
 } as const;
 
-// 8px Grid System
+// Spacing (8px grid system)
 export const Spacing = {
-  none: 0,
-  xxs: 4,  // 0.5 unit
+  xxs: 4,  // 0.5 units
   xs: 8,   // 1 unit
   sm: 12,  // 1.5 units
   md: 16,  // 2 units
@@ -111,11 +110,21 @@ export const BorderRadius = {
   none: 0,
   xs: 4,
   sm: 8,
-  md: 12,
-  lg: 16,
-  xl: 20,
-  xxl: 24,
+  md: 10,
+  lg: 12,
+  card: 16,
+  button: 12,
+  pill: 999,
   full: 9999,
+} as const;
+
+// Size constants (touch targets, buttons, inputs)
+export const Size = {
+  tap: 44,
+  button: 48,
+  input: 48,
+  tab: 56,
+  icon: 22,
 } as const;
 
 // Typography Scale

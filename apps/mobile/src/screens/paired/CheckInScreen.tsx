@@ -1,24 +1,79 @@
 import React, { useState } from "react";
-import { View, ScrollView } from "react-native";
+import { View, ScrollView, Pressable, StyleSheet } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
 import { CONTENT, checkinCreateSchema } from "@withyou/shared";
 import { Screen } from "../../ui/components/Screen";
 import { Text } from "../../ui/components/Text";
-import { ButtonNew as Button } from "../../ui/components/ButtonNew";
-import { TextFieldNew as TextField } from "../../ui/components/TextFieldNew";
-import { CardNew as Card } from "../../ui/components/CardNew";
-import { ToggleNew } from "../../ui/components/ToggleNew";
-import { MoodPickerNew } from "../../ui/components/MoodPickerNew";
+import { Button } from "../../ui/components/Button";
+import { TextField } from "../../ui/components/TextField";
+import { Card } from "../../ui/components/Card";
+import { Section } from "../../ui/components/Section";
 import { api } from "../../state/appState";
 import { useAsyncAction } from "../../api/hooks";
 import { Spacing } from "../../ui/tokens";
-import { useTheme } from "../../ui/theme/ThemeProvider";
+import { useTheme } from "../../ui/theme";
 
 type CheckInScreenProps = {
   navigation: unknown;
 };
 
+const MOODS = [
+  { key: "1", label: "Very low", icon: "sad-outline" },
+  { key: "2", label: "Low", icon: "remove-circle-outline" },
+  { key: "3", label: "Neutral", icon: "ellipse-outline" },
+  { key: "4", label: "Good", icon: "happy-outline" },
+  { key: "5", label: "Very good", icon: "heart-outline" },
+] as const;
+
+function MoodCard({
+  selected,
+  label,
+  icon,
+  onPress,
+}: {
+  selected: boolean;
+  label: string;
+  icon: keyof typeof Ionicons.glyphMap;
+  onPress: () => void;
+}) {
+  const theme = useTheme();
+  return (
+    <Pressable
+      onPress={onPress}
+      style={{
+        flex: 1,
+        borderRadius: 14,
+        borderWidth: 1,
+        borderColor: selected ? theme.primary : theme.border,
+        backgroundColor: selected ? theme.surface : "transparent",
+        padding: Spacing.sm,
+        alignItems: "center",
+        justifyContent: "center",
+        minHeight: 72,
+      }}
+    >
+      <Ionicons
+        name={icon}
+        size={22}
+        color={selected ? theme.primary : theme.text2}
+      />
+      <Text
+        variant="body"
+        style={{
+          marginTop: Spacing.xs,
+          color: selected ? theme.text : theme.text2,
+          fontSize: 12,
+          fontWeight: "600",
+        }}
+      >
+        {label}
+      </Text>
+    </Pressable>
+  );
+}
+
 export function CheckInScreen({ navigation }: CheckInScreenProps) {
-  const { colors } = useTheme();
+  const theme = useTheme();
   const c = CONTENT.checkIn.create;
 
   const [moodLevel, setMoodLevel] = useState<1 | 2 | 3 | 4 | 5 | null>(null);
@@ -68,71 +123,106 @@ export function CheckInScreen({ navigation }: CheckInScreenProps) {
     (navigation as any)?.goBack?.();
   };
 
-  const moodOptions = [
-    { key: "1", icon: "frown", label: "Very low" },
-    { key: "2", icon: "meh", label: "Low" },
-    { key: "3", icon: "smile", label: "Neutral" },
-    { key: "4", icon: "smile", label: "Good" },
-    { key: "5", icon: "heart", label: "Very good" },
-  ];
-
   return (
-    <Screen>
-      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ gap: Spacing.lg, paddingBottom: Spacing.xl }}>
-        {/* Header */}
-        <View style={{ gap: Spacing.sm }}>
-          <Text variant="title">{c.title}</Text>
-          <Text variant="body" style={{ color: colors.textMuted }}>
-            {c.prompt}
-          </Text>
+    <Screen style={{ paddingHorizontal: Spacing.md, paddingTop: Spacing.lg }}>
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={{ paddingBottom: Spacing.xl }}
+      >
+        {/* Page Header */}
+        <View style={{ marginBottom: Spacing.xl }}>
+          <Text style={[styles.h1, { color: theme.text }]}>{c.title}</Text>
+          <Text style={[styles.h2, { color: theme.text2 }]}>{c.prompt}</Text>
         </View>
 
         {/* Mood Error */}
         {moodError ? (
-          <Card variant="outlined">
-            <Text variant="body" style={{ color: colors.error }}>
-              {moodError}
-            </Text>
-          </Card>
+          <Section>
+            <Card>
+              <Text variant="body" style={{ color: theme.danger }}>
+                {moodError}
+              </Text>
+            </Card>
+          </Section>
         ) : null}
 
-        {/* Mood Picker */}
-        <Card variant="elevated">
-          <View style={{ gap: Spacing.md }}>
-            <Text variant="subtitle">{c.fields.moodLabel}</Text>
-            <MoodPickerNew
-              options={moodOptions}
-              value={moodLevel ? String(moodLevel) : undefined}
-              onChange={(key) => setMoodLevel(parseInt(key) as 1 | 2 | 3 | 4 | 5)}
-            />
+        {/* Mood Selector */}
+        <Section title={c.fields.moodLabel}>
+          <View style={{ flexDirection: "row", gap: Spacing.sm }}>
+            {MOODS.map((mood) => (
+              <MoodCard
+                key={mood.key}
+                selected={moodLevel === parseInt(mood.key)}
+                label={mood.label}
+                icon={mood.icon}
+                onPress={() => setMoodLevel(parseInt(mood.key) as 1 | 2 | 3 | 4 | 5)}
+              />
+            ))}
           </View>
-        </Card>
+        </Section>
 
         {/* Note Input */}
-        <TextField
-          label={c.fields.noteLabel}
-          value={note}
-          onChangeText={setNote}
-          placeholder="What's on your mind?"
-        />
+        <Section title={c.fields.noteLabel}>
+          <Card>
+            <TextField
+              value={note}
+              onChangeText={setNote}
+              placeholder="What's on your mind?"
+              multiline
+              numberOfLines={4}
+              style={{ minHeight: 100 }}
+            />
+          </Card>
+        </Section>
 
         {/* Share Toggle */}
-        <Card>
-          <ToggleNew
-            label={c.fields.shareToggleLabel}
-            helper={c.fields.shareHelper}
-            value={shared}
-            onValueChange={setShared}
-          />
-        </Card>
+        <Section>
+          <Card>
+            <Pressable
+              onPress={() => setShared(!shared)}
+              style={styles.toggleRow}
+            >
+              <View style={{ flex: 1 }}>
+                <Text variant="body" style={{ color: theme.text }}>
+                  {c.fields.shareToggleLabel}
+                </Text>
+                <Text
+                  variant="muted"
+                  style={{ color: theme.text2, fontSize: 12, marginTop: Spacing.xs }}
+                >
+                  {c.fields.shareHelper}
+                </Text>
+              </View>
+              <View
+                style={[
+                  styles.switch,
+                  {
+                    backgroundColor: shared ? theme.primary : theme.border,
+                  },
+                ]}
+              >
+                <View
+                  style={[
+                    styles.switchThumb,
+                    {
+                      transform: [{ translateX: shared ? 20 : 0 }],
+                    },
+                  ]}
+                />
+              </View>
+            </Pressable>
+          </Card>
+        </Section>
 
         {/* API Error */}
         {errorText ? (
-          <Card variant="outlined">
-            <Text variant="body" style={{ color: colors.error }}>
-              {errorText}
-            </Text>
-          </Card>
+          <Section>
+            <Card>
+              <Text variant="body" style={{ color: theme.danger }}>
+                {errorText}
+              </Text>
+            </Card>
+          </Section>
         ) : null}
 
         {/* Action Buttons */}
@@ -141,16 +231,37 @@ export function CheckInScreen({ navigation }: CheckInScreenProps) {
             label={loading ? CONTENT.app.common.loading : c.actions.primary}
             onPress={onSubmit}
             disabled={loading || !moodLevel}
-            fullWidth
+            variant="primary"
           />
           <Button
             label={c.actions.secondary}
             onPress={onCancel}
             variant="secondary"
-            fullWidth
           />
         </View>
       </ScrollView>
     </Screen>
   );
 }
+
+const styles = StyleSheet.create({
+  h1: { fontSize: 28, fontWeight: "700" },
+  h2: { fontSize: 16, marginTop: Spacing.sm },
+  toggleRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: Spacing.md,
+  },
+  switch: {
+    width: 48,
+    height: 28,
+    borderRadius: 14,
+    padding: 2,
+  },
+  switchThumb: {
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    backgroundColor: "#fff",
+  },
+});

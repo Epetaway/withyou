@@ -1,22 +1,57 @@
 import React, { useState } from "react";
-import { View, ScrollView } from "react-native";
-import { Feather } from "@expo/vector-icons";
+import { View, ScrollView, Pressable, StyleSheet } from "react-native";
 import { CONTENT, preferencesSchema } from "@withyou/shared";
 import { Screen } from "../../ui/components/Screen";
 import { Text } from "../../ui/components/Text";
-import { ButtonNew as Button } from "../../ui/components/ButtonNew";
-import { CardNew as Card } from "../../ui/components/CardNew";
+import { Button } from "../../ui/components/Button";
+import { Section } from "../../ui/components/Section";
 import { api } from "../../state/appState";
 import { useAsyncAction } from "../../api/hooks";
-import { Spacing } from "../../ui/tokens";
-import { useTheme } from "../../ui/theme/ThemeProvider";
+import { Spacing, BorderRadius } from "../../ui/tokens";
+import { useTheme } from "../../ui/theme";
 
 type PreferencesScreenProps = {
   navigation: unknown;
 };
 
+function Chip({
+  label,
+  selected,
+  onPress,
+}: {
+  label: string;
+  selected: boolean;
+  onPress: () => void;
+}) {
+  const theme = useTheme();
+  return (
+    <Pressable
+      onPress={onPress}
+      style={{
+        paddingHorizontal: Spacing.md,
+        paddingVertical: Spacing.sm,
+        borderRadius: BorderRadius.pill,
+        borderWidth: 1,
+        borderColor: selected ? theme.primary : theme.border,
+        backgroundColor: selected ? theme.primary : "transparent",
+      }}
+    >
+      <Text
+        variant="body"
+        style={{
+          fontSize: 14,
+          fontWeight: "600",
+          color: selected ? "#fff" : theme.text,
+        }}
+      >
+        {label}
+      </Text>
+    </Pressable>
+  );
+}
+
 export function PreferencesScreen({ navigation }: PreferencesScreenProps) {
-  const { colors } = useTheme();
+  const theme = useTheme();
   const c = CONTENT.preferences;
 
   const [activityStyle, setActivityStyle] = useState<
@@ -67,152 +102,101 @@ export function PreferencesScreen({ navigation }: PreferencesScreenProps) {
     }
   };
 
-  const activityIcons: Record<"chill" | "active" | "surprise", keyof typeof Feather.glyphMap> = {
-    chill: "moon",
-    active: "zap",
-    surprise: "star",
-  };
-
-  const budgetIcons: Record<"low" | "medium" | "high", keyof typeof Feather.glyphMap> = {
-    low: "dollar-sign",
-    medium: "trending-up",
-    high: "trending-up",
-  };
-
   return (
-    <Screen>
-      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ gap: Spacing.lg, paddingBottom: Spacing.xl }}>
-        {/* Header */}
-        <View style={{ gap: Spacing.sm }}>
-          <Text variant="title">{c.title}</Text>
-          <Text variant="body" style={{ color: colors.textMuted }}>
-            {c.body}
-          </Text>
+    <Screen style={{ paddingHorizontal: Spacing.md, paddingTop: Spacing.lg }}>
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={{ paddingBottom: Spacing.xl }}
+      >
+        {/* Page Header */}
+        <View style={{ marginBottom: Spacing.xl }}>
+          <Text style={[styles.h1, { color: theme.text }]}>{c.title}</Text>
+          <Text style={[styles.h2, { color: theme.text2 }]}>{c.body}</Text>
         </View>
 
         {/* Activity Style */}
-        <Card>
-          <View style={{ gap: Spacing.md }}>
-            <Text variant="subtitle">{c.fields.activityStyleLabel}</Text>
-            <View style={{ flexDirection: "row", gap: Spacing.sm }}>
-              {(["chill", "active", "surprise"] as const).map((style) => {
-                const isSelected = activityStyle === style;
-                return (
-                  <Button
-                    key={style}
-                    label={c.options.activityStyle[style]}
-                    onPress={() => setActivityStyle(style)}
-                    variant={isSelected ? "primary" : "secondary"}
-                    icon={
-                      <Feather
-                        name={activityIcons[style]}
-                        size={16}
-                        color={isSelected ? colors.textInverse : colors.primary}
-                      />
-                    }
-                  />
-                );
-              })}
-            </View>
+        <Section title={c.fields.activityStyleLabel}>
+          <View style={{ flexDirection: "row", gap: Spacing.sm }}>
+            {(["chill", "active", "surprise"] as const).map((style) => (
+              <Chip
+                key={style}
+                label={c.options.activityStyle[style]}
+                selected={activityStyle === style}
+                onPress={() => setActivityStyle(style)}
+              />
+            ))}
           </View>
-        </Card>
+        </Section>
 
         {/* Food Types */}
-        <Card>
-          <View style={{ gap: Spacing.md }}>
-            <View>
-              <Text variant="subtitle">{c.fields.foodTypesLabel}</Text>
-              <Text variant="muted" style={{ color: colors.textMuted, marginTop: Spacing.xs }}>
-                {c.fields.foodTypesHelper}
-              </Text>
-            </View>
-            <View style={{ flexDirection: "row", flexWrap: "wrap", gap: Spacing.sm }}>
-              {CONTENT.lists.foodTypes.map((food) => {
-                const isSelected = foodTypes.includes(food);
-                return (
-                  <Button
-                    key={food}
-                    label={food}
-                    onPress={() => toggleFoodType(food)}
-                    variant={isSelected ? "primary" : "secondary"}
-                    size="small"
-                  />
-                );
-              })}
-            </View>
+        <Section
+          title={c.fields.foodTypesLabel}
+          subtitle={c.fields.foodTypesHelper}
+        >
+          <View style={{ flexDirection: "row", flexWrap: "wrap", gap: Spacing.sm }}>
+            {CONTENT.lists.foodTypes.map((food) => (
+              <Chip
+                key={food}
+                label={food}
+                selected={foodTypes.includes(food)}
+                onPress={() => toggleFoodType(food)}
+              />
+            ))}
           </View>
-        </Card>
+        </Section>
 
         {/* Budget */}
-        <Card>
-          <View style={{ gap: Spacing.md }}>
-            <Text variant="subtitle">{c.fields.budgetLabel}</Text>
-            <View style={{ flexDirection: "row", gap: Spacing.sm }}>
-              {(["low", "medium", "high"] as const).map((level) => {
-                const isSelected = budget === level;
-                return (
-                  <Button
-                    key={level}
-                    label={c.options.budget[level]}
-                    onPress={() => setBudget(level)}
-                    variant={isSelected ? "primary" : "secondary"}
-                    icon={
-                      <Feather
-                        name={budgetIcons[level]}
-                        size={16}
-                        color={isSelected ? colors.textInverse : colors.primary}
-                      />
-                    }
-                  />
-                );
-              })}
-            </View>
+        <Section title={c.fields.budgetLabel}>
+          <View style={{ flexDirection: "row", gap: Spacing.sm }}>
+            {(["low", "medium", "high"] as const).map((level) => (
+              <Chip
+                key={level}
+                label={c.options.budget[level]}
+                selected={budget === level}
+                onPress={() => setBudget(level)}
+              />
+            ))}
           </View>
-        </Card>
+        </Section>
 
         {/* Energy Level */}
-        <Card>
-          <View style={{ gap: Spacing.md }}>
-            <View>
-              <Text variant="subtitle">{c.fields.energyLabel}</Text>
-              <Text variant="muted" style={{ color: colors.textMuted, marginTop: Spacing.xs }}>
-                {c.fields.energyHelper}
-              </Text>
-            </View>
-            <View style={{ flexDirection: "row", gap: Spacing.sm }}>
-              {[1, 2, 3, 4, 5].map((level) => {
-                const isSelected = energyLevel === level;
-                return (
-                  <Button
-                    key={level}
-                    label={String(level)}
-                    onPress={() => setEnergyLevel(level as 1 | 2 | 3 | 4 | 5)}
-                    variant={isSelected ? "primary" : "secondary"}
-                    size="small"
-                  />
-                );
-              })}
-            </View>
+        <Section title={c.fields.energyLabel} subtitle={c.fields.energyHelper}>
+          <View style={{ flexDirection: "row", gap: Spacing.sm }}>
+            {[1, 2, 3, 4, 5].map((level) => (
+              <Chip
+                key={level}
+                label={String(level)}
+                selected={energyLevel === level}
+                onPress={() => setEnergyLevel(level as 1 | 2 | 3 | 4 | 5)}
+              />
+            ))}
           </View>
-        </Card>
+        </Section>
 
         {/* Error State */}
         {errorText ? (
-          <Card variant="outlined">
-            <Text variant="body" style={{ color: colors.error }}>
+          <View style={{ marginTop: Spacing.md }}>
+            <Text variant="body" style={{ color: theme.danger }}>
               {errorText}
             </Text>
-          </Card>
+          </View>
         ) : null}
 
         {/* Submit Button */}
-        <Button
-          label={loading ? CONTENT.app.common.loading : c.actions.primary}
-          onPress={onSubmit}
-          disabled={loading}
-          fullWidth
-        />
+        <View style={{ marginTop: Spacing.lg }}>
+          <Button
+            label={loading ? CONTENT.app.common.loading : c.actions.primary}
+            onPress={onSubmit}
+            disabled={loading}
+            variant="primary"
+          />
+        </View>
       </ScrollView>
     </Screen>
   );
 }
+
+const styles = StyleSheet.create({
+  h1: { fontSize: 28, fontWeight: "700" },
+  h2: { fontSize: 16, marginTop: Spacing.sm },
+});

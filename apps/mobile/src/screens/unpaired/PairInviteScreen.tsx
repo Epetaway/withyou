@@ -1,12 +1,16 @@
 import React, { useState } from "react";
-import { View } from "react-native";
+import { View, ScrollView, StyleSheet, Pressable } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
 import { CONTENT, InviteResponse } from "@withyou/shared";
 import { Screen } from "../../ui/components/Screen";
 import { Text } from "../../ui/components/Text";
-import { ButtonNew as Button } from "../../ui/components/ButtonNew";
-import { CardNew as Card } from "../../ui/components/CardNew";
+import { Button } from "../../ui/components/Button";
+import { Card } from "../../ui/components/Card";
+import { Section } from "../../ui/components/Section";
 import { api } from "../../state/appState";
 import { useAsyncAction } from "../../api/hooks";
+import { Spacing } from "../../ui/tokens";
+import { useTheme } from "../../ui/theme";
 import * as Clipboard from "expo-clipboard";
 
 type PairInviteScreenProps = {
@@ -14,6 +18,7 @@ type PairInviteScreenProps = {
 };
 
 export function PairInviteScreen({ navigation }: PairInviteScreenProps) {
+  const theme = useTheme();
   const c = CONTENT.pairing.invite;
 
   const [inviteCode, setInviteCode] = useState<string | null>(null);
@@ -40,48 +45,99 @@ export function PairInviteScreen({ navigation }: PairInviteScreenProps) {
   };
 
   return (
-    <Screen>
-      <View style={{ gap: 16 }}>
-        <Text variant="title">{c.title}</Text>
-        <Text variant="body">{c.body}</Text>
+    <Screen style={{ paddingHorizontal: Spacing.md, paddingTop: Spacing.lg }}>
+      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: Spacing.xl }}>
+        {/* Page Header */}
+        <View style={{ marginBottom: Spacing.xl }}>
+          <Text style={[styles.h1, { color: theme.text }]}>{c.title}</Text>
+          <Text style={[styles.h2, { color: theme.text2 }]}>{c.body}</Text>
+        </View>
 
         {errorText ? (
-          <Text variant="muted" style={{ color: "#B00020" }}>
-            {errorText}
-          </Text>
+          <Section>
+            <Card>
+              <Text variant="body" style={{ color: theme.danger }}>
+                {errorText}
+              </Text>
+            </Card>
+          </Section>
         ) : null}
 
+        {!inviteCode ? (
+          <Button
+            label={loading ? CONTENT.app.common.loading : c.actions.generate}
+            onPress={run}
+            disabled={loading}
+            variant="primary"
+          />
+        ) : (
+          <Section title="Your invite code">
+            <Card>
+              <View style={{ gap: Spacing.md }}>
+                <View style={[styles.codeBox, { backgroundColor: theme.surface, borderColor: theme.border }]}>
+                  <Text style={[styles.codeText, { color: theme.primary }]}>{inviteCode}</Text>
+                </View>
+                
+                <View style={{ gap: Spacing.sm }}>
+                  <Pressable
+                    onPress={copyCode}
+                    style={({ pressed }) => [
+                      styles.actionButton,
+                      { backgroundColor: pressed ? theme.surface : "transparent" }
+                    ]}
+                  >
+                    <Ionicons name="copy-outline" size={18} color={theme.primary} />
+                    <Text style={{ color: theme.primary, fontWeight: "600" }}>Copy Code</Text>
+                  </Pressable>
+                  
+                  <Pressable
+                    onPress={copyLink}
+                    style={({ pressed }) => [
+                      styles.actionButton,
+                      { backgroundColor: pressed ? theme.surface : "transparent" }
+                    ]}
+                  >
+                    <Ionicons name="link-outline" size={18} color={theme.primary} />
+                    <Text style={{ color: theme.primary, fontWeight: "600" }}>Copy Link</Text>
+                  </Pressable>
+                </View>
+
+                {expiresAt ? (
+                  <Text style={{ fontSize: 12, color: theme.text2, marginTop: Spacing.sm }}>
+                    Expires: {new Date(expiresAt).toLocaleDateString()}
+                  </Text>
+                ) : null}
+              </View>
+            </Card>
+          </Section>
+        )}
+
         <Button
-          label={loading ? CONTENT.app.common.loading : c.actions.generateCode}
-          onPress={() => run()}
-          disabled={loading}
-        />
-
-        {inviteCode ? (
-          <Card>
-            <View style={{ gap: 10 }}>
-              <Text variant="subtitle">{c.fields.inviteCodeLabel}</Text>
-              <Text variant="body">{inviteCode}</Text>
-              {expiresAt ? (
-                <Text variant="muted">Expires: {expiresAt}</Text>
-              ) : null}
-
-              <Button label="Copy code" onPress={copyCode} variant="secondary" />
-              <Button label={c.actions.copyLink} onPress={copyLink} variant="secondary" />
-              <Text variant="muted">{c.status.waiting}</Text>
-            </View>
-          </Card>
-        ) : null}
-
-        <Button
-          label="Enter invite code"
-          onPress={() =>
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            (navigation as any)?.navigate?.("PairAccept")
-          }
+          label={c.actions.back}
+          onPress={() => (navigation as any)?.goBack?.()}
           variant="secondary"
+          style={{ marginTop: Spacing.lg }}
         />
-      </View>
+      </ScrollView>
     </Screen>
   );
 }
+
+const styles = StyleSheet.create({
+  h1: { fontSize: 28, fontWeight: "700" },
+  h2: { fontSize: 16, marginTop: Spacing.sm },
+  codeBox: {
+    padding: Spacing.lg,
+    borderRadius: 12,
+    borderWidth: 1,
+    alignItems: "center",
+  },
+  codeText: { fontSize: 18, fontWeight: "700", fontFamily: "Menlo" },
+  actionButton: { 
+    flexDirection: "row",
+    alignItems: "center",
+    gap: Spacing.sm,
+    padding: Spacing.sm,
+    borderRadius: 8,
+  },
+});

@@ -38,6 +38,19 @@ enum BudgetLevel {
   high
 }
 
+enum IdeaType {
+  LOCAL
+  FOOD
+  MOVIE
+  HOME
+}
+
+enum IdeaSource {
+  CURATED
+  GENERATED
+  USER_SAVED
+}
+
 model User {
   id           String      @id @default(cuid())
   email        String      @unique
@@ -51,6 +64,7 @@ model User {
   checkins     Checkin[]
   preferences  Preference?
   savedIdeas   SavedIdea[]
+  ideaRequests IdeaRequest[]
 }
 
 model Relationship {
@@ -65,6 +79,7 @@ model Relationship {
   invites    RelationshipInvite[]
   checkins   Checkin[]
   savedIdeas SavedIdea[]
+  ideaRequests IdeaRequest[]
 
   userA User @relation("UserARelationships", fields: [userAId], references: [id])
   userB User @relation("UserBRelationships", fields: [userBId], references: [id])
@@ -122,15 +137,45 @@ model SavedIdea {
   id              String        @id @default(cuid())
   userId          String
   relationshipId  String?
+  ideaId          String
+  notes           String?
+  createdAt       DateTime      @default(now())
+
+  user         User          @relation(fields: [userId], references: [id])
+  relationship Relationship? @relation(fields: [relationshipId], references: [id])
+  idea         Idea          @relation(fields: [ideaId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, ideaId])
+  @@index([relationshipId])
+}
+
+model Idea {
+  id              String        @id @default(cuid())
+  type            IdeaType
   title           String
   description     String?
-  activityStyle   ActivityStyle?
-  budgetLevel     BudgetLevel?
-  energyLevel     Int?
+  category        String?
+  source          IdeaSource    @default(CURATED)
+  metadata        Json          @default("{}")
+  createdAt       DateTime      @default(now())
+
+  savedIdeas SavedIdea[]
+
+  @@index([type])
+  @@index([source])
+}
+
+model IdeaRequest {
+  id              String        @id @default(cuid())
+  userId          String
+  relationshipId  String?
+  type            IdeaType
+  params          Json
   createdAt       DateTime      @default(now())
 
   user         User          @relation(fields: [userId], references: [id])
   relationship Relationship? @relation(fields: [relationshipId], references: [id])
 
-  @@index([relationshipId])
+  @@index([userId])
+  @@index([type])
 }

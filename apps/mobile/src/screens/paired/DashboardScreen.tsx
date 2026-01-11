@@ -1,21 +1,22 @@
 import React, { useEffect, useState } from "react";
-import { View, ScrollView } from "react-native";
-import { Feather } from "@expo/vector-icons";
+import { View, ScrollView, StyleSheet } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
 import { CONTENT, DashboardResponse } from "@withyou/shared";
 import { Screen } from "../../ui/components/Screen";
 import { Text } from "../../ui/components/Text";
-import { ButtonNew as Button } from "../../ui/components/ButtonNew";
-import { CardNew as Card } from "../../ui/components/CardNew";
+import { Button } from "../../ui/components/Button";
+import { Card } from "../../ui/components/Card";
+import { Section } from "../../ui/components/Section";
 import { api } from "../../state/appState";
 import { Spacing } from "../../ui/tokens";
-import { useTheme } from "../../ui/theme/ThemeProvider";
+import { useTheme } from "../../ui/theme";
 
 type DashboardScreenProps = {
   navigation: unknown;
 };
 
 export function DashboardScreen({ navigation }: DashboardScreenProps) {
-  const { colors } = useTheme();
+  const theme = useTheme();
   const [dashboard, setDashboard] = useState<DashboardResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [errorText, setErrorText] = useState("");
@@ -50,82 +51,83 @@ export function DashboardScreen({ navigation }: DashboardScreenProps) {
   }
 
   return (
-    <Screen>
-      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ gap: Spacing.lg, paddingBottom: Spacing.xl }}>
-        {/* Welcome Header */}
-        <View style={{ gap: Spacing.sm }}>
-          <Text variant="title">{CONTENT.dashboard.paired.title}</Text>
-          <Text variant="body" style={{ color: colors.textMuted }}>
-            Welcome back! 👋
-          </Text>
+    <Screen style={{ paddingHorizontal: Spacing.md, paddingTop: Spacing.lg }}>
+      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: Spacing.xl }}>
+        {/* Page Header */}
+        <View style={{ marginBottom: Spacing.xl }}>
+          <Text style={[styles.h1, { color: theme.text }]}>Dashboard</Text>
+          <Text style={[styles.h2, { color: theme.text2 }]}>Welcome back.</Text>
         </View>
 
         {/* Error State */}
         {errorText ? (
-          <Card variant="outlined">
-            <Text variant="body" style={{ color: colors.error }}>
-              {errorText}
-            </Text>
-          </Card>
+          <Section>
+            <Card>
+              <Text variant="body" style={{ color: theme.danger }}>
+                {errorText}
+              </Text>
+            </Card>
+          </Section>
         ) : null}
 
         {/* Relationship Stage Card */}
         {dashboard?.relationshipStage ? (
-          <Card variant="elevated">
-            <View style={{ gap: Spacing.sm }}>
-              <Text variant="muted" style={{ color: colors.textMuted }}>
-                {CONTENT.dashboard.paired.labels.stage}
+          <Section>
+            <Card>
+              <Text style={[styles.label, { color: theme.text2 }]}>
+                Relationship stage
               </Text>
-              <Text variant="title" style={{ color: colors.primary }}>
+              <Text style={[styles.value, { color: theme.primary }]}>
                 {CONTENT.preferences.options.stage[dashboard.relationshipStage]}
               </Text>
-            </View>
-          </Card>
+            </Card>
+          </Section>
         ) : null}
 
-        {/* Partner Mood Card */}
+        {/* Partner Check-in Card */}
         {dashboard?.partnerLastCheckIn ? (
-          <Card variant="elevated">
-            <View style={{ gap: Spacing.md }}>
-              <Text variant="subtitle">
-                {CONTENT.dashboard.paired.labels.partnerCheckInHeader}
-              </Text>
-              <View style={{ gap: Spacing.sm }}>
-                <View style={{ flexDirection: "row", alignItems: "center", gap: Spacing.sm }}>
-                  <Feather
-                    name={["frown", "meh", "smile", "smile", "heart"][
-                      (dashboard.partnerLastCheckIn.mood_level as 1 | 2 | 3 | 4 | 5) - 1
-                    ]}
-                    size={24}
-                    color={
-                      dashboard.partnerLastCheckIn.mood_level === 5
-                        ? colors.secondary
-                        : dashboard.partnerLastCheckIn.mood_level === 1
-                        ? colors.error
-                        : colors.primary
-                    }
-                  />
-                  <Text variant="body">
+          <Section title="Partner check-in" subtitle="Latest shared update">
+            <Card>
+              <View style={styles.row}>
+                <Ionicons
+                  name={
+                    dashboard.partnerLastCheckIn.mood_level === 5
+                      ? "heart-outline"
+                      : dashboard.partnerLastCheckIn.mood_level === 4
+                      ? "happy-outline"
+                      : dashboard.partnerLastCheckIn.mood_level === 3
+                      ? "ellipse-outline"
+                      : dashboard.partnerLastCheckIn.mood_level === 2
+                      ? "remove-circle-outline"
+                      : "sad-outline"
+                  }
+                  size={22}
+                  color={theme.primary}
+                />
+                <View style={{ marginLeft: Spacing.sm }}>
+                  <Text style={[styles.value2, { color: theme.text }]}>
                     {
                       CONTENT.checkIn.create
                         .moodLabels[dashboard.partnerLastCheckIn.mood_level]
                     }
                   </Text>
+                  <Text style={[styles.meta, { color: theme.text2 }]}>
+                    {new Date(
+                      dashboard.partnerLastCheckIn.timestamp
+                    ).toLocaleDateString()}
+                  </Text>
                 </View>
-                <Text variant="muted" style={{ color: colors.textMuted }}>
-                  {new Date(
-                    dashboard.partnerLastCheckIn.timestamp
-                  ).toLocaleDateString()}
-                </Text>
               </View>
-            </View>
-          </Card>
+            </Card>
+          </Section>
         ) : (
-          <Card variant="outlined">
-            <Text variant="body" style={{ color: colors.textMuted }}>
-              {CONTENT.dashboard.paired.empty.noSharedCheckIns}
-            </Text>
-          </Card>
+          <Section title="Partner check-in" subtitle="Latest shared update">
+            <Card>
+              <Text variant="body" style={{ color: theme.text2 }}>
+                {CONTENT.dashboard.paired.empty.noSharedCheckIns}
+              </Text>
+            </Card>
+          </Section>
         )}
 
         {/* Action Buttons */}
@@ -136,7 +138,7 @@ export function DashboardScreen({ navigation }: DashboardScreenProps) {
               // eslint-disable-next-line @typescript-eslint/no-explicit-any
               (navigation as any)?.navigate?.("CheckIn")
             }
-            fullWidth
+            variant="primary"
           />
           <Button
             label={CONTENT.dashboard.paired.actions.updatePreferences}
@@ -145,7 +147,6 @@ export function DashboardScreen({ navigation }: DashboardScreenProps) {
               (navigation as any)?.navigate?.("Preferences")
             }
             variant="secondary"
-            fullWidth
           />
           <Button
             label={CONTENT.dashboard.paired.actions.getIdeas}
@@ -154,10 +155,20 @@ export function DashboardScreen({ navigation }: DashboardScreenProps) {
               (navigation as any)?.navigate?.("Ideas")
             }
             variant="secondary"
-            fullWidth
           />
         </View>
       </ScrollView>
     </Screen>
   );
 }
+
+const styles = StyleSheet.create({
+  h1: { fontSize: 28, fontWeight: "700" },
+  h2: { fontSize: 16, marginTop: Spacing.sm },
+  label: { fontSize: 12, fontWeight: "500" },
+  value: { fontSize: 28, fontWeight: "700", marginTop: Spacing.sm },
+  value2: { fontSize: 16, fontWeight: "600" },
+  meta: { fontSize: 12, marginTop: Spacing.xs },
+  row: { flexDirection: "row", alignItems: "center" },
+});
+

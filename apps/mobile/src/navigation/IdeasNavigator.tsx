@@ -3,6 +3,9 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { IdeasScreen } from "../screens/paired/IdeasScreen";
 import { LocalFiltersScreen } from "../screens/paired/LocalFiltersScreen";
 import { LocalResultsScreen } from "../screens/paired/LocalResultsScreen";
+import { FoodModeScreen } from "../screens/paired/FoodModeScreen";
+import { MovieModeScreen } from "../screens/paired/MovieModeScreen";
+import { SavedIdeasScreen } from "../screens/paired/SavedIdeasScreen";
 
 const Stack = createNativeStackNavigator();
 
@@ -12,6 +15,9 @@ export function IdeasNavigator() {
       <Stack.Screen name="IdeasHome" component={IdeasScreen} />
       <Stack.Screen name="LocalFilters" component={LocalFiltersScreen} />
       <Stack.Screen name="LocalResults" component={LocalResultsScreen} />
+      <Stack.Screen name="FoodMode" component={FoodModeScreen} />
+      <Stack.Screen name="MovieMode" component={MovieModeScreen} />
+      <Stack.Screen name="SavedIdeas" component={SavedIdeasScreen} />
     </Stack.Navigator>
   );
 }

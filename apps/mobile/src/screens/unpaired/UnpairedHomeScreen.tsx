@@ -1,36 +1,36 @@
 import React from "react";
-import { View } from "react-native";
-import { Feather } from "@expo/vector-icons";
+import { View, StyleSheet } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
 import { CONTENT } from "@withyou/shared";
 import { Screen } from "../../ui/components/Screen";
 import { Text } from "../../ui/components/Text";
-import { ButtonNew as Button } from "../../ui/components/ButtonNew";
-import { CardNew as Card } from "../../ui/components/CardNew";
+import { Button } from "../../ui/components/Button";
+import { Card } from "../../ui/components/Card";
 import { Spacing } from "../../ui/tokens";
-import { useTheme } from "../../ui/theme/ThemeProvider";
+import { useTheme } from "../../ui/theme";
 
 type UnpairedHomeScreenProps = {
   navigation: unknown;
 };
 
 export function UnpairedHomeScreen({ navigation }: UnpairedHomeScreenProps) {
-  const { colors } = useTheme();
+  const theme = useTheme();
   const c = CONTENT.dashboard.unpaired;
 
   return (
-    <Screen>
+    <Screen style={{ paddingHorizontal: Spacing.md, paddingTop: Spacing.lg }}>
       <View style={{ flex: 1, justifyContent: "center", gap: Spacing.xl }}>
         {/* Hero Section */}
-        <Card variant="elevated">
+        <Card>
           <View style={{ gap: Spacing.lg, alignItems: "center" }}>
-            <Feather name="heart" size={56} color={colors.secondary} />
+            <Ionicons name="heart-outline" size={56} color={theme.primary} />
             <View style={{ gap: Spacing.sm }}>
-              <Text variant="title" style={{ textAlign: "center" }}>
+              <Text style={[styles.title, { color: theme.text, textAlign: "center" }]}>
                 {c.title}
               </Text>
               <Text
                 variant="body"
-                style={{ textAlign: "center", color: colors.textMuted }}
+                style={{ textAlign: "center", color: theme.text2 }}
               >
                 {c.body}
               </Text>
@@ -46,22 +46,22 @@ export function UnpairedHomeScreen({ navigation }: UnpairedHomeScreenProps) {
               // eslint-disable-next-line @typescript-eslint/no-explicit-any
               (navigation as any)?.navigate?.("PairInvite")
             }
-            fullWidth
-            icon={<Feather name="link" size={16} color={colors.textInverse} />}
+            variant="primary"
           />
-
           <Button
-            label={CONTENT.settings.title}
+            label={c.actions.secondary}
             onPress={() =>
               // eslint-disable-next-line @typescript-eslint/no-explicit-any
-              (navigation as any)?.navigate?.("Settings")
+              (navigation as any)?.navigate?.("PairAccept")
             }
             variant="secondary"
-            fullWidth
-            icon={<Feather name="settings" size={16} color={colors.primary} />}
           />
         </View>
       </View>
     </Screen>
   );
 }
+
+const styles = StyleSheet.create({
+  title: { fontSize: 24, fontWeight: "700" },
+});

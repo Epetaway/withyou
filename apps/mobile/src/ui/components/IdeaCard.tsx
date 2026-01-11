@@ -24,7 +24,7 @@ type IdeaMetadata = {
   genre?: string;
 };
 
-type Idea = {
+export type Idea = {
   id: string;
   type: IdeaType;
   title: string;
@@ -37,6 +37,7 @@ type Idea = {
 type IdeaCardProps = {
   idea: Idea;
   onSave?: (idea: Idea) => void;
+  onUnsave?: (idea: Idea) => void;
   onOpenMap?: (idea: Idea) => void;
   onAddToCalendar?: (idea: Idea) => void;
   saved?: boolean;
@@ -52,8 +53,7 @@ const palette = {
   border: "rgba(75,22,76,0.10)",
 };
 
-export function IdeaCard({ idea, onSave, onOpenMap, onAddToCalendar, saved, style }: IdeaCardProps) {
-  const theme = useTheme();
+export function IdeaCard({ idea, onSave, onUnsave, onOpenMap, onAddToCalendar, saved, style }: IdeaCardProps) {
   const distance = idea.metadata.distanceMiles ? `${idea.metadata.distanceMiles.toFixed(1)} mi` : undefined;
   const priceIndicator = typeof idea.metadata.priceLevel === "number" ? "$".repeat(Math.max(1, Math.min(4, idea.metadata.priceLevel || 1))) : undefined;
   const websiteUrl = idea.metadata.websiteUrl || idea.metadata.recipeUrl || idea.metadata.deepLinkUrl;
@@ -113,7 +113,11 @@ export function IdeaCard({ idea, onSave, onOpenMap, onAddToCalendar, saved, styl
         {websiteUrl ? <GhostButton label="Open" onPress={handleOpen} /> : null}
         {onAddToCalendar ? <GhostButton label="Calendar" onPress={() => onAddToCalendar(idea)} /> : null}
         {onSave ? (
-          <PrimaryButton label={saved ? "Saved" : "Save"} onPress={() => onSave(idea)} />
+          saved ? (
+            <PrimaryButton label="Saved" onPress={() => onUnsave ? onUnsave(idea) : onSave(idea)} />
+          ) : (
+            <PrimaryButton label="Save" onPress={() => onSave(idea)} />
+          )
         ) : null}
       </View>
     </View>

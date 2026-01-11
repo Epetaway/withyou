@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import { getSession, clearSession } from "../state/session";
+import { getSession, clearSession, onSessionChange } from "../state/session";
 import { DashboardResponse } from "@withyou/shared";
 import { api, setToken } from "../state/appState";
 import { LoginScreen } from "../screens/auth/LoginScreen";
@@ -20,9 +20,10 @@ const Stack = createNativeStackNavigator();
 export function RootNavigator() {
   const [authStatus, setAuthStatus] = useState<AuthStatus>("loading");
   const [pairingStatus, setPairingStatus] = useState<PairingStatus>("unknown");
+  const [refreshKey, setRefreshKey] = useState(0);
 
   useEffect(() => {
-    (async () => {
+    const checkAuth = async () => {
       const session = await getSession();
       if (!session.token) {
         setAuthStatus("signedOut");
@@ -30,8 +31,15 @@ export function RootNavigator() {
       }
       setToken(session.token);
       setAuthStatus("signedIn");
-    })();
-  }, []);
+    };
+
+    checkAuth();
+
+    // Listen for session changes (login/logout)
+    return onSessionChange(() => {
+      setRefreshKey(k => k + 1);
+    });
+  }, [refreshKey]);
 
   useEffect(() => {
     if (authStatus !== "signedIn") return;

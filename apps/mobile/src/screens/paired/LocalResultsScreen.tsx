@@ -3,24 +3,12 @@ import { Linking, ScrollView, StyleSheet, View, Alert } from "react-native";
 import { Screen } from "../../ui/components/Screen";
 import { Text } from "../../ui/components/Text";
 import { Button } from "../../ui/components/Button";
-import { IdeaCard, IdeaType } from "../../ui/components/IdeaCard";
+import { Idea, IdeaCard, IdeaType } from "../../ui/components/IdeaCard";
 import { EmptyState } from "../../ui/components/EmptyState";
 import { SkeletonCard } from "../../ui/components/SkeletonCard";
 import { Spacing } from "../../ui/tokens";
 import { api } from "../../state/appState";
 import { ApiError } from "../../api/client";
-
-export type IdeaSource = "CURATED" | "GENERATED" | "USER_SAVED";
-
-export type Idea = {
-  id: string;
-  type: IdeaType;
-  title: string;
-  description?: string | null;
-  category?: string | null;
-  source: IdeaSource;
-  metadata: Record<string, any>;
-};
 
 type Params = {
   radiusMiles?: number;

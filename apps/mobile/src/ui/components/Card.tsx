@@ -1,6 +1,7 @@
 import React from "react";
 import { View, StyleSheet, ViewStyle } from "react-native";
-import { tokens } from "../tokens";
+import { BorderRadius, Spacing } from "../tokens";
+import { useTheme } from "../theme";
 
 export function Card({
   children,
@@ -9,15 +10,15 @@ export function Card({
   children: React.ReactNode;
   style?: ViewStyle;
 }) {
-  return <View style={[styles.card, style]}>{children}</View>;
+  const theme = useTheme();
+  return <View style={[styles.card, { backgroundColor: theme.card, borderColor: theme.border }, style]}>{children}</View>;
 }
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: tokens.color.cardBg,
     borderWidth: 1,
-    borderColor: tokens.color.border,
-    borderRadius: tokens.radius.lg,
-    padding: tokens.space.md,
+    borderRadius: BorderRadius.card,
+    padding: Spacing.md,
   },
 });
+
