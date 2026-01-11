@@ -5,6 +5,7 @@ import { CONTENT, DashboardResponse } from "@withyou/shared";
 import { Screen } from "../../ui/components/Screen";
 import { Text } from "../../ui/components/Text";
 import { Button } from "../../ui/components/Button";
+import { clearSession } from "../../state/session";
 import { Card } from "../../ui/components/Card";
 import { Section } from "../../ui/components/Section";
 import { api } from "../../state/appState";
@@ -20,6 +21,11 @@ export function DashboardScreen({ navigation }: DashboardScreenProps) {
   const [dashboard, setDashboard] = useState<DashboardResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [errorText, setErrorText] = useState("");
+
+  const handleLogout = async () => {
+    await clearSession();
+    (navigation as any).navigate("Login");
+  };
 
   useEffect(() => {
     const fetchDashboard = async () => {
@@ -154,6 +160,11 @@ export function DashboardScreen({ navigation }: DashboardScreenProps) {
               // eslint-disable-next-line @typescript-eslint/no-explicit-any
               (navigation as any)?.navigate?.("Ideas")
             }
+            variant="secondary"
+          />
+          <Button
+            label="Logout"
+            onPress={handleLogout}
             variant="secondary"
           />
         </View>

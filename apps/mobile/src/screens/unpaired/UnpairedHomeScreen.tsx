@@ -5,6 +5,7 @@ import { CONTENT } from "@withyou/shared";
 import { Screen } from "../../ui/components/Screen";
 import { Text } from "../../ui/components/Text";
 import { Button } from "../../ui/components/Button";
+import { clearSession } from "../../state/session";
 import { Card } from "../../ui/components/Card";
 import { Spacing } from "../../ui/tokens";
 import { useTheme } from "../../ui/theme";
@@ -16,6 +17,11 @@ type UnpairedHomeScreenProps = {
 export function UnpairedHomeScreen({ navigation }: UnpairedHomeScreenProps) {
   const theme = useTheme();
   const c = CONTENT.dashboard.unpaired;
+
+  const handleLogout = async () => {
+    await clearSession();
+    (navigation as any).navigate("Login");
+  };
 
   return (
     <Screen style={{ paddingHorizontal: Spacing.md, paddingTop: Spacing.lg }}>
@@ -54,6 +60,11 @@ export function UnpairedHomeScreen({ navigation }: UnpairedHomeScreenProps) {
               // eslint-disable-next-line @typescript-eslint/no-explicit-any
               (navigation as any)?.navigate?.("PairAccept")
             }
+            variant="secondary"
+          />
+          <Button
+            label="Logout"
+            onPress={handleLogout}
             variant="secondary"
           />
         </View>
