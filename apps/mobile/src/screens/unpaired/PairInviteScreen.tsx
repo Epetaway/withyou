@@ -114,7 +114,10 @@ export function PairInviteScreen({ navigation }: PairInviteScreenProps) {
 
         <Button
           label={c.actions.back}
-          onPress={() => (navigation as any)?.goBack?.()}
+          onPress={() => {
+            const nav = navigation as { goBack?: () => void };
+            nav.goBack?.();
+          }}
           variant="secondary"
           style={{ marginTop: Spacing.lg }}
         />

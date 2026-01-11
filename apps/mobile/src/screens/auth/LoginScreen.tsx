@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { View } from "react-native";
 import { CONTENT, loginSchema, AuthResponse } from "@withyou/shared";
-import { useNavigation } from "@react-navigation/native";
 import { Screen } from "../../ui/components/Screen";
 import { Text } from "../../ui/components/Text";
 import { TextFieldNew } from "../../ui/components/TextFieldNew";

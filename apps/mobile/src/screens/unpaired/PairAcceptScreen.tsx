@@ -108,7 +108,10 @@ export function PairAcceptScreen({ navigation }: PairAcceptScreenProps) {
           />
           <Button
             label={c.actions.back}
-            onPress={() => (navigation as any)?.goBack?.()}
+            onPress={() => {
+              const nav = navigation as { goBack?: () => void };
+              nav.goBack?.();
+            }}
             variant="secondary"
           />
         </View>

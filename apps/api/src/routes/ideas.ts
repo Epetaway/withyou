@@ -3,8 +3,6 @@ import type { Request } from "express";
 import {
   ideasQuerySchema,
   recipesQuerySchema,
-  ideaResponseSchema,
-  savedIdeasResponseSchema,
 } from "@withyou/shared";
 import { prisma } from "../utils/prisma.js";
 import { AppError } from "../errors/app-error.js";
@@ -172,7 +170,7 @@ router.post("/query", jwtMiddleware, async (req: AuthedRequest, res, next) => {
           userId,
           relationshipId: relationship.id,
           type: params.type,
-          params: params as any,
+          params: params as Record<string, unknown>,
         },
       });
     }
@@ -196,7 +194,7 @@ router.post("/query", jwtMiddleware, async (req: AuthedRequest, res, next) => {
     res.json({ ideas: [] });
   } catch (error) {
     if (error instanceof z.ZodError) {
-      return next(new AppError("Validation error", 400, "INVALID_REQUEST", (error as any).issues));
+      return next(new AppError("Validation error", 400, "INVALID_REQUEST", error.issues as unknown));
     }
     next(error);
   }
@@ -227,7 +225,7 @@ router.post("/recipes", jwtMiddleware, async (req: AuthedRequest, res, next) => 
           userId,
           relationshipId: relationship.id,
           type: "FOOD",
-          params: params as any,
+          params: params as Record<string, unknown>,
         },
       });
     }
@@ -247,7 +245,7 @@ router.post("/recipes", jwtMiddleware, async (req: AuthedRequest, res, next) => 
     res.json({ recipes });
   } catch (error) {
     if (error instanceof z.ZodError) {
-      return next(new AppError("Validation error", 400, "INVALID_REQUEST", (error as any).issues));
+      return next(new AppError("Validation error", 400, "INVALID_REQUEST", error.issues as unknown));
     }
     next(error);
   }

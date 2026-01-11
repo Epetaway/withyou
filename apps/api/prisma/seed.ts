@@ -415,7 +415,7 @@ async function main() {
         description: idea.description,
         category: idea.category,
         source: idea.source,
-        metadata: idea.metadata as any,
+        metadata: idea.metadata as Record<string, unknown>,
       },
     });
   }

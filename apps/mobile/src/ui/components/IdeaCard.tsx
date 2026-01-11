@@ -1,7 +1,6 @@
 import React from "react";
 import { Linking, Pressable, StyleSheet, View, ViewStyle, TextStyle } from "react-native";
 import { Text } from "./Text";
-import { useTheme } from "../theme";
 
 export type IdeaType = "LOCAL" | "FOOD" | "MOVIE" | "HOME";
 export type IdeaSource = "CURATED" | "GENERATED" | "USER_SAVED";

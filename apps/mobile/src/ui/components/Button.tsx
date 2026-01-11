@@ -1,5 +1,5 @@
 import React from "react";
-import { Pressable, StyleSheet, ViewStyle, TextStyle, Text as RNText } from "react-native";
+import { Pressable, StyleSheet, ViewStyle, TextStyle } from "react-native";
 import { BorderRadius, Size, Spacing } from "../tokens";
 import { useTheme } from "../theme";
 import { Text } from "./Text";
