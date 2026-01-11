@@ -187,7 +187,6 @@ export function PreferencesScreen({ navigation }: PreferencesScreenProps) {
             variant="primary"
           />
         </View>
-      </ScrollView>
     </Screen>
   );
 }
