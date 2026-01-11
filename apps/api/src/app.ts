@@ -6,6 +6,7 @@ import healthRouter from './routes/health.js';
 import authRouter from './routes/auth.js';
 import relationshipRouter from './routes/relationship.js';
 import coreRouter from './routes/core.js';
+import ideasRouter from './routes/ideas.js';
 import { errorHandler } from './middleware/error-handler.js';
 import { generalLimiter, authLimiter, inviteLimiter } from './middleware/rate-limit.js';
 
@@ -37,6 +38,8 @@ app.use(authRouter);
 // Relationship routes with invite-specific rate limiting
 app.use('/relationship/invite', inviteLimiter);
 app.use(relationshipRouter);
+
+app.use('/ideas', ideasRouter);
 
 app.use(coreRouter);
 
