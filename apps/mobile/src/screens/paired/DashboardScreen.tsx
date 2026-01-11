@@ -81,7 +81,11 @@ export function DashboardScreen({ navigation }: DashboardScreenProps) {
               <Text style={[styles.label, { color: theme.text2 }]}>
                 Relationship stage
               </Text>
-              <Text style={[styles.value, { color: theme.primary }]}>
+              <Text 
+                style={[styles.value, { color: theme.primary }]}
+                numberOfLines={1}
+                ellipsizeMode="tail"
+              >
                 {CONTENT.preferences.options.stage[dashboard.relationshipStage]}
               </Text>
             </Card>
@@ -174,7 +178,13 @@ const styles = StyleSheet.create({
   h1: { fontSize: 28, fontWeight: "700" },
   h2: { fontSize: 16, marginTop: Spacing.sm },
   label: { fontSize: 12, fontWeight: "500" },
-  value: { fontSize: 28, fontWeight: "700", marginTop: Spacing.sm },
+  value: { 
+    fontSize: 28, 
+    fontWeight: "700", 
+    marginTop: Spacing.sm,
+    lineHeight: 34,
+    numberOfLines: 1,
+  },
   value2: { fontSize: 16, fontWeight: "600" },
   meta: { fontSize: 12, marginTop: Spacing.xs },
   row: { flexDirection: "row", alignItems: "center" },

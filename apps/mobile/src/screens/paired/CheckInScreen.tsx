@@ -147,7 +147,7 @@ export function CheckInScreen({ navigation }: CheckInScreenProps) {
           <TextField
             value={note}
             onChangeText={setNote}
-            placeholder={c.note.placeholder}
+            placeholder="Share more about your mood..."
             multiline
             numberOfLines={4}
           />
