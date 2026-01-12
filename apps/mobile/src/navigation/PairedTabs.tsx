@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { View, StyleSheet, Pressable, Dimensions } from "react-native";
+import { View, StyleSheet, Pressable } from "react-native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { FontAwesome6 } from "@expo/vector-icons";
 import { DashboardScreen } from "../screens/paired/DashboardScreen";
@@ -10,7 +10,6 @@ import { SettingsScreen } from "../screens/shared/SettingsScreen";
 import { useTheme } from "../ui/theme/ThemeProvider";
 
 const Stack = createNativeStackNavigator();
-const { width } = Dimensions.get('window');
 
 interface FloatingNavProps {
   currentRoute: string;
@@ -63,7 +62,7 @@ export function PairedTabs() {
   const [currentRoute, setCurrentRoute] = useState("Dashboard");
   const theme = useTheme();
 
-  const navigationConfig: Record<string, React.ComponentType<any>> = {
+  const navigationConfig: Record<string, React.ComponentType<Record<string, unknown>>> = {
     Dashboard: DashboardScreen,
     CheckIn: CheckInScreen,
     Ideas: IdeasNavigator,
@@ -84,7 +83,7 @@ export function PairedTabs() {
       >
         <Stack.Screen
           name={currentRoute}
-          component={Screen}
+          component={Screen as React.ComponentType<Record<string, unknown>>}
           options={{ animationEnabled: false }}
         />
       </Stack.Navigator>

@@ -46,7 +46,7 @@ export function DashboardScreen({ navigation }: DashboardScreenProps) {
   const theme = useTheme();
   const [dashboard, setDashboard] = useState<DashboardResponse | null>(null);
   const [loading, setLoading] = useState(true);
-  const [errorText, setErrorText] = useState("");
+  const [_errorText, setErrorText] = useState("");
 
   useEffect(() => {
     const fetchDashboard = async () => {
@@ -139,7 +139,7 @@ export function DashboardScreen({ navigation }: DashboardScreenProps) {
         <View style={styles.quickActions}>
           <Pressable 
             style={[styles.actionButton, { backgroundColor: '#EDE9FE' }]}
-            onPress={() => (navigation as any)?.navigate?.("CheckIn")}
+            onPress={() => (navigation as Record<string, unknown>)?.navigate?.("CheckIn")}
           >
             <FontAwesome6 name="heart" size={24} color="#7C3AED" weight="solid" />
             <Text style={[styles.actionText, { color: '#7C3AED' }]}>Check In</Text>
@@ -193,7 +193,7 @@ export function DashboardScreen({ navigation }: DashboardScreenProps) {
         <View style={styles.exploreSection}>
           <View style={styles.sectionHeader}>
             <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>Explore Ideas</Text>
-            <Pressable onPress={() => (navigation as any)?.navigate?.("Ideas")}>
+            <Pressable onPress={() => (navigation as Record<string, unknown>)?.navigate?.("Ideas")}>
               <Text style={[styles.viewAll, { color: theme.colors.primary }]}>View all</Text>
             </Pressable>
           </View>

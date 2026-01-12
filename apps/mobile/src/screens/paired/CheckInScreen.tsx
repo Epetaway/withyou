@@ -13,7 +13,7 @@ import { useAsyncAction } from "../../api/hooks";
 import { useTheme } from "../../ui/theme/ThemeProvider";
 
 type CheckInScreenProps = {
-  navigation: unknown;
+  navigation?: Record<string, unknown>;
 };
 
 const MOODS = [
@@ -50,7 +50,7 @@ function MoodCard({
       ]}
     >
       <FontAwesome6
-        name={icon as any}
+        name={icon as "arrow-down" | "minus" | "arrows-left-right" | "circle-check" | "arrow-up"}
         size={20}
         color={selected ? ACTIVE_COLOR : INACTIVE_COLOR}
         weight="bold"
@@ -73,7 +73,7 @@ function MoodCard({
 }
 
 export function CheckInScreen({ navigation }: CheckInScreenProps) {
-  const theme = useTheme();
+  const _theme = useTheme();
   const c = CONTENT.checkIn.create;
 
   const [moodLevel, setMoodLevel] = useState<1 | 2 | 3 | 4 | 5 | null>(null);
@@ -122,8 +122,8 @@ export function CheckInScreen({ navigation }: CheckInScreenProps) {
                   key={mood.key}
                   label={mood.label}
                   icon={mood.icon}
-                  selected={moodLevel === parseInt(mood.key) as any}
-                  onPress={() => setMoodLevel(parseInt(mood.key) as any)}
+                  selected={moodLevel === parseInt(mood.key)}
+                  onPress={() => setMoodLevel(parseInt(mood.key) as 1 | 2 | 3 | 4 | 5)}
                 />
               ))}
             </View>

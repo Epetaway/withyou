@@ -75,7 +75,7 @@ export function LoginScreen({ navigation }: LoginScreenProps) {
 
         {/* Title */}
         <View style={styles.titleSection}>
-          <Text style={styles.title}>Let's meeting new</Text>
+          <Text style={styles.title}>Let&apos;s meeting new</Text>
           <Text style={styles.title}>people around you</Text>
         </View>
 
@@ -101,7 +101,7 @@ export function LoginScreen({ navigation }: LoginScreenProps) {
         {/* Sign Up Link */}
         <View style={styles.signupSection}>
           <Text style={[styles.signupText, { color: theme.colors.text2 }]}>
-            Don't have an account?{" "}
+            Don&apos;t have an account?{" "}
           </Text>
           <Pressable onPress={() => navigation.navigate("Register")}>
             <Text style={[styles.signupLink, { color: theme.colors.primary }]}>
