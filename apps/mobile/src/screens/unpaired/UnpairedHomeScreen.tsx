@@ -1,6 +1,6 @@
 import React from "react";
 import { View, StyleSheet } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
+import { FontAwesome6 } from "@expo/vector-icons";
 import { CONTENT } from "@withyou/shared";
 import { Screen } from "../../ui/components/Screen";
 import { Text } from "../../ui/components/Text";
@@ -8,7 +8,7 @@ import { Button } from "../../ui/components/Button";
 import { clearSession } from "../../state/session";
 import { Card } from "../../ui/components/Card";
 import { Spacing } from "../../ui/tokens";
-import { useTheme } from "../../ui/theme";
+import { useTheme } from "../../ui/theme/ThemeProvider";
 
 type UnpairedHomeScreenProps = {
   navigation: unknown;
@@ -28,7 +28,7 @@ export function UnpairedHomeScreen({ navigation }: UnpairedHomeScreenProps) {
         {/* Hero Section */}
         <Card>
           <View style={{ gap: Spacing.lg, alignItems: "center" }}>
-            <Ionicons name="heart-outline" size={56} color={theme.primary} />
+            <FontAwesome6 name="heart" size={56} color={theme.primary} weight="solid" />
             <View style={{ gap: Spacing.sm }}>
               <Text style={[styles.title, { color: theme.text, textAlign: "center" }]}>
                 {c.title}

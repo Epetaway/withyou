@@ -14,7 +14,7 @@ import { Section } from "../../ui/components/Section";
 import { api } from "../../state/appState";
 import { useAsyncAction } from "../../api/hooks";
 import { Spacing } from "../../ui/tokens";
-import { useTheme } from "../../ui/theme";
+import { useTheme } from "../../ui/theme/ThemeProvider";
 
 type PairAcceptScreenProps = {
   navigation: unknown;

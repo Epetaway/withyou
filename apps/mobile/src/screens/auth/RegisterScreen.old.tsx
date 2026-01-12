@@ -5,6 +5,7 @@ import { CONTENT, registerSchema, AuthResponse } from "@withyou/shared";
 import { Screen } from "../../ui/components/Screen";
 import { Text } from "../../ui/components/Text";
 import { TextFieldNew } from "../../ui/components/TextFieldNew";
+import { ButtonNew } from "../../ui/components/ButtonNew";
 import { api } from "../../state/appState";
 import { setSession } from "../../state/session";
 import { setToken } from "../../state/appState";

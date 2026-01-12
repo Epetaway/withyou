@@ -10,7 +10,7 @@ import { api } from "../../state/appState";
 import { clearSession } from "../../state/session";
 import { useAsyncAction } from "../../api/hooks";
 import { Spacing } from "../../ui/tokens";
-import { useTheme } from "../../ui/theme";
+import { useTheme } from "../../ui/theme/ThemeProvider";
 
 type SettingsScreenProps = {
   navigation: unknown;

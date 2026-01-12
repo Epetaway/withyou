@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { View, StyleSheet, Pressable, ScrollView, Dimensions } from "react-native";
-import { FontAwesome6 } from "@expo/vector-icons";
+import { Ionicons } from "@expo/vector-icons";
 import { CONTENT, DashboardResponse } from "@withyou/shared";
 import { Screen } from "../../ui/components/Screen";
 import { Text } from "../../ui/components/Text";
@@ -23,24 +23,6 @@ const dateIdeas = [
   { id: 5, title: "Game Night", emoji: "🎮", category: "Fun", image: "games" },
   { id: 6, title: "Spa Day", emoji: "💆", category: "Relaxation", image: "spa" },
 ];
-
-// Mood ring color mapping based on mood level (1-5)
-function getMoodColor(moodLevel: number): string {
-  switch (moodLevel) {
-    case 5:
-      return "#A78BFA"; // Purple - very good/happy
-    case 4:
-      return "#22C55E"; // Green - good
-    case 3:
-      return "#EAB308"; // Yellow - neutral
-    case 2:
-      return "#F97316"; // Orange - low
-    case 1:
-      return "#EF4444"; // Red - very low/sad
-    default:
-      return "#D1D5DB"; // Gray - no mood set
-  }
-}
 
 export function DashboardScreen({ navigation }: DashboardScreenProps) {
   const theme = useTheme();
@@ -87,7 +69,7 @@ export function DashboardScreen({ navigation }: DashboardScreenProps) {
         <View style={styles.header}>
           <Text style={[styles.appTitle, { color: theme.colors.text }]}>WithYou</Text>
           <Pressable onPress={clearSession}>
-            <FontAwesome6 name="right-from-bracket" size={24} color={theme.colors.text} weight="bold" />
+            <Ionicons name="log-out-outline" size={24} color={theme.colors.text} />
           </Pressable>
         </View>
 
@@ -98,7 +80,7 @@ export function DashboardScreen({ navigation }: DashboardScreenProps) {
             {/* User Card */}
             <View style={[styles.profileCard, { backgroundColor: theme.colors.surface }]}>
               <View style={[styles.profileImagePlaceholder, { backgroundColor: '#E9D5FF' }]}>
-                <FontAwesome6 name="user" size={40} color="#A78BFA" weight="bold" />
+                <Ionicons name="person" size={40} color="#A78BFA" />
               </View>
               <Text style={[styles.profileName, { color: theme.colors.text }]}>You</Text>
               <View style={styles.statusBadge}>
@@ -107,14 +89,10 @@ export function DashboardScreen({ navigation }: DashboardScreenProps) {
               </View>
             </View>
 
-            {/* Partner Card - Mood Ring */}
-            <View style={[styles.profileCard, { 
-              backgroundColor: theme.colors.surface,
-              borderWidth: 3,
-              borderColor: dashboard?.partnerLastCheckIn ? getMoodColor(dashboard.partnerLastCheckIn.mood_level) : '#D1D5DB'
-            }]}>
+            {/* Partner Card */}
+            <View style={[styles.profileCard, { backgroundColor: theme.colors.surface }]}>
               <View style={[styles.profileImagePlaceholder, { backgroundColor: '#FED7AA' }]}>
-                <FontAwesome6 name="user" size={40} color="#F97316" weight="bold" />
+                <Ionicons name="person" size={40} color="#F97316" />
               </View>
               <Text style={[styles.profileName, { color: theme.colors.text }]}>Partner</Text>
               <View style={styles.statusBadge}>
@@ -127,7 +105,7 @@ export function DashboardScreen({ navigation }: DashboardScreenProps) {
           {/* Relationship Stage */}
           {dashboard?.relationshipStage && (
             <View style={[styles.stageBadge, { backgroundColor: '#EDE9FE' }]}>
-              <FontAwesome6 name="heart" size={16} color="#A78BFA" weight="solid" />
+              <Ionicons name="heart" size={16} color="#A78BFA" />
               <Text style={[styles.stageText, { color: '#7C3AED' }]}>
                 {CONTENT.preferences.options.stage[dashboard.relationshipStage]}
               </Text>
@@ -141,7 +119,7 @@ export function DashboardScreen({ navigation }: DashboardScreenProps) {
             style={[styles.actionButton, { backgroundColor: '#EDE9FE' }]}
             onPress={() => (navigation as any)?.navigate?.("CheckIn")}
           >
-            <FontAwesome6 name="heart" size={24} color="#7C3AED" weight="solid" />
+            <Ionicons name="heart-circle" size={24} color="#7C3AED" />
             <Text style={[styles.actionText, { color: '#7C3AED' }]}>Check In</Text>
           </Pressable>
 
@@ -149,7 +127,7 @@ export function DashboardScreen({ navigation }: DashboardScreenProps) {
             style={[styles.actionButton, { backgroundColor: '#DBEAFE' }]}
             onPress={() => {}}
           >
-            <FontAwesome6 name="message" size={24} color="#2563EB" weight="solid" />
+            <Ionicons name="chatbubble-ellipses" size={24} color="#2563EB" />
             <Text style={[styles.actionText, { color: '#2563EB' }]}>Send Note</Text>
           </Pressable>
         </View>
@@ -170,7 +148,7 @@ export function DashboardScreen({ navigation }: DashboardScreenProps) {
           >
             {/* Add Note Card */}
             <Pressable style={[styles.noteCard, styles.addNoteCard, { borderColor: theme.colors.border }]}>
-              <FontAwesome6 name="plus-circle" size={32} color={theme.colors.primary} weight="solid" />
+              <Ionicons name="add-circle" size={32} color={theme.colors.primary} />
               <Text style={[styles.addNoteText, { color: theme.colors.text2 }]}>Send a note</Text>
             </Pressable>
 
@@ -182,12 +160,46 @@ export function DashboardScreen({ navigation }: DashboardScreenProps) {
             </View>
 
             <View style={[styles.noteCard, { backgroundColor: '#DBEAFE' }]}>
-              <FontAwesome6 name="microphone" size={24} color="#2563EB" weight="solid" />
+              <Ionicons name="mic" size={24} color="#2563EB" />
               <Text style={styles.notePreview}>Voice note</Text>
               <Text style={styles.noteTime}>1d ago</Text>
             </View>
           </ScrollView>
         </View>
+
+        {/* Partner's Latest Check-in */}
+        {dashboard?.partnerLastCheckIn && (
+          <View style={styles.checkInSection}>
+            <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>Partner's Mood</Text>
+            <View style={[styles.moodCard, { backgroundColor: theme.colors.surface }]}>
+              <View style={styles.moodIconContainer}>
+                <Ionicons
+                  name={
+                    dashboard.partnerLastCheckIn.mood_level === 5
+                      ? "heart"
+                      : dashboard.partnerLastCheckIn.mood_level === 4
+                      ? "happy"
+                      : dashboard.partnerLastCheckIn.mood_level === 3
+                      ? "ellipse"
+                      : dashboard.partnerLastCheckIn.mood_level === 2
+                      ? "remove-circle"
+                      : "sad"
+                  }
+                  size={32}
+                  color="#A78BFA"
+                />
+              </View>
+              <View style={{ flex: 1 }}>
+                <Text style={[styles.moodLabel, { color: theme.colors.text }]}>
+                  {CONTENT.checkIn.create.moodLabels[dashboard.partnerLastCheckIn.mood_level]}
+                </Text>
+                <Text style={[styles.moodTime, { color: theme.colors.text2 }]}>
+                  {new Date(dashboard.partnerLastCheckIn.timestamp).toLocaleDateString()}
+                </Text>
+              </View>
+            </View>
+          </View>
+        )}
 
         {/* Explore Date Ideas */}
         <View style={styles.exploreSection}>
@@ -226,10 +238,86 @@ export function DashboardScreen({ navigation }: DashboardScreenProps) {
     </View>
   );
 }
+                  name={
+                    dashboard.partnerLastCheckIn.mood_level === 5
+                      ? "heart-outline"
+                      : dashboard.partnerLastCheckIn.mood_level === 4
+                      ? "happy-outline"
+                      : dashboard.partnerLastCheckIn.mood_level === 3
+                      ? "ellipse-outline"
+                      : dashboard.partnerLastCheckIn.mood_level === 2
+                      ? "remove-circle-outline"
+                      : "sad-outline"
+                  }
+                  size={22}
+                  color={theme.primary}
+                />
+                <View style={{ marginLeft: Spacing.sm }}>
+                  <Text style={[styles.value2, { color: theme.text }]}>
+                    {
+                      CONTENT.checkIn.create
+                        .moodLabels[dashboard.partnerLastCheckIn.mood_level]
+                    }
+                  </Text>
+                  <Text style={[styles.meta, { color: theme.text2 }]}>
+                    {new Date(
+                      dashboard.partnerLastCheckIn.timestamp
+                    ).toLocaleDateString()}
+                  </Text>
+                </View>
+              </View>
+            </Card>
+          </Section>
+        ) : (
+          <Section title="Partner check-in" subtitle="Latest shared update">
+            <Card>
+              <Text variant="body" style={{ color: theme.text2 }}>
+                {CONTENT.dashboard.paired.empty.noSharedCheckIns}
+              </Text>
+            </Card>
+          </Section>
+        )}
+
+        {/* Action Buttons */}
+        <View style={{ gap: Spacing.sm, marginTop: Spacing.md }}>
+          <Button
+            label={CONTENT.dashboard.paired.actions.newCheckIn}
+            onPress={() =>
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              (navigation as any)?.navigate?.("CheckIn")
+            }
+            variant="primary"
+          />
+          <Button
+            label={CONTENT.dashboard.paired.actions.updatePreferences}
+            onPress={() =>
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              (navigation as any)?.navigate?.("Preferences")
+            }
+            variant="secondary"
+          />
+          <Button
+            label={CONTENT.dashboard.paired.actions.getIdeas}
+            onPress={() =>
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              (navigation as any)?.navigate?.("Ideas")
+            }
+            variant="secondary"
+          />
+          <Button
+            label="Logout"
+            onPress={handleLogout}
+            variant="secondary"
+          />
+        </View>
+    </Screen>
+  );
+}
+
 
 const styles = StyleSheet.create({
   scrollContent: {
-    paddingBottom: 120,
+    paddingBottom: 20,
   },
   header: {
     flexDirection: 'row',
@@ -450,3 +538,4 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
 });
+

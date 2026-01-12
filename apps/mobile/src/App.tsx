@@ -1,15 +1,15 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import { StatusBar } from 'expo-status-bar';
 import { ActivityIndicator, View } from 'react-native';
-import { PaperProvider } from 'react-native-paper';
+import { PaperProvider, MD3LightTheme, MD3DarkTheme } from 'react-native-paper';
 import { RootNavigator } from './navigation/RootNavigator';
 import { ThemeProvider, useTheme } from './ui/theme/ThemeProvider';
-import { usePaperTheme } from './ui/theme';
+import { lightTheme, darkTheme } from './ui/theme';
 
 function AppInner() {
   const [isLoading, setIsLoading] = useState(true);
-  const { colors, mode } = useTheme();
-  const paperTheme = usePaperTheme();
+  const { colors, mode, toggle } = useTheme();
+  const paperTheme = useMemo(() => (mode === 'dark' ? darkTheme : lightTheme), [mode]);
 
   useEffect(() => {
     const prepare = async () => {
@@ -32,10 +32,10 @@ function AppInner() {
           flex: 1,
           justifyContent: 'center',
           alignItems: 'center',
-          backgroundColor: colors.background,
+          backgroundColor: paperTheme.colors.background,
         }}
       >
-        <ActivityIndicator size="large" color={colors.primary} />
+        <ActivityIndicator size="large" color={paperTheme.colors.primary} />
       </View>
     );
   }

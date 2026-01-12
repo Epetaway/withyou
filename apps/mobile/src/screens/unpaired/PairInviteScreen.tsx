@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { View, ScrollView, StyleSheet, Pressable } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
+import { FontAwesome6 } from "@expo/vector-icons";
 import { CONTENT, InviteResponse } from "@withyou/shared";
 import { Screen } from "../../ui/components/Screen";
 import { Text } from "../../ui/components/Text";
@@ -10,7 +10,7 @@ import { Section } from "../../ui/components/Section";
 import { api } from "../../state/appState";
 import { useAsyncAction } from "../../api/hooks";
 import { Spacing } from "../../ui/tokens";
-import { useTheme } from "../../ui/theme";
+import { useTheme } from "../../ui/theme/ThemeProvider";
 import * as Clipboard from "expo-clipboard";
 
 type PairInviteScreenProps = {
@@ -86,7 +86,7 @@ export function PairInviteScreen({ navigation }: PairInviteScreenProps) {
                       { backgroundColor: pressed ? theme.surface : "transparent" }
                     ]}
                   >
-                    <Ionicons name="copy-outline" size={18} color={theme.primary} />
+                    <FontAwesome6 name="copy" size={18} color={theme.primary} weight="bold" />
                     <Text style={{ color: theme.primary, fontWeight: "600" }}>Copy Code</Text>
                   </Pressable>
                   
@@ -97,7 +97,7 @@ export function PairInviteScreen({ navigation }: PairInviteScreenProps) {
                       { backgroundColor: pressed ? theme.surface : "transparent" }
                     ]}
                   >
-                    <Ionicons name="link-outline" size={18} color={theme.primary} />
+                    <FontAwesome6 name="link" size={18} color={theme.primary} weight="bold" />
                     <Text style={{ color: theme.primary, fontWeight: "600" }}>Copy Link</Text>
                   </Pressable>
                 </View>

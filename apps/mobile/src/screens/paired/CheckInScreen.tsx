@@ -1,13 +1,6 @@
 import React, { useState } from "react";
 import { View, Pressable, StyleSheet } from "react-native";
-import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
-import { 
-  faArrowDown,
-  faMinus,
-  faEquals,
-  faWaveSquare,
-  faArrowUp
-} from "@fortawesome/free-solid-svg-icons";
+import { FontAwesome6 } from "@expo/vector-icons";
 import { CONTENT, checkinCreateSchema } from "@withyou/shared";
 import { Screen } from "../../ui/components/Screen";
 import { Text } from "../../ui/components/Text";
@@ -17,18 +10,18 @@ import { Card } from "../../ui/components/Card";
 import { Section } from "../../ui/components/Section";
 import { api } from "../../state/appState";
 import { useAsyncAction } from "../../api/hooks";
-import { useTheme } from "../../ui/theme";
+import { useTheme } from "../../ui/theme/ThemeProvider";
 
 type CheckInScreenProps = {
   navigation: unknown;
 };
 
 const MOODS = [
-  { key: "1", label: "Very low", icon: faArrowDown },
-  { key: "2", label: "Low", icon: faMinus },
-  { key: "3", label: "Neutral", icon: faEquals },
-  { key: "4", label: "Good", icon: faWaveSquare },
-  { key: "5", label: "Very good", icon: faArrowUp },
+  { key: "1", label: "Very low", icon: "arrow-down" },
+  { key: "2", label: "Low", icon: "minus" },
+  { key: "3", label: "Neutral", icon: "arrows-left-right" },
+  { key: "4", label: "Good", icon: "circle-check" },
+  { key: "5", label: "Very good", icon: "arrow-up" },
 ] as const;
 
 const ACTIVE_COLOR = "#9B8CFF";
@@ -42,7 +35,7 @@ function MoodCard({
 }: {
   selected: boolean;
   label: string;
-  icon: any;
+  icon: string;
   onPress: () => void;
 }) {
   return (
@@ -56,10 +49,11 @@ function MoodCard({
         },
       ]}
     >
-      <FontAwesomeIcon
-        icon={icon}
-        size={24}
+      <FontAwesome6
+        name={icon as any}
+        size={20}
         color={selected ? ACTIVE_COLOR : INACTIVE_COLOR}
+        weight="bold"
       />
       <Text
         variant="body"
@@ -68,7 +62,9 @@ function MoodCard({
           color: selected ? "#1F2937" : "#6B7280",
           fontSize: 12,
           fontWeight: "600",
+          textAlign: "center",
         }}
+        numberOfLines={2}
       >
         {label}
       </Text>
@@ -112,13 +108,13 @@ export function CheckInScreen({ navigation }: CheckInScreenProps) {
   return (
     <Screen scrollable>
       {/* Header */}
-      <View style={styles.header}>
+      <View style={[styles.header, { marginTop: 16 }]}>
         <Text style={styles.h1}>{c.title}</Text>
         <Text style={styles.h2}>{c.subtitle}</Text>
       </View>
 
-        {/* Mood Selection */}
-        <Section title="How are you feeling?" subtitle="Select your mood level">
+      {/* Mood Selection */}
+      <Section title="How are you feeling?" subtitle="Select your mood level">
           <Card>
             <View style={styles.moodGrid}>
               {MOODS.map((mood) => (
@@ -209,17 +205,17 @@ const styles = StyleSheet.create({
   },
   moodGrid: {
     flexDirection: "row",
-    gap: 12,
+    gap: 8,
     marginBottom: 12,
   },
   moodCard: {
     flex: 1,
     borderRadius: 12,
     borderWidth: 1,
-    padding: 12,
+    padding: 6,
     alignItems: "center",
     justifyContent: "center",
-    minHeight: 80,
+    minHeight: 90,
   },
   shareRow: {
     flexDirection: "row",

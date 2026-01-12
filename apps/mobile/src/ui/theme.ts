@@ -84,3 +84,11 @@ export function usePaperTheme() {
   const scheme = useColorScheme();
   return scheme === "dark" ? darkTheme : lightTheme;
 }
+
+export function usePaperThemeWithContext() {
+  // This function must be called within ThemeProvider context
+  // Import useTheme from './theme/ThemeProvider' in calling component
+  // This is a placeholder - actual implementation in App.tsx
+  const scheme = useColorScheme();
+  return scheme === "dark" ? darkTheme : lightTheme;
+}
