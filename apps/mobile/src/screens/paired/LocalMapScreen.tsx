@@ -10,12 +10,12 @@ type LocalMapScreenProps = {
 };
 
 const nearbyPlaces = [
-  { id: 1, name: "Coffee House", emoji: "☕", category: "Cafe", distance: "0.5 km", rating: 4.8 },
-  { id: 2, name: "Park", emoji: "🌳", category: "Outdoor", distance: "1.2 km", rating: 4.5 },
-  { id: 3, name: "Cinema", emoji: "🎬", category: "Entertainment", distance: "0.8 km", rating: 4.7 },
-  { id: 4, name: "Restaurant", emoji: "🍽️", category: "Food", distance: "1.5 km", rating: 4.6 },
-  { id: 5, name: "Museum", emoji: "🖼️", category: "Culture", distance: "2 km", rating: 4.9 },
-  { id: 6, name: "Hiking Trail", emoji: "🥾", category: "Adventure", distance: "3 km", rating: 4.8 },
+  { id: 1, name: "Coffee House", icon: "mug-hot", category: "Cafe", distance: "0.5 km", rating: 4.8 },
+  { id: 2, name: "Park", icon: "tree", category: "Outdoor", distance: "1.2 km", rating: 4.5 },
+  { id: 3, name: "Cinema", icon: "film", category: "Entertainment", distance: "0.8 km", rating: 4.7 },
+  { id: 4, name: "Restaurant", icon: "utensils", category: "Food", distance: "1.5 km", rating: 4.6 },
+  { id: 5, name: "Museum", icon: "palette", category: "Culture", distance: "2 km", rating: 4.9 },
+  { id: 6, name: "Hiking Trail", icon: "person-hiking", category: "Adventure", distance: "3 km", rating: 4.8 },
 ];
 
 const categories = [
@@ -88,13 +88,20 @@ export function LocalMapScreen({ navigation }: LocalMapScreenProps) {
         {nearbyPlaces.map((place) => (
           <Pressable key={place.id} style={[styles.placeCard, { backgroundColor: theme.colors.surface }]}>
             <View style={styles.placeLeft}>
-              <Text style={styles.placeEmoji}>{place.emoji}</Text>
+              <View style={styles.placeIconContainer}>
+                <FontAwesome6 
+                  name={place.icon as "mug-hot" | "tree" | "film" | "utensils" | "palette" | "person-hiking"}
+                  size={20}
+                  color={theme.colors.primary}
+                  weight="bold"
+                />
+              </View>
               <View style={styles.placeInfo}>
                 <Text style={[styles.placeName, { color: theme.colors.text }]}>
                   {place.name}
                 </Text>
                 <View style={styles.placeDetails}>
-                  <Text style={[styles.placeCategory, { color: theme.colors.text2 }]}>
+                  <Text style={[styles.placeCategory, { color: theme.colors.secondary }]}>
                     {place.category}
                   </Text>
                   <Text style={[styles.placeDistance, { color: theme.colors.primary }]}>
@@ -199,8 +206,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 12,
   },
-  placeEmoji: {
-    fontSize: 32,
+  placeIconContainer: {
+    width: 44,
+    height: 44,
+    borderRadius: 12,
+    backgroundColor: '#F3F4F6',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   placeInfo: {
     flex: 1,

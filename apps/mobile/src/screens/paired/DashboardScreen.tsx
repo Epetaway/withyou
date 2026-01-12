@@ -16,12 +16,12 @@ type DashboardScreenProps = {
 };
 
 const dateIdeas = [
-  { id: 1, title: "Romantic Dinner", emoji: "🍷", category: "Food", image: "restaurant" },
-  { id: 2, title: "Movie Night", emoji: "🎬", category: "Entertainment", image: "film" },
-  { id: 3, title: "Hiking Adventure", emoji: "⛰️", category: "Outdoor", image: "trail" },
-  { id: 4, title: "Cook Together", emoji: "👨‍🍳", category: "Home", image: "cooking" },
-  { id: 5, title: "Game Night", emoji: "🎮", category: "Fun", image: "games" },
-  { id: 6, title: "Spa Day", emoji: "💆", category: "Relaxation", image: "spa" },
+  { id: 1, title: "Romantic Dinner", icon: "utensils", category: "Food", image: "restaurant" },
+  { id: 2, title: "Movie Night", icon: "film", category: "Entertainment", image: "film" },
+  { id: 3, title: "Hiking Adventure", icon: "tree", category: "Outdoor", image: "trail" },
+  { id: 4, title: "Cook Together", icon: "fire", category: "Home", image: "cooking" },
+  { id: 5, title: "Game Night", icon: "gamepad", category: "Fun", image: "games" },
+  { id: 6, title: "Spa Day", icon: "spa", category: "Relaxation", image: "spa" },
 ];
 
 // Mood ring color mapping based on mood level (1-5)
@@ -205,7 +205,12 @@ export function DashboardScreen({ navigation }: DashboardScreenProps) {
               key={idea.id}
               style={[styles.ideaPill, { backgroundColor: theme.colors.primary + "20" }]}
             >
-              <Text style={styles.ideaEmoji}>{idea.emoji}</Text>
+              <FontAwesome6 
+                name={idea.icon as "utensils" | "film" | "tree" | "fire" | "gamepad" | "spa"}
+                size={16}
+                color={theme.colors.primary}
+                weight="bold"
+              />
               <Text style={[styles.ideaPillText, { color: theme.colors.text }]}>{idea.title}</Text>
             </Pressable>
           ))}
@@ -365,9 +370,6 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     borderRadius: 18,
     minHeight: 36,
-  },
-  ideaEmoji: {
-    fontSize: 16,
   },
   ideaPillText: {
     fontSize: 13,
