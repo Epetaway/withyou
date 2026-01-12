@@ -5,6 +5,7 @@ import { FontAwesome6 } from "@expo/vector-icons";
 import { DashboardScreen } from "../screens/paired/DashboardScreen";
 import { CheckInScreen } from "../screens/paired/CheckInScreen";
 import { PreferencesScreen } from "../screens/paired/PreferencesScreen";
+import { LocalMapScreen } from "../screens/paired/LocalMapScreen";
 import { IdeasNavigator } from "./IdeasNavigator";
 import { SettingsScreen } from "../screens/shared/SettingsScreen";
 import { useTheme } from "../ui/theme/ThemeProvider";
@@ -68,6 +69,7 @@ export function PairedTabs() {
     Ideas: IdeasNavigator,
     Preferences: PreferencesScreen,
     Settings: SettingsScreen,
+    LocalMap: LocalMapScreen,
   };
 
   const renderScreen = () => {

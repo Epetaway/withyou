@@ -9,7 +9,7 @@ import { api } from "../../state/appState";
 import { useTheme } from "../../ui/theme/ThemeProvider";
 
 const { width } = Dimensions.get('window');
-const CARD_WIDTH = (width - 60) / 2;
+const _CARD_WIDTH = (width - 60) / 2;
 
 type DashboardScreenProps = {
   navigation: unknown;
@@ -91,37 +91,50 @@ export function DashboardScreen({ navigation }: DashboardScreenProps) {
           </Pressable>
         </View>
 
-        {/* Couple Profile Cards - Side by Side */}
+        {/* Couple Profile Cards - Tinder-style */}
         <View style={styles.coupleSection}>
           <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>Your Connection</Text>
           <View style={styles.coupleCards}>
             {/* User Card */}
-            <View style={[styles.profileCard, { backgroundColor: theme.colors.surface }]}>
-              <View style={[styles.profileImagePlaceholder, { backgroundColor: '#E9D5FF' }]}>
-                <FontAwesome6 name="user" size={40} color="#A78BFA" weight="bold" />
+            <Pressable style={[styles.largeProfileCard, { backgroundColor: '#A78BFA' }]}>
+              <View style={styles.cardContent}>
+                <View style={styles.matchBadge}>
+                  <Text style={styles.matchPercentage}>100% Match</Text>
+                </View>
+                <View style={styles.cardBottom}>
+                  <View>
+                    <Text style={styles.cardName}>You</Text>
+                    <Text style={styles.cardLocation}>Active now</Text>
+                  </View>
+                  <View style={styles.moodRing} />
+                </View>
               </View>
-              <Text style={[styles.profileName, { color: theme.colors.text }]}>You</Text>
-              <View style={styles.statusBadge}>
-                <View style={[styles.statusDot, { backgroundColor: '#10B981' }]} />
-                <Text style={styles.statusText}>Active</Text>
-              </View>
-            </View>
+            </Pressable>
 
-            {/* Partner Card - Mood Ring */}
-            <View style={[styles.profileCard, { 
-              backgroundColor: theme.colors.surface,
-              borderWidth: 3,
-              borderColor: dashboard?.partnerLastCheckIn ? getMoodColor(dashboard.partnerLastCheckIn.mood_level) : '#D1D5DB'
-            }]}>
-              <View style={[styles.profileImagePlaceholder, { backgroundColor: '#FED7AA' }]}>
-                <FontAwesome6 name="user" size={40} color="#F97316" weight="bold" />
+            {/* Partner Card - with Mood Ring */}
+            <Pressable 
+              style={[
+                styles.largeProfileCard, 
+                { 
+                  backgroundColor: '#D946EF',
+                  borderWidth: dashboard?.partnerLastCheckIn ? 3 : 0,
+                  borderColor: dashboard?.partnerLastCheckIn ? getMoodColor(dashboard.partnerLastCheckIn.mood_level) : 'transparent'
+                }
+              ]}
+            >
+              <View style={styles.cardContent}>
+                <View style={styles.matchBadge}>
+                  <Text style={styles.matchPercentage}>94% Match</Text>
+                </View>
+                <View style={styles.cardBottom}>
+                  <View>
+                    <Text style={styles.cardName}>Partner</Text>
+                    <Text style={styles.cardLocation}>Active now</Text>
+                  </View>
+                  <View style={styles.moodRing} />
+                </View>
               </View>
-              <Text style={[styles.profileName, { color: theme.colors.text }]}>Partner</Text>
-              <View style={styles.statusBadge}>
-                <View style={[styles.statusDot, { backgroundColor: '#10B981' }]} />
-                <Text style={styles.statusText}>Active</Text>
-              </View>
-            </View>
+            </Pressable>
           </View>
 
           {/* Relationship Stage */}
@@ -189,35 +202,36 @@ export function DashboardScreen({ navigation }: DashboardScreenProps) {
           </ScrollView>
         </View>
 
-        {/* Explore Date Ideas */}
+        {/* Explore Date Ideas - Interest Pills */}
         <View style={styles.exploreSection}>
           <View style={styles.sectionHeader}>
-            <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>Explore Ideas</Text>
+            <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>Things to do</Text>
             <Pressable onPress={() => (navigation as Record<string, unknown>)?.navigate?.("Ideas")}>
               <Text style={[styles.viewAll, { color: theme.colors.primary }]}>View all</Text>
             </Pressable>
           </View>
 
-          <View style={styles.ideasGrid}>
-            {dateIdeas.slice(0, 4).map((idea) => (
+          <View style={styles.ideasPills}>
+            {dateIdeas.slice(0, 6).map((idea) => (
               <Pressable 
                 key={idea.id}
-                style={[styles.ideaCard, { backgroundColor: theme.colors.surface }]}
+                style={[styles.ideaPill]}
               >
-                <View style={styles.ideaImagePlaceholder}>
-                  <Text style={styles.ideaEmoji}>{idea.emoji}</Text>
-                </View>
-                <View style={styles.ideaContent}>
-                  <Text style={[styles.ideaCategory, { color: theme.colors.primary }]}>
-                    {idea.category}
-                  </Text>
-                  <Text style={[styles.ideaTitle, { color: theme.colors.text }]} numberOfLines={2}>
-                    {idea.title}
-                  </Text>
-                </View>
+                <Text style={styles.ideaEmoji}>{idea.emoji}</Text>
+                <Text style={styles.ideaPillText}>{idea.title}</Text>
               </Pressable>
             ))}
           </View>
+
+          {/* Find Near Me Button */}
+          <Pressable 
+            style={[styles.findNearMeButton, { backgroundColor: theme.colors.primary }]}
+            onPress={() => (navigation as Record<string, unknown>)?.navigate?.("LocalMap")}
+          >
+            <FontAwesome6 name="map" size={20} color="#FFFFFF" weight="bold" />
+            <Text style={styles.findNearMeText}>Find near me</Text>
+            <FontAwesome6 name="arrow-right" size={16} color="#FFFFFF" weight="bold" />
+          </Pressable>
         </View>
 
         {/* Bottom Spacing */}
@@ -257,48 +271,57 @@ const styles = StyleSheet.create({
     gap: 12,
     marginBottom: 16,
   },
-  profileCard: {
+  largeProfileCard: {
     flex: 1,
-    borderRadius: 16,
-    padding: 16,
-    alignItems: 'center',
+    height: 200,
+    borderRadius: 24,
+    padding: 20,
+    justifyContent: 'space-between',
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 3,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 12,
+    elevation: 5,
   },
-  profileImagePlaceholder: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 12,
+  cardContent: {
+    flex: 1,
+    justifyContent: 'space-between',
   },
-  profileName: {
-    fontSize: 16,
-    fontWeight: '600',
-    marginBottom: 8,
-  },
-  statusBadge: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
+  matchBadge: {
+    backgroundColor: 'rgba(255, 255, 255, 0.9)',
     paddingHorizontal: 12,
-    paddingVertical: 4,
-    borderRadius: 12,
-    backgroundColor: '#F0FDF4',
+    paddingVertical: 6,
+    borderRadius: 20,
+    alignSelf: 'flex-start',
   },
-  statusDot: {
-    width: 6,
-    height: 6,
-    borderRadius: 3,
+  matchPercentage: {
+    fontSize: 13,
+    fontWeight: '700',
+    color: '#A78BFA',
   },
-  statusText: {
-    fontSize: 12,
-    color: '#059669',
+  cardBottom: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-end',
+  },
+  cardName: {
+    fontSize: 24,
+    fontWeight: '700',
+    color: '#FFFFFF',
+    marginBottom: 4,
+  },
+  cardLocation: {
+    fontSize: 14,
+    color: 'rgba(255, 255, 255, 0.8)',
     fontWeight: '500',
+  },
+  moodRing: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    backgroundColor: 'rgba(255, 255, 255, 0.3)',
+    borderWidth: 3,
+    borderColor: '#FFFFFF',
   },
   stageBadge: {
     flexDirection: 'row',
@@ -411,33 +434,41 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     marginBottom: 24,
   },
-  ideasGrid: {
+  ideasPills: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: 12,
+    gap: 10,
+    marginBottom: 16,
   },
-  ideaCard: {
-    width: CARD_WIDTH,
-    borderRadius: 16,
-    overflow: 'hidden',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 3,
+  ideaPill: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    borderRadius: 20,
+    backgroundColor: '#EDE9FE',
+    borderWidth: 1,
+    borderColor: '#A78BFA',
   },
-  ideaImagePlaceholder: {
-    width: '100%',
-    height: 100,
-    backgroundColor: '#F3F4F6',
+  ideaPillText: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: '#FFFFFF',
+  },
+  findNearMeButton: {
+    flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
+    gap: 10,
+    paddingVertical: 16,
+    borderRadius: 16,
+    marginTop: 8,
   },
-  ideaEmoji: {
-    fontSize: 40,
-  },
-  ideaContent: {
-    padding: 12,
+  findNearMeText: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: '#FFFFFF',
   },
   ideaCategory: {
     fontSize: 11,
