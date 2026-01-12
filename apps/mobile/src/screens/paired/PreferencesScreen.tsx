@@ -1,18 +1,13 @@
 import React, { useState } from "react";
-import { View, Pressable, StyleSheet } from "react-native";
+import { View, Pressable } from "react-native";
 import { CONTENT, preferencesSchema } from "@withyou/shared";
 import { Screen } from "../../ui/components/Screen";
 import { Text } from "../../ui/components/Text";
 import { Button } from "../../ui/components/Button";
-import { Section } from "../../ui/components/Section";
 import { api } from "../../state/appState";
 import { useAsyncAction } from "../../api/hooks";
 import { Spacing, BorderRadius } from "../../ui/tokens";
 import { useTheme } from "../../ui/theme/ThemeProvider";
-
-type PreferencesScreenProps = {
-  navigation: unknown;
-};
 
 function Chip({
   label,
@@ -32,8 +27,9 @@ function Chip({
         paddingVertical: Spacing.sm,
         borderRadius: BorderRadius.pill,
         borderWidth: 1,
-        borderColor: selected ? theme.primary : theme.border,
-        backgroundColor: selected ? theme.primary : "transparent",
+        borderColor: selected ? theme.colors.primary : theme.colors.border,
+        backgroundColor: selected ? theme.colors.primary : "transparent",
+        minHeight: 36,
       }}
     >
       <Text
@@ -41,7 +37,7 @@ function Chip({
         style={{
           fontSize: 14,
           fontWeight: "600",
-          color: selected ? "#fff" : theme.text,
+          color: selected ? theme.colors.background : theme.colors.text,
         }}
       >
         {label}
@@ -50,7 +46,7 @@ function Chip({
   );
 }
 
-export function PreferencesScreen({ navigation }: PreferencesScreenProps) {
+export function PreferencesScreen(_navigation: unknown) {
   const theme = useTheme();
   const c = CONTENT.preferences;
 
@@ -88,9 +84,6 @@ export function PreferencesScreen({ navigation }: PreferencesScreenProps) {
       body: JSON.stringify(parsed.data),
     });
 
-    // Success - navigate back to dashboard
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    (navigation as any)?.goBack?.();
     return null;
   });
 
@@ -103,95 +96,91 @@ export function PreferencesScreen({ navigation }: PreferencesScreenProps) {
   };
 
   return (
-    <Screen style={{ paddingHorizontal: Spacing.md, paddingTop: Spacing.lg }} scrollable>
-        {/* Page Header */}
-        <View style={{ marginBottom: Spacing.xl }}>
-          <Text style={[styles.h1, { color: theme.text }]}>{c.title}</Text>
-          <Text style={[styles.h2, { color: theme.text2 }]}>{c.body}</Text>
+    <Screen scrollable>
+      {/* Page Header */}
+      <View style={{ marginBottom: Spacing.xl, gap: Spacing.sm }}>
+        <Text variant="title">{c.title}</Text>
+        <Text variant="body" style={{ color: theme.colors.textSecondary }}>{c.body}</Text>
+      </View>
+
+      {/* Activity Style */}
+      <View style={{ marginBottom: Spacing.xl, gap: Spacing.sm }}>
+        <Text variant="subtitle">{c.fields.activityStyleLabel}</Text>
+        <View style={{ flexDirection: "row", gap: Spacing.sm, flexWrap: "wrap" }}>
+          {(["chill", "active", "surprise"] as const).map((style) => (
+            <Chip
+              key={style}
+              label={c.options.activityStyle[style]}
+              selected={activityStyle === style}
+              onPress={() => setActivityStyle(style)}
+            />
+          ))}
         </View>
+      </View>
 
-        {/* Activity Style */}
-        <Section title={c.fields.activityStyleLabel}>
-          <View style={{ flexDirection: "row", gap: Spacing.sm }}>
-            {(["chill", "active", "surprise"] as const).map((style) => (
-              <Chip
-                key={style}
-                label={c.options.activityStyle[style]}
-                selected={activityStyle === style}
-                onPress={() => setActivityStyle(style)}
-              />
-            ))}
-          </View>
-        </Section>
-
-        {/* Food Types */}
-        <Section
-          title={c.fields.foodTypesLabel}
-          subtitle={c.fields.foodTypesHelper}
-        >
-          <View style={{ flexDirection: "row", flexWrap: "wrap", gap: Spacing.sm }}>
-            {CONTENT.lists.foodTypes.map((food) => (
-              <Chip
-                key={food}
-                label={food}
-                selected={foodTypes.includes(food)}
-                onPress={() => toggleFoodType(food)}
-              />
-            ))}
-          </View>
-        </Section>
-
-        {/* Budget */}
-        <Section title={c.fields.budgetLabel}>
-          <View style={{ flexDirection: "row", gap: Spacing.sm }}>
-            {(["low", "medium", "high"] as const).map((level) => (
-              <Chip
-                key={level}
-                label={c.options.budget[level]}
-                selected={budget === level}
-                onPress={() => setBudget(level)}
-              />
-            ))}
-          </View>
-        </Section>
-
-        {/* Energy Level */}
-        <Section title={c.fields.energyLabel} subtitle={c.fields.energyHelper}>
-          <View style={{ flexDirection: "row", gap: Spacing.sm }}>
-            {[1, 2, 3, 4, 5].map((level) => (
-              <Chip
-                key={level}
-                label={String(level)}
-                selected={energyLevel === level}
-                onPress={() => setEnergyLevel(level as 1 | 2 | 3 | 4 | 5)}
-              />
-            ))}
-          </View>
-        </Section>
-
-        {/* Error State */}
-        {errorText ? (
-          <View style={{ marginTop: Spacing.md }}>
-            <Text variant="body" style={{ color: theme.danger }}>
-              {errorText}
-            </Text>
-          </View>
-        ) : null}
-
-        {/* Submit Button */}
-        <View style={{ marginTop: Spacing.lg }}>
-          <Button
-            label={loading ? CONTENT.app.common.loading : c.actions.primary}
-            onPress={onSubmit}
-            disabled={loading}
-            variant="primary"
-          />
+      {/* Food Types */}
+      <View style={{ marginBottom: Spacing.xl, gap: Spacing.sm }}>
+        <Text variant="subtitle">{c.fields.foodTypesLabel}</Text>
+        <Text variant="body" style={{ color: theme.colors.textSecondary, fontSize: 13 }}>{c.fields.foodTypesHelper}</Text>
+        <View style={{ flexDirection: "row", flexWrap: "wrap", gap: Spacing.sm }}>
+          {CONTENT.lists.foodTypes.map((food) => (
+            <Chip
+              key={food}
+              label={food}
+              selected={foodTypes.includes(food)}
+              onPress={() => toggleFoodType(food)}
+            />
+          ))}
         </View>
+      </View>
+
+      {/* Budget */}
+      <View style={{ marginBottom: Spacing.xl, gap: Spacing.sm }}>
+        <Text variant="subtitle">{c.fields.budgetLabel}</Text>
+        <View style={{ flexDirection: "row", gap: Spacing.sm, flexWrap: "wrap" }}>
+          {(["low", "medium", "high"] as const).map((level) => (
+            <Chip
+              key={level}
+              label={c.options.budget[level]}
+              selected={budget === level}
+              onPress={() => setBudget(level)}
+            />
+          ))}
+        </View>
+      </View>
+
+      {/* Energy Level */}
+      <View style={{ marginBottom: Spacing.xl, gap: Spacing.sm }}>
+        <Text variant="subtitle">{c.fields.energyLabel}</Text>
+        <Text variant="body" style={{ color: theme.colors.textSecondary, fontSize: 13 }}>{c.fields.energyHelper}</Text>
+        <View style={{ flexDirection: "row", gap: Spacing.sm, flexWrap: "wrap" }}>
+          {[1, 2, 3, 4, 5].map((level) => (
+            <Chip
+              key={level}
+              label={String(level)}
+              selected={energyLevel === level}
+              onPress={() => setEnergyLevel(level as 1 | 2 | 3 | 4 | 5)}
+            />
+          ))}
+        </View>
+      </View>
+
+      {/* Error State */}
+      {errorText ? (
+        <View style={{ marginBottom: Spacing.lg }}>
+          <Text variant="body" style={{ color: theme.colors.error }}>
+            {errorText}
+          </Text>
+        </View>
+      ) : null}
+
+      {/* Submit Button */}
+      <Button
+        label={loading ? CONTENT.app.common.loading : c.actions.primary}
+        onPress={onSubmit}
+        disabled={loading}
+        variant="primary"
+      />
     </Screen>
   );
 }
-
-const styles = StyleSheet.create({
-  h1: { fontSize: 28, fontWeight: "700" },
-  h2: { fontSize: 16, marginTop: Spacing.sm },
-});

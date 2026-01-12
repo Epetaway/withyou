@@ -1,7 +1,7 @@
 import React from "react";
 import { View, StyleSheet, ViewStyle, ScrollView } from "react-native";
 import { useSafeAreaInsets, SafeAreaView } from "react-native-safe-area-context";
-import { useTheme } from "./theme/ThemeProvider";
+import { useTheme } from "../theme/ThemeProvider";
 
 type Props = {
   children: React.ReactNode;

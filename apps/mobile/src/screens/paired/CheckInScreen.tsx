@@ -71,7 +71,7 @@ function MoodCard({
 }
 
 export function CheckInScreen() {
-  // eslint-disable-next-line react/prop-types
+   
   const theme = useTheme();
   const c = CONTENT.checkIn.create;
 

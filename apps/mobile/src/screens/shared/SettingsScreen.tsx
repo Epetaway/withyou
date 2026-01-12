@@ -4,19 +4,13 @@ import { CONTENT } from "@withyou/shared";
 import { Screen } from "../../ui/components/Screen";
 import { Text } from "../../ui/components/Text";
 import { Button } from "../../ui/components/Button";
-import { Card } from "../../ui/components/Card";
-import { Section } from "../../ui/components/Section";
 import { api } from "../../state/appState";
 import { clearSession } from "../../state/session";
 import { useAsyncAction } from "../../api/hooks";
 import { Spacing } from "../../ui/tokens";
 import { useTheme } from "../../ui/theme/ThemeProvider";
 
-type SettingsScreenProps = {
-  navigation: unknown;
-};
-
-export function SettingsScreen({ navigation }: SettingsScreenProps) {
+export function SettingsScreen() {
   const theme = useTheme();
   const [showEndPairingModal, setShowEndPairingModal] = useState(false);
   const [showLogoutModal, setShowLogoutModal] = useState(false);
@@ -29,9 +23,6 @@ export function SettingsScreen({ navigation }: SettingsScreenProps) {
         method: "POST",
       });
       setShowEndPairingModal(false);
-      // Navigate back - will show unpaired home
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      (navigation as any)?.goBack?.();
       return null;
     }
   );
@@ -55,6 +46,15 @@ export function SettingsScreen({ navigation }: SettingsScreenProps) {
     );
   }
 
+  const SettingSection = ({ title, children }: { title: string; children: React.ReactNode }) => (
+    <View style={{ marginBottom: Spacing.xl, gap: Spacing.sm }}>
+      <Text variant="subtitle" style={{ color: theme.colors.textSecondary, fontSize: 13, textTransform: "uppercase", letterSpacing: 0.5 }}>
+        {title}
+      </Text>
+      {children}
+    </View>
+  );
+
   const onEndPairingConfirm = async () => {
     try {
       await runEndPairing();
@@ -64,72 +64,79 @@ export function SettingsScreen({ navigation }: SettingsScreenProps) {
   };
 
   return (
-    <Screen style={{ paddingHorizontal: Spacing.md, paddingTop: Spacing.lg }} scrollable>
-        {/* Page Header */}
-        <View style={{ marginBottom: Spacing.xl }}>
-          <Text style={[styles.h1, { color: theme.text }]}>{CONTENT.settings.title}</Text>
+    <Screen scrollable>
+      {/* Page Header */}
+      <View style={{ marginBottom: Spacing.xl }}>
+        <Text variant="title">{CONTENT.settings.title}</Text>
+      </View>
+
+      {/* Appearance */}
+      <SettingSection title="Appearance">
+        <View style={{
+          backgroundColor: theme.colors.surface,
+          borderRadius: 12,
+          padding: Spacing.md,
+        }}>
+          <Pressable
+            onPress={() => setDarkMode(!darkMode)}
+            style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}
+          >
+            <Text variant="body">
+              Dark Mode
+            </Text>
+            <Switch
+              value={darkMode}
+              onValueChange={setDarkMode}
+              trackColor={{ false: theme.colors.border, true: theme.colors.primary }}
+              thumbColor={theme.colors.background}
+            />
+          </Pressable>
         </View>
+      </SettingSection>
 
-        {/* Appearance */}
-        <Section title="Appearance">
-          <Card>
-            <Pressable
-              onPress={() => setDarkMode(!darkMode)}
-              style={styles.settingRow}
-            >
-              <Text variant="body" style={{ color: theme.text }}>
-                Dark Mode
-              </Text>
-              <Switch
-                value={darkMode}
-                onValueChange={setDarkMode}
-                trackColor={{ false: theme.border, true: theme.primary }}
-                thumbColor="#fff"
-              />
-            </Pressable>
-          </Card>
-        </Section>
-
-        {/* Relationship */}
-        <Section title={CONTENT.settings.sections.relationship}>
-          <Card>
-            <View style={{ gap: Spacing.sm }}>
-              <Text style={{ fontSize: 12, color: theme.text2, fontWeight: "500" }}>
-                {CONTENT.settings.relationship.stageLabel}
-              </Text>
-              <Text variant="body" style={{ color: theme.text }}>
-                Dating
-              </Text>
-            </View>
-          </Card>
-        </Section>
-
-        {/* Account */}
-        <Section title={CONTENT.settings.sections.account}>
-          <Button
-            label={CONTENT.settings.account.logout}
-            onPress={() => setShowLogoutModal(true)}
-            variant="secondary"
-          />
-        </Section>
-
-        {/* End Pairing (isolated destructive action) */}
-        <View style={{ marginTop: Spacing.xl }}>
-          <Button
-            label={CONTENT.settings.relationship.endPairing}
-            onPress={() => setShowEndPairingModal(true)}
-            variant="danger"
-          />
+      {/* Relationship */}
+      <SettingSection title={CONTENT.settings.sections.relationship}>
+        <View style={{
+          backgroundColor: theme.colors.surface,
+          borderRadius: 12,
+          padding: Spacing.md,
+          gap: Spacing.sm,
+        }}>
+          <Text variant="body" style={{ color: theme.colors.textSecondary, fontSize: 13 }}>
+            {CONTENT.settings.relationship.stageLabel}
+          </Text>
+          <Text variant="body">
+            Dating
+          </Text>
         </View>
+      </SettingSection>
+
+      {/* Account */}
+      <SettingSection title={CONTENT.settings.sections.account}>
+        <Button
+          label={CONTENT.settings.account.logout}
+          onPress={() => setShowLogoutModal(true)}
+          variant="secondary"
+        />
+      </SettingSection>
+
+      {/* End Pairing (isolated destructive action) */}
+      <View style={{ marginBottom: Spacing.lg }}>
+        <Button
+          label={CONTENT.settings.relationship.endPairing}
+          onPress={() => setShowEndPairingModal(true)}
+          variant="danger"
+        />
+      </View>
 
       {/* Confirmation Modals - simplified inline for now */}
       {showEndPairingModal && (
         <View style={styles.modalOverlay}>
-          <View style={[styles.modalContent, { backgroundColor: theme.card }]}>
-            <Text variant="title" style={{ color: theme.text }}>
+          <View style={[styles.modalContent, { backgroundColor: theme.colors.surface }]}>
+            <Text variant="title">
               {CONTENT.settings.relationship.confirmEndTitle}
             </Text>
-            <Text variant="body" style={{ color: theme.text2, marginTop: Spacing.sm }}>
+            <Text variant="body" style={{ color: theme.colors.textSecondary, marginTop: Spacing.sm }}>
               {CONTENT.settings.relationship.confirmEndBody}
             </Text>
             <View style={{ gap: Spacing.sm, marginTop: Spacing.lg }}>
@@ -154,11 +161,11 @@ export function SettingsScreen({ navigation }: SettingsScreenProps) {
 
       {showLogoutModal && (
         <View style={styles.modalOverlay}>
-          <View style={[styles.modalContent, { backgroundColor: theme.card }]}>
-            <Text variant="title" style={{ color: theme.text }}>
+          <View style={[styles.modalContent, { backgroundColor: theme.colors.surface }]}>
+            <Text variant="title">
               {CONTENT.settings.account.confirmLogoutTitle}
             </Text>
-            <Text variant="body" style={{ color: theme.text2, marginTop: Spacing.sm }}>
+            <Text variant="body" style={{ color: theme.colors.textSecondary, marginTop: Spacing.sm }}>
               {CONTENT.settings.account.confirmLogoutBody}
             </Text>
             <View style={{ gap: Spacing.sm, marginTop: Spacing.lg }}>
@@ -181,12 +188,6 @@ export function SettingsScreen({ navigation }: SettingsScreenProps) {
 }
 
 const styles = StyleSheet.create({
-  h1: { fontSize: 28, fontWeight: "700" },
-  settingRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-  },
   modalOverlay: {
     position: "absolute",
     top: 0,

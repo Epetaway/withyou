@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { View, StyleSheet, Pressable, ScrollView } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
+import { FontAwesome6 } from "@expo/vector-icons";
 import { CONTENT, registerSchema, AuthResponse } from "@withyou/shared";
 import { Screen } from "../../ui/components/Screen";
 import { Text } from "../../ui/components/Text";
@@ -83,7 +83,7 @@ export function RegisterScreen({ navigation }: RegisterScreenProps) {
             style={styles.backButton}
             onPress={() => navigation.navigate("Login")}
           >
-            <Ionicons name="arrow-back" size={24} color={theme.colors.text} />
+            <FontAwesome6 name="arrow-left" size={24} color={theme.colors.text} weight="bold" />
           </Pressable>
         </View>
 
