@@ -1,7 +1,7 @@
 import React from "react";
 import { View, StyleSheet, ViewStyle, ScrollView } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
-import { Surface } from "react-native-paper";
+import { useSafeAreaInsets, SafeAreaView } from "react-native-safe-area-context";
+import { useTheme } from "./theme/ThemeProvider";
 
 type Props = {
   children: React.ReactNode;
@@ -10,27 +10,39 @@ type Props = {
 };
 
 export function Screen({ children, style, scrollable = false }: Props) {
+  const insets = useSafeAreaInsets();
+  const theme = useTheme();
+
+  const containerStyle = {
+    paddingTop: insets.top + 16,
+    paddingHorizontal: 16,
+    paddingBottom: 32,
+  };
+
   const content = (
-    <View style={[styles.container, style]}>
+    <View style={[{ flex: 1 }, style]}>
       {children}
     </View>
   );
 
   return (
-    <Surface style={styles.surface}>
-      <SafeAreaView style={styles.safe} edges={["top", "left", "right"]}>
+    <View style={[styles.surface, { backgroundColor: theme.colors.background }]}>
+      <SafeAreaView style={styles.safe} edges={["left", "right"]}>
         {scrollable ? (
           <ScrollView 
             showsVerticalScrollIndicator={false}
-            contentContainerStyle={styles.scrollContent}
+            contentContainerStyle={[styles.scrollContent, containerStyle]}
+            scrollEventThrottle={16}
           >
             {content}
           </ScrollView>
         ) : (
-          content
+          <View style={[styles.container, containerStyle]}>
+            {content}
+          </View>
         )}
       </SafeAreaView>
-    </Surface>
+    </View>
   );
 }
 
@@ -39,11 +51,8 @@ const styles = StyleSheet.create({
   safe: { flex: 1 },
   container: { 
     flex: 1, 
-    paddingHorizontal: 18,
-    paddingVertical: 8,
   },
   scrollContent: {
-    paddingHorizontal: 18,
-    paddingVertical: 8,
+    minHeight: "100%",
   },
 });

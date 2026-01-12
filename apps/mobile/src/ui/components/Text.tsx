@@ -1,31 +1,57 @@
 import React from "react";
-import { Text as PaperText } from "react-native-paper";
-import { TextProps as RNTextProps, StyleProp, TextStyle } from "react-native";
+import { Text as RNText, StyleProp, TextStyle } from "react-native";
 
 type Variant = "title" | "subtitle" | "body" | "muted";
 
-type TextProps = RNTextProps & {
+type TextProps = React.ComponentProps<typeof RNText> & {
   variant?: Variant;
   style?: StyleProp<TextStyle>;
 };
 
 export function Text({ variant = "body", style, children, ...props }: TextProps) {
-  const getPaperVariant = () => {
+  const getFontSize = () => {
     switch (variant) {
       case "title":
-        return "titleLarge";
+        return 32;
       case "subtitle":
-        return "titleMedium";
+        return 20;
       case "muted":
-        return "bodySmall";
+        return 13;
       default:
-        return "bodyMedium";
+        return 16;
     }
   };
 
+  const getFontWeight = () => {
+    switch (variant) {
+      case "title":
+        return "800" as const;
+      case "subtitle":
+        return "700" as const;
+      case "muted":
+        return "500" as const;
+      default:
+        return "400" as const;
+    }
+  };
+
+  const fontSize = getFontSize();
+  const fontWeight = getFontWeight();
+
+  const textStyle: TextStyle = {
+    fontSize,
+    fontWeight,
+    lineHeight: fontSize * 1.35,
+    includeFontPadding: false,
+    textAlignVertical: "center",
+  };
+
   return (
-    <PaperText variant={getPaperVariant() as any} style={style} {...props}>
+    <RNText 
+      {...props}
+      style={[textStyle, style]}
+    >
       {children}
-    </PaperText>
+    </RNText>
   );
 }

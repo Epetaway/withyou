@@ -17,26 +17,29 @@ type CheckInScreenProps = {
 };
 
 const MOODS = [
-  { key: "1", label: "Very low", icon: "arrow-down" },
-  { key: "2", label: "Low", icon: "minus" },
-  { key: "3", label: "Neutral", icon: "arrows-left-right" },
-  { key: "4", label: "Good", icon: "circle-check" },
-  { key: "5", label: "Very good", icon: "arrow-up" },
+  { key: "1", label: "Very low", icon: "arrow-down", color: "#EF4444" },
+  { key: "2", label: "Low", icon: "minus", color: "#F97316" },
+  { key: "3", label: "Neutral", icon: "arrows-left-right", color: "#EAB308" },
+  { key: "4", label: "Good", icon: "circle-check", color: "#22C55E" },
+  { key: "5", label: "Very good", icon: "arrow-up", color: "#A78BFA" },
 ] as const;
 
-const ACTIVE_COLOR = "#9B8CFF";
-const INACTIVE_COLOR = "#B9B5D0";
+const ACTIVE_COLOR = "#A78BFA";
+const ACCENT_COLOR = "#D946EF";
+const INACTIVE_COLOR = "#9CA3AF";
 
 function MoodCard({
   selected,
   label,
   icon,
   onPress,
+  moodColor,
 }: {
   selected: boolean;
   label: string;
   icon: string;
   onPress: () => void;
+  moodColor: string;
 }) {
   return (
     <Pressable
@@ -44,23 +47,24 @@ function MoodCard({
       style={[
         styles.moodCard,
         {
-          backgroundColor: selected ? "#EDE9FE" : "transparent",
-          borderColor: selected ? ACTIVE_COLOR : "#E5E7EB",
+          backgroundColor: selected ? moodColor : "#F3F4F6",
+          borderColor: selected ? moodColor : "transparent",
+          borderWidth: selected ? 3 : 0,
         },
       ]}
     >
       <FontAwesome6
         name={icon as "arrow-down" | "minus" | "arrows-left-right" | "circle-check" | "arrow-up"}
-        size={20}
-        color={selected ? ACTIVE_COLOR : INACTIVE_COLOR}
+        size={28}
+        color={selected ? "#FFFFFF" : INACTIVE_COLOR}
         weight="bold"
       />
       <Text
         variant="body"
         style={{
-          marginTop: 8,
-          color: selected ? "#1F2937" : "#6B7280",
-          fontSize: 12,
+          marginTop: 12,
+          color: selected ? "#FFFFFF" : "#4B5563",
+          fontSize: 14,
           fontWeight: "600",
           textAlign: "center",
         }}
@@ -73,7 +77,7 @@ function MoodCard({
 }
 
 export function CheckInScreen({ navigation }: CheckInScreenProps) {
-  const _theme = useTheme();
+  const theme = useTheme();
   const c = CONTENT.checkIn.create;
 
   const [moodLevel, setMoodLevel] = useState<1 | 2 | 3 | 4 | 5 | null>(null);
@@ -108,114 +112,124 @@ export function CheckInScreen({ navigation }: CheckInScreenProps) {
   return (
     <Screen scrollable>
       {/* Header */}
-      <View style={[styles.header, { marginTop: 16 }]}>
-        <Text style={styles.h1}>{c.title}</Text>
-        <Text style={styles.h2}>{c.subtitle}</Text>
-      </View>
+      <Text variant="title">{c.title}</Text>
+      <Text variant="subtitle" style={[styles.subtitle, { color: theme.colors.secondary }]}>
+        {c.subtitle}
+      </Text>
 
       {/* Mood Selection */}
-      <Section title="How are you feeling?" subtitle="Select your mood level">
-          <Card>
-            <View style={styles.moodGrid}>
-              {MOODS.map((mood) => (
-                <MoodCard
-                  key={mood.key}
-                  label={mood.label}
-                  icon={mood.icon}
-                  selected={moodLevel === parseInt(mood.key)}
-                  onPress={() => setMoodLevel(parseInt(mood.key) as 1 | 2 | 3 | 4 | 5)}
-                />
-              ))}
-            </View>
-            {moodError ? (
-              <Text
-                variant="body"
-                style={{ color: "#EF4444", marginTop: 12, fontSize: 14 }}
-              >
-                {moodError}
-              </Text>
-            ) : null}
-          </Card>
-        </Section>
-
-        {/* Note */}
-        <Section title="Add a note" subtitle="Tell your partner more">
-          <TextField
-            value={note}
-            onChangeText={setNote}
-            placeholder="Share more about your mood..."
-            multiline
-            numberOfLines={4}
-          />
-        </Section>
-
-        {/* Share Option */}
-        <Section>
-          <Card>
-            <Pressable
-              onPress={() => setShared(!shared)}
-              style={styles.shareRow}
-            >
-              <Text variant="body">{c.share}</Text>
-              <View
-                style={[
-                  styles.checkbox,
-                  { backgroundColor: shared ? ACTIVE_COLOR : "transparent" },
-                ]}
-              >
-                {shared ? (
-                  <Text style={{ color: "white", fontSize: 12 }}>✓</Text>
-                ) : null}
-              </View>
-            </Pressable>
-          </Card>
-        </Section>
-
-        {/* Error */}
-        {errorText ? (
-          <Card>
-            <Text style={{ color: "#EF4444" }}>{errorText}</Text>
-          </Card>
+      <View style={styles.section}>
+        <Text variant="subtitle">How are you feeling?</Text>
+        <View style={styles.moodGrid}>
+          {MOODS.map((mood) => (
+            <MoodCard
+              key={mood.key}
+              label={mood.label}
+              icon={mood.icon}
+              moodColor={mood.color}
+              selected={moodLevel === parseInt(mood.key)}
+              onPress={() => setMoodLevel(parseInt(mood.key) as 1 | 2 | 3 | 4 | 5)}
+            />
+          ))}
+        </View>
+        {moodError ? (
+          <Text
+            variant="body"
+            style={[styles.errorText, { color: theme.colors.error || "#EF4444" }]}
+          >
+            {moodError}
+          </Text>
         ) : null}
+      </View>
 
-        {/* Submit Button */}
-        <Button
-          label={c.action}
-          onPress={() => run()}
-          disabled={loading}
-          style={{ marginTop: 24 }}
+      {/* Note */}
+      <View style={styles.section}>
+        <Text variant="subtitle">Add a note</Text>
+        <TextField
+          value={note}
+          onChangeText={setNote}
+          placeholder="Share more about your mood..."
+          multiline
+          numberOfLines={4}
         />
+      </View>
+
+      {/* Share Option */}
+      <View style={[styles.shareCard, { backgroundColor: theme.colors.surface }]}>
+        <Pressable
+          onPress={() => setShared(!shared)}
+          style={styles.shareRow}
+        >
+          <Text style={{ color: theme.colors.text }}>{c.share}</Text>
+          <View
+            style={[
+              styles.checkbox,
+              { 
+                backgroundColor: shared ? theme.colors.primary : "transparent",
+                borderColor: shared ? theme.colors.primary : theme.colors.secondary
+              },
+            ]}
+          >
+            {shared ? (
+              <FontAwesome6 name="check" size={14} color={theme.colors.onPrimary || "#FFFFFF"} weight="bold" />
+            ) : null}
+          </View>
+        </Pressable>
+      </View>
+
+      {/* Error */}
+      {errorText ? (
+        <View style={[styles.errorCard, { backgroundColor: theme.colors.error + "20" }]}>
+          <Text style={{ color: theme.colors.error || "#EF4444" }}>{errorText}</Text>
+        </View>
+      ) : null}
+
+      {/* Submit Button */}
+      <Button
+        label={c.action}
+        onPress={() => run()}
+        disabled={loading}
+        style={styles.submitButton}
+      />
     </Screen>
   );
 }
 
 const styles = StyleSheet.create({
-  header: {
+  subtitle: {
     marginBottom: 24,
-  },
-  h1: {
-    fontSize: 28,
-    fontWeight: "700",
-    color: "#1F2937",
-  },
-  h2: {
-    fontSize: 16,
-    color: "#6B7280",
     marginTop: 8,
+  },
+  section: {
+    marginBottom: 24,
+    gap: 12,
   },
   moodGrid: {
     flexDirection: "row",
     gap: 8,
-    marginBottom: 12,
   },
   moodCard: {
     flex: 1,
-    borderRadius: 12,
-    borderWidth: 1,
-    padding: 6,
+    borderRadius: 20,
+    padding: 12,
     alignItems: "center",
     justifyContent: "center",
-    minHeight: 90,
+    minHeight: 100,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  shareCard: {
+    marginBottom: 24,
+    borderRadius: 20,
+    padding: 16,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 8,
+    elevation: 2,
   },
   shareRow: {
     flexDirection: "row",
@@ -223,12 +237,23 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   checkbox: {
-    width: 20,
-    height: 20,
-    borderRadius: 4,
-    borderWidth: 1,
-    borderColor: INACTIVE_COLOR,
+    width: 24,
+    height: 24,
+    borderRadius: 6,
+    borderWidth: 2,
     alignItems: "center",
     justifyContent: "center",
+  },
+  errorCard: {
+    marginBottom: 16,
+    borderRadius: 16,
+    padding: 12,
+  },
+  errorText: {
+    marginTop: 12,
+    fontSize: 14,
+  },
+  submitButton: {
+    marginTop: 24,
   },
 });
