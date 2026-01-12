@@ -6,15 +6,11 @@ import { Screen } from "../../ui/components/Screen";
 import { Text } from "../../ui/components/Text";
 import { Button } from "../../ui/components/Button";
 import { TextField } from "../../ui/components/TextField";
-import { Card } from "../../ui/components/Card";
-import { Section } from "../../ui/components/Section";
 import { api } from "../../state/appState";
 import { useAsyncAction } from "../../api/hooks";
 import { useTheme } from "../../ui/theme/ThemeProvider";
 
-type CheckInScreenProps = {
-  navigation?: Record<string, unknown>;
-};
+type CheckInScreenProps = Record<string, unknown>;
 
 const MOODS = [
   { key: "1", label: "Very low", icon: "arrow-down", color: "#EF4444" },
@@ -24,8 +20,6 @@ const MOODS = [
   { key: "5", label: "Very good", icon: "arrow-up", color: "#A78BFA" },
 ] as const;
 
-const ACTIVE_COLOR = "#A78BFA";
-const ACCENT_COLOR = "#D946EF";
 const INACTIVE_COLOR = "#9CA3AF";
 
 function MoodCard({
@@ -76,7 +70,8 @@ function MoodCard({
   );
 }
 
-export function CheckInScreen({ navigation }: CheckInScreenProps) {
+export function CheckInScreen() {
+  // eslint-disable-next-line react/prop-types
   const theme = useTheme();
   const c = CONTENT.checkIn.create;
 
