@@ -92,7 +92,7 @@ export function PairedTabs() {
   };
 
   return (
-    <View style={{ flex: 1, backgroundColor: theme.colors.bg }}>
+    <View style={{ flex: 1, backgroundColor: theme.colors.background }}>
       {renderScreen()}
       <FloatingNav 
         currentRoute={currentRoute} 
