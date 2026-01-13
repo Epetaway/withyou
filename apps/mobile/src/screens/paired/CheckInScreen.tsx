@@ -68,7 +68,7 @@ function MoodCard({
   );
 }
 
-export function CheckInScreen() {
+export function CheckInScreen({ navigation }: { navigation?: { goBack: () => void } | unknown }) {
    
   const theme = useTheme();
   const c = CONTENT.checkIn.create;
@@ -96,10 +96,16 @@ export function CheckInScreen() {
       throw new Error("Validation failed");
     }
 
-    await api.request("/check-in", { method: "POST", body: parsed.data });
+    await api.request("/checkins", { 
+      method: "POST", 
+      body: JSON.stringify(parsed.data) 
+    });
     setMoodLevel(null);
     setNote("");
     setShared(false);
+    
+    // Navigate back to dashboard after successful check-in
+    (navigation as Record<string, unknown>)?.goBack?.();
   });
 
   return (
@@ -182,7 +188,7 @@ export function CheckInScreen() {
 
       {/* Submit Button */}
       <Button
-        label={c.action}
+        label={c.actions.primary}
         onPress={() => run()}
         disabled={loading}
         style={styles.submitButton}
