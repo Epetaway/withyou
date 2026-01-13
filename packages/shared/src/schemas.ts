@@ -56,6 +56,51 @@ export const preferencesSchema = z.object({
   energy_level: moodLevelSchema,
 });
 
+export const noteTypeSchema = z.union([
+  z.literal("TEXT"),
+  z.literal("VOICE"),
+  z.literal("VIDEO"),
+]);
+
+export const noteCreateSchema = z
+  .object({
+    type: noteTypeSchema,
+    content: z.string().trim().max(300).optional(),
+    media_url: z.string().url().max(500).optional(),
+  })
+  .superRefine((value, ctx) => {
+    if (value.type === "TEXT") {
+      if (!value.content || value.content.trim().length === 0) {
+        ctx.addIssue({
+          code: "too_small",
+          minimum: 1,
+          type: "string",
+          inclusive: true,
+          message: "Text notes require content",
+          path: ["content"],
+        });
+      }
+    } else {
+      if (!value.media_url) {
+        ctx.addIssue({
+          code: "custom",
+          message: `${value.type === "VOICE" ? "Voice" : "Video"} notes require a media URL`,
+          path: ["media_url"],
+        });
+      }
+      if (value.content && value.content.length > 120) {
+        ctx.addIssue({
+          code: "too_big",
+          maximum: 120,
+          type: "string",
+          inclusive: true,
+          message: "Keep captions short (<=120 chars)",
+          path: ["content"],
+        });
+      }
+    }
+  });
+
 export const relationshipStageSchema = z.union([
   z.literal("dating"),
   z.literal("committed"),

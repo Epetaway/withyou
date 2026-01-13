@@ -1,12 +1,14 @@
 import React, { useEffect, useState } from "react";
 import { View, StyleSheet, Pressable, ScrollView, Dimensions } from "react-native";
 import { FontAwesome6 } from "@expo/vector-icons";
-import { CONTENT, DashboardResponse } from "@withyou/shared";
+import { LinearGradient } from "expo-linear-gradient";
+import { CONTENT, DashboardResponse, Note, NoteType, NotesResponse } from "@withyou/shared";
 import { Screen } from "../../ui/components/Screen";
 import { Text } from "../../ui/components/Text";
 import { clearSession } from "../../state/session";
 import { api } from "../../state/appState";
 import { useTheme } from "../../ui/theme/ThemeProvider";
+import { TextField } from "../../ui/components/TextField";
 
 const { width } = Dimensions.get('window');
 const _CARD_WIDTH = (width - 60) / 2;
@@ -42,19 +44,100 @@ function getMoodColor(moodLevel: number): string {
   }
 }
 
+function getMoodCategory(moodLevel: number | null): "positive" | "neutral" | "negative" | "unknown" {
+  if (!moodLevel) return "unknown";
+  if (moodLevel >= 4) return "positive";
+  if (moodLevel === 3) return "neutral";
+  return "negative";
+}
+
+function getMoodTip(userMood: number | null, partnerMood: number | null): string | null {
+  if (!userMood || !partnerMood) return null;
+
+  const userCat = getMoodCategory(userMood);
+  const partnerCat = getMoodCategory(partnerMood);
+
+  if (userCat === "positive" && partnerCat === "positive") {
+    return "You’re both in a good place. Celebrate it—share appreciation or do something light and fun together.";
+  }
+
+  if ((userCat === "positive" && partnerCat === "negative") || (userCat === "negative" && partnerCat === "positive")) {
+    return "Different vibes today. The calmer partner can listen and support; the stressed partner can share what they need (comfort, space, or help).";
+  }
+
+  if (userCat === "negative" && partnerCat === "negative") {
+    return "Both of you are running low. Be gentle, keep plans low-pressure, and do something soothing together (walk, quiet movie, or just sit close).";
+  }
+
+  if (userCat === "neutral" && partnerCat === "neutral") {
+    return "Steady but flat—try sharing one good thing from today or plan a small treat to lift the mood.";
+  }
+
+  // Mixed or unsure
+  return "Check in with each other: ask what would feel supportive right now. Small gestures (a quick hug or a listening ear) go a long way.";
+}
+
 export function DashboardScreen({ navigation }: DashboardScreenProps) {
   const theme = useTheme();
   const [dashboard, setDashboard] = useState<DashboardResponse | null>(null);
+  const [userMood, setUserMood] = useState<number | null>(null);
+  const [notes, setNotes] = useState<Note[]>([]);
+  const [noteType, setNoteType] = useState<NoteType>("TEXT");
+  const [noteContent, setNoteContent] = useState("");
+  const [noteMediaUrl, setNoteMediaUrl] = useState("");
+  const [noteSubmitting, setNoteSubmitting] = useState(false);
   const [loading, setLoading] = useState(true);
   const [_errorText, setErrorText] = useState("");
 
+  const partnerMood = dashboard?.partnerLastCheckIn?.mood_level ?? null;
+  const moodTip = getMoodTip(userMood, partnerMood);
+  const blendedColors = [getMoodColor(userMood ?? 3), getMoodColor(partnerMood ?? 3)];
+
+  const submitNote = async () => {
+    if (noteSubmitting) return;
+
+    if (noteType === "TEXT" && !noteContent.trim()) return;
+    if (noteType !== "TEXT" && !noteMediaUrl.trim()) return;
+
+    try {
+      setNoteSubmitting(true);
+      const payload = {
+        type: noteType,
+        content: noteContent.trim() || undefined,
+        media_url: noteType === "TEXT" ? undefined : noteMediaUrl.trim(),
+      };
+
+      const res = await api.request<{ note: Note }>("/notes", {
+        method: "POST",
+        body: JSON.stringify(payload),
+      });
+
+      setNotes((prev) => [res.note, ...prev].slice(0, 10));
+      setNoteContent("");
+      setNoteMediaUrl("");
+      setNoteType("TEXT");
+    } finally {
+      setNoteSubmitting(false);
+    }
+  };
+
   useEffect(() => {
-    const fetchDashboard = async () => {
+    const fetchData = async () => {
       try {
         setLoading(true);
         setErrorText("");
-        const res = await api.request<DashboardResponse>("/dashboard");
-        setDashboard(res);
+
+        const [dashRes, checkinRes, notesRes] = await Promise.all([
+          api.request<DashboardResponse>("/dashboard"),
+          api.request<{ checkins: Array<{ moodLevel: number; createdAt: string }> }>("/checkins?limit=1"),
+          api.request<NotesResponse>("/notes?limit=10"),
+        ]);
+
+        setDashboard(dashRes);
+        if (checkinRes.checkins?.length) {
+          setUserMood(checkinRes.checkins[0].moodLevel);
+        }
+        setNotes(notesRes.notes ?? []);
       } catch (err) {
         if (err instanceof Error) {
           setErrorText(err.message);
@@ -64,7 +147,7 @@ export function DashboardScreen({ navigation }: DashboardScreenProps) {
       }
     };
 
-    fetchDashboard();
+    fetchData();
   }, []);
 
   if (loading) {
@@ -96,7 +179,9 @@ export function DashboardScreen({ navigation }: DashboardScreenProps) {
               <View style={styles.cardBottom}>
                 <View>
                   <Text style={styles.cardName}>You</Text>
-                  <Text style={styles.cardLocation}>Active now</Text>
+                  <Text style={styles.cardLocation}>
+                    {userMood ? CONTENT.checkIn.create.moodLabels[userMood as 1 | 2 | 3 | 4 | 5] : "No check-in yet"}
+                  </Text>
                 </View>
                 <View style={styles.moodRing} />
               </View>
@@ -118,7 +203,13 @@ export function DashboardScreen({ navigation }: DashboardScreenProps) {
               <View style={styles.cardBottom}>
                 <View>
                   <Text style={styles.cardName}>Partner</Text>
-                  <Text style={styles.cardLocation}>Active now</Text>
+                  <Text style={styles.cardLocation}>
+                    {dashboard?.partnerLastCheckIn
+                      ? CONTENT.checkIn.create.moodLabels[dashboard.partnerLastCheckIn.mood_level]
+                      : dashboard?.relationshipStage
+                        ? "Waiting for check-in"
+                        : "Not paired"}
+                  </Text>
                 </View>
                 <View style={styles.moodRing} />
               </View>
@@ -137,6 +228,62 @@ export function DashboardScreen({ navigation }: DashboardScreenProps) {
         )}
       </View>
 
+      {/* Mood board */}
+      <View style={[styles.section, styles.moodBoard]}>
+        <View style={styles.sectionHeader}>
+          <Text variant="sectionLabel" style={{ color: theme.colors.textSecondary, textTransform: "uppercase", letterSpacing: 0.5 }}>MOOD BOARD</Text>
+          <Text variant="helper" style={{ color: theme.colors.textSecondary }}>
+            Updated after both check-ins
+          </Text>
+        </View>
+
+        <View style={styles.moodPairRow}>
+          <View style={styles.moodPill}>
+            <View style={[styles.moodDot, { backgroundColor: userMood ? getMoodColor(userMood) : theme.colors.border }]} />
+            <View>
+              <Text variant="helper" style={{ color: theme.colors.textSecondary }}>You</Text>
+              <Text variant="body" style={{ color: theme.colors.text }}>
+                {userMood ? CONTENT.checkIn.create.moodLabels[userMood as 1 | 2 | 3 | 4 | 5] : "No check-in"}
+              </Text>
+            </View>
+          </View>
+
+          <View style={styles.moodPill}>
+            <View style={[styles.moodDot, { backgroundColor: partnerMood ? getMoodColor(partnerMood) : theme.colors.border }]} />
+            <View>
+              <Text variant="helper" style={{ color: theme.colors.textSecondary }}>Partner</Text>
+              <Text variant="body" style={{ color: theme.colors.text }}>
+                {partnerMood
+                  ? CONTENT.checkIn.create.moodLabels[partnerMood as 1 | 2 | 3 | 4 | 5]
+                  : dashboard?.relationshipStage
+                    ? "Waiting for check-in"
+                    : "Not paired"}
+              </Text>
+            </View>
+          </View>
+        </View>
+
+        <LinearGradient
+          colors={blendedColors}
+          start={{ x: 0, y: 0.5 }}
+          end={{ x: 1, y: 0.5 }}
+          style={styles.blendBar}
+        />
+
+        {partnerMood && userMood ? (
+          <View style={[styles.tipCard, { backgroundColor: theme.colors.primary + "10" }]}> 
+            <FontAwesome6 name="lightbulb" size={16} color={theme.colors.primary} weight="solid" style={{ marginRight: 8 }} />
+            <Text variant="body" style={{ color: theme.colors.text, flex: 1 }}>
+              {moodTip}
+            </Text>
+          </View>
+        ) : (
+          <Text variant="helper" style={{ color: theme.colors.textSecondary }}>
+            Waiting for both check-ins to blend moods.
+          </Text>
+        )}
+      </View>
+
       {/* Quick Actions */}
       <View style={styles.actionRow}>
         <Pressable 
@@ -149,7 +296,10 @@ export function DashboardScreen({ navigation }: DashboardScreenProps) {
 
         <Pressable 
           style={[styles.actionButton, { backgroundColor: theme.colors.secondary + "20" }]}
-          onPress={() => {}}
+          onPress={() => {
+            setNoteType("TEXT");
+            setNoteMediaUrl("");
+          }}
         >
           <FontAwesome6 name="message" size={20} color={theme.colors.secondary} weight="solid" />
           <Text style={[styles.actionText, { color: theme.colors.secondary }]}>Send Note</Text>
@@ -165,29 +315,93 @@ export function DashboardScreen({ navigation }: DashboardScreenProps) {
           </Pressable>
         </View>
 
-        <ScrollView 
-          horizontal 
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={styles.notesScroll}
-        >
-          {/* Add Note Card */}
-          <Pressable style={[styles.noteCard, styles.addNoteCard, { borderColor: theme.colors.secondary }]}>
-            <FontAwesome6 name="plus" size={24} color={theme.colors.primary} weight="solid" />
-            <Text style={[styles.addNoteText, { color: theme.colors.secondary }]}>Add note</Text>
+        {/* Composer */}
+        <View style={[styles.noteComposer, { borderColor: theme.colors.border, backgroundColor: theme.colors.surface }]}> 
+          <View style={styles.noteTypeRow}>
+            {["TEXT", "VOICE", "VIDEO"].map((type) => (
+              <Pressable
+                key={type}
+                onPress={() => setNoteType(type as NoteType)}
+                style={[
+                  styles.noteTypePill,
+                  {
+                    backgroundColor: noteType === type ? theme.colors.primary + "20" : theme.colors.background,
+                    borderColor: noteType === type ? theme.colors.primary : theme.colors.border,
+                  },
+                ]}
+              >
+                <Text variant="helper" style={{ color: noteType === type ? theme.colors.primary : theme.colors.textSecondary }}>
+                  {type === "TEXT" ? "Text" : type === "VOICE" ? "Voice" : "Video"}
+                </Text>
+              </Pressable>
+            ))}
+          </View>
+
+          <TextField
+            value={noteContent}
+            onChangeText={setNoteContent}
+            placeholder={noteType === "TEXT" ? "Type a short note" : "Add a caption (optional)"}
+            multiline
+            numberOfLines={noteType === "TEXT" ? 3 : 2}
+          />
+
+          {noteType !== "TEXT" ? (
+            <TextField
+              value={noteMediaUrl}
+              onChangeText={setNoteMediaUrl}
+              placeholder={noteType === "VOICE" ? "Voice clip URL" : "Video clip URL"}
+              autoCapitalize="none"
+            />
+          ) : null}
+
+          <Pressable
+            style={[
+              styles.sendNoteButton,
+              { backgroundColor: theme.colors.primary },
+              noteSubmitting && { opacity: 0.6 },
+            ]}
+            disabled={noteSubmitting}
+            onPress={submitNote}
+          >
+            <FontAwesome6 name="paper-plane" size={16} color={theme.colors.background} weight="solid" />
+            <Text style={{ color: theme.colors.background, fontWeight: "700", marginLeft: 8 }}>
+              {noteSubmitting ? CONTENT.app.common.loading : "Send"}
+            </Text>
           </Pressable>
+        </View>
 
-          {/* Example Notes */}
-          <View style={[styles.noteCard, { backgroundColor: "#FEF3C7" }]}>
-            <Text style={styles.notePreview}>Love you!</Text>
-            <Text style={styles.noteTime}>2h ago</Text>
-          </View>
-
-          <View style={[styles.noteCard, { backgroundColor: "#DBEAFE" }]}>
-            <FontAwesome6 name="microphone" size={20} color="#2563EB" weight="solid" />
-            <Text style={styles.notePreview}>Voice note</Text>
-            <Text style={styles.noteTime}>1d ago</Text>
-          </View>
-        </ScrollView>
+        {/* Notes feed */}
+        <View style={styles.notesList}>
+          {notes.length === 0 ? (
+            <Text variant="helper" style={{ color: theme.colors.textSecondary }}>No notes yet.</Text>
+          ) : (
+            notes.map((note) => (
+              <View key={note.id} style={[styles.noteRow, { borderColor: theme.colors.border }]}> 
+                <View style={styles.noteIconWrap}>
+                  <FontAwesome6
+                    name={note.type === "VOICE" ? "microphone" : note.type === "VIDEO" ? "video" : "message"}
+                    size={16}
+                    color={theme.colors.primary}
+                    weight="solid"
+                  />
+                </View>
+                <View style={{ flex: 1 }}>
+                  <Text variant="body" style={{ color: theme.colors.text }} numberOfLines={2}>
+                    {note.content || (note.type === "VOICE" ? "Voice note" : "Video note")}
+                  </Text>
+                  {note.media_url ? (
+                    <Text variant="helper" style={{ color: theme.colors.primary, marginTop: 4 }} numberOfLines={1}>
+                      {note.media_url}
+                    </Text>
+                  ) : null}
+                  <Text variant="helper" style={{ color: theme.colors.textSecondary, marginTop: 4 }}>
+                    {new Date(note.createdAt).toLocaleString()}
+                  </Text>
+                </View>
+              </View>
+            ))
+          )}
+        </View>
       </View>
 
       {/* Ideas Section */}
@@ -294,6 +508,40 @@ const styles = StyleSheet.create({
     borderWidth: 3,
     borderColor: '#FFFFFF',
   },
+  moodBoard: {
+    gap: 12,
+  },
+  moodPairRow: {
+    flexDirection: 'row',
+    gap: 12,
+  },
+  moodPill: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    padding: 12,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
+    backgroundColor: '#F9FAFB',
+  },
+  moodDot: {
+    width: 14,
+    height: 14,
+    borderRadius: 7,
+  },
+  blendBar: {
+    height: 12,
+    borderRadius: 999,
+  },
+  tipCard: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: 8,
+    padding: 12,
+    borderRadius: 12,
+  },
   stageBadge: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -356,6 +604,48 @@ const styles = StyleSheet.create({
     fontSize: 11,
     color: '#6B7280',
     marginTop: 4,
+  noteComposer: {
+    borderWidth: 1,
+    borderRadius: 12,
+    padding: 12,
+    gap: 12,
+  },
+  noteTypeRow: {
+    flexDirection: 'row',
+    gap: 8,
+  },
+  noteTypePill: {
+    paddingVertical: 6,
+    paddingHorizontal: 12,
+    borderRadius: 999,
+    borderWidth: 1,
+  },
+  sendNoteButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 12,
+    borderRadius: 10,
+  },
+  notesList: {
+    gap: 10,
+  },
+  noteRow: {
+    flexDirection: 'row',
+    gap: 12,
+    padding: 12,
+    borderWidth: 1,
+    borderRadius: 12,
+    alignItems: 'center',
+  },
+  noteIconWrap: {
+    width: 34,
+    height: 34,
+    borderRadius: 17,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#F3F4F6',
+  },
   },
   ideasPills: {
     flexDirection: 'row',

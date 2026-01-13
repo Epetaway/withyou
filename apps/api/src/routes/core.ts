@@ -1,6 +1,6 @@
 import { Router } from "express";
 import type { Request } from "express";
-import { checkinCreateSchema, preferencesSchema } from "@withyou/shared";
+import { checkinCreateSchema, preferencesSchema, noteCreateSchema } from "@withyou/shared";
 import { prisma } from "../utils/prisma.js";
 import { AppError } from "../errors/app-error.js";
 import { jwtMiddleware } from "../middleware/jwt-middleware.js";
@@ -125,6 +125,108 @@ router.post("/checkins", jwtMiddleware, async (req: AuthedRequest, res, next) =>
     res.status(201).json({
       checkinId: checkin.id,
       createdAt: checkin.createdAt.toISOString(),
+    });
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      return next(
+        new AppError(
+          "Validation error",
+          400,
+          "VALIDATION_ERROR",
+          error.issues.map((issue: z.ZodIssue) => ({
+            path: issue.path.join("."),
+            message: issue.message,
+          }))
+        )
+      );
+    }
+    next(error);
+  }
+});
+
+router.get("/notes", jwtMiddleware, async (req: AuthedRequest, res, next) => {
+  try {
+    const userId = req.user?.userId;
+    if (!userId) {
+      return next(new AppError("Unauthorized", 401, "UNAUTHORIZED"));
+    }
+
+    const relationship = await prisma.relationship.findFirst({
+      where: {
+        OR: [{ userAId: userId }, { userBId: userId }],
+        status: "active",
+      },
+    });
+
+    const parsedLimit = Number.parseInt(String(req.query.limit ?? "10"), 10);
+    const limit = Number.isFinite(parsedLimit) && parsedLimit > 0 ? parsedLimit : 10;
+
+    const notes = await prisma.note.findMany({
+      where: relationship
+        ? { relationshipId: relationship.id }
+        : { userId },
+      orderBy: { createdAt: "desc" },
+      take: limit,
+      select: {
+        id: true,
+        userId: true,
+        type: true,
+        content: true,
+        mediaUrl: true,
+        createdAt: true,
+      },
+    });
+
+    res.json({
+      notes: notes.map((n) => ({
+        id: n.id,
+        authorId: n.userId,
+        type: n.type,
+        content: n.content,
+        media_url: n.mediaUrl,
+        createdAt: n.createdAt.toISOString(),
+      })),
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.post("/notes", jwtMiddleware, async (req: AuthedRequest, res, next) => {
+  try {
+    const userId = req.user?.userId;
+    if (!userId) {
+      return next(new AppError("Unauthorized", 401, "UNAUTHORIZED"));
+    }
+
+    const payload = noteCreateSchema.parse(req.body);
+
+    const relationship = await prisma.relationship.findFirst({
+      where: {
+        OR: [{ userAId: userId }, { userBId: userId }],
+        status: "active",
+      },
+    });
+
+    const note = await prisma.note.create({
+      data: {
+        userId,
+        relationshipId: relationship?.id ?? null,
+        type: payload.type,
+        content: payload.content ?? null,
+        mediaUrl: payload.media_url ?? null,
+      },
+    });
+
+    res.status(201).json({
+      note: {
+        id: note.id,
+        authorId: note.userId,
+        type: note.type,
+        content: note.content,
+        media_url: note.mediaUrl,
+        createdAt: note.createdAt.toISOString(),
+      },
     });
   } catch (error) {
     if (error instanceof z.ZodError) {

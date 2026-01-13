@@ -8,6 +8,27 @@ export type BudgetLevel = "low" | "medium" | "high";
 
 export type MoodLevel = 1 | 2 | 3 | 4 | 5;
 
+export type NoteType = "TEXT" | "VOICE" | "VIDEO";
+
+export type Note = {
+  id: UUID;
+  type: NoteType;
+  content: string | null;
+  media_url: string | null;
+  authorId: UUID;
+  createdAt: string;
+};
+
+export type NoteCreatePayload = {
+  type: NoteType;
+  content?: string | null;
+  media_url?: string | null;
+};
+
+export type NotesResponse = {
+  notes: Note[];
+};
+
 export type ApiErrorShape = {
   error: {
     code: string;
