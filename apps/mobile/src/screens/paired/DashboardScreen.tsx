@@ -604,6 +604,7 @@ const styles = StyleSheet.create({
     fontSize: 11,
     color: '#6B7280',
     marginTop: 4,
+  },
   noteComposer: {
     borderWidth: 1,
     borderRadius: 12,
@@ -645,7 +646,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: '#F3F4F6',
-  },
   },
   ideasPills: {
     flexDirection: 'row',
