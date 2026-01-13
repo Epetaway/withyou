@@ -43,6 +43,7 @@ export function TextField({
         keyboardType={keyboardType}
         multiline={multiline}
         numberOfLines={numberOfLines}
+        textAlignVertical={textAlignVertical}
         error={!!errorText}
         mode="outlined"
         style={[{ backgroundColor: "transparent" }, style]}

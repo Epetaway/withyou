@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import { View, StyleSheet, Pressable } from "react-native";
-import { FontAwesome6 } from "@expo/vector-icons";
 import { CONTENT, loginSchema, AuthResponse } from "@withyou/shared";
 import { Screen } from "../../ui/components/Screen";
 import { Text } from "../../ui/components/Text";

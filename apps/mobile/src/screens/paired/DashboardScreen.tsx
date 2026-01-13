@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { View, StyleSheet, Pressable, ScrollView, Dimensions } from "react-native";
+import { View, StyleSheet, Pressable, Dimensions } from "react-native";
 import { FontAwesome6 } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import { CONTENT, DashboardResponse, Note, NoteType, NotesResponse } from "@withyou/shared";

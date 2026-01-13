@@ -76,6 +76,7 @@ export const noteCreateSchema = z
           minimum: 1,
           type: "string",
           inclusive: true,
+          origin: "string",
           message: "Text notes require content",
           path: ["content"],
         });
@@ -94,6 +95,7 @@ export const noteCreateSchema = z
           maximum: 120,
           type: "string",
           inclusive: true,
+          origin: "string",
           message: "Keep captions short (<=120 chars)",
           path: ["content"],
         });
