@@ -10,8 +10,6 @@ import { api } from "../../state/appState";
 import { useAsyncAction } from "../../api/hooks";
 import { useTheme } from "../../ui/theme/ThemeProvider";
 
-type CheckInScreenProps = Record<string, unknown>;
-
 const MOODS = [
   { key: "1", label: "Very low", icon: "arrow-down", color: "#EF4444" },
   { key: "2", label: "Low", icon: "minus", color: "#F97316" },
@@ -107,14 +105,14 @@ export function CheckInScreen() {
   return (
     <Screen scrollable>
       {/* Header */}
-      <Text variant="title">{c.title}</Text>
-      <Text variant="subtitle" style={[styles.subtitle, { color: theme.colors.secondary }]}>
-        {c.subtitle}
+      <Text variant="screenTitle">Check-in</Text>
+      <Text variant="screenSubtitle" style={[styles.subtitle, { color: theme.colors.textSecondary }]}>
+        How are you feeling today?
       </Text>
 
       {/* Mood Selection */}
       <View style={styles.section}>
-        <Text variant="subtitle">How are you feeling?</Text>
+        <Text variant="sectionLabel" style={{ color: theme.colors.textSecondary, textTransform: "uppercase", letterSpacing: 0.5 }}>MOOD</Text>
         <View style={styles.moodGrid}>
           {MOODS.map((mood) => (
             <MoodCard
@@ -139,7 +137,7 @@ export function CheckInScreen() {
 
       {/* Note */}
       <View style={styles.section}>
-        <Text variant="subtitle">Add a note</Text>
+        <Text variant="sectionLabel" style={{ color: theme.colors.textSecondary, textTransform: "uppercase", letterSpacing: 0.5 }}>NOTE (OPTIONAL)</Text>
         <TextField
           value={note}
           onChangeText={setNote}
@@ -155,7 +153,10 @@ export function CheckInScreen() {
           onPress={() => setShared(!shared)}
           style={styles.shareRow}
         >
-          <Text style={{ color: theme.colors.text }}>{c.share}</Text>
+          <View>
+            <Text variant="sectionLabel" style={{ color: theme.colors.textSecondary, textTransform: "uppercase", letterSpacing: 0.5, marginBottom: 4 }}>SHARE</Text>
+            <Text variant="helper" style={{ color: theme.colors.textSecondary }}>{c.share}</Text>
+          </View>
           <View
             style={[
               styles.checkbox,

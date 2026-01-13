@@ -1,7 +1,7 @@
 import React from "react";
 import { Text as RNText, StyleProp, TextStyle } from "react-native";
 
-type Variant = "title" | "subtitle" | "body" | "muted";
+type Variant = "screenTitle" | "screenSubtitle" | "cardTitle" | "sectionLabel" | "body" | "helper";
 
 type TextProps = React.ComponentProps<typeof RNText> & {
   variant?: Variant;
@@ -11,12 +11,16 @@ type TextProps = React.ComponentProps<typeof RNText> & {
 export function Text({ variant = "body", style, children, ...props }: TextProps) {
   const getFontSize = () => {
     switch (variant) {
-      case "title":
-        return 32;
-      case "subtitle":
-        return 20;
-      case "muted":
-        return 13;
+      case "screenTitle":
+        return 28;
+      case "screenSubtitle":
+        return 16;
+      case "cardTitle":
+        return 18;
+      case "sectionLabel":
+        return 12;
+      case "helper":
+        return 14;
       default:
         return 16;
     }
@@ -24,12 +28,11 @@ export function Text({ variant = "body", style, children, ...props }: TextProps)
 
   const getFontWeight = () => {
     switch (variant) {
-      case "title":
-        return "800" as const;
-      case "subtitle":
+      case "screenTitle":
         return "700" as const;
-      case "muted":
-        return "500" as const;
+      case "cardTitle":
+      case "sectionLabel":
+        return "600" as const;
       default:
         return "400" as const;
     }

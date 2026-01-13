@@ -48,7 +48,7 @@ export function SettingsScreen() {
 
   const SettingSection = ({ title, children }: { title: string; children: React.ReactNode }) => (
     <View style={{ marginBottom: Spacing.xl, gap: Spacing.sm }}>
-      <Text variant="subtitle" style={{ color: theme.colors.textSecondary, fontSize: 13, textTransform: "uppercase", letterSpacing: 0.5 }}>
+      <Text variant="sectionLabel" style={{ color: theme.colors.textSecondary, textTransform: "uppercase", letterSpacing: 0.5 }}>
         {title}
       </Text>
       {children}
@@ -67,11 +67,11 @@ export function SettingsScreen() {
     <Screen scrollable>
       {/* Page Header */}
       <View style={{ marginBottom: Spacing.xl }}>
-        <Text variant="title">{CONTENT.settings.title}</Text>
+        <Text variant="screenTitle">{CONTENT.settings.title}</Text>
       </View>
 
       {/* Appearance */}
-      <SettingSection title="Appearance">
+      <SettingSection title="APPEARANCE">
         <View style={{
           backgroundColor: theme.colors.surface,
           borderRadius: 12,
@@ -95,7 +95,7 @@ export function SettingsScreen() {
       </SettingSection>
 
       {/* Relationship */}
-      <SettingSection title={CONTENT.settings.sections.relationship}>
+      <SettingSection title={CONTENT.settings.sections.relationship.toUpperCase()}>
         <View style={{
           backgroundColor: theme.colors.surface,
           borderRadius: 12,
@@ -112,7 +112,7 @@ export function SettingsScreen() {
       </SettingSection>
 
       {/* Account */}
-      <SettingSection title={CONTENT.settings.sections.account}>
+      <SettingSection title={CONTENT.settings.sections.account.toUpperCase()}>
         <Button
           label={CONTENT.settings.account.logout}
           onPress={() => setShowLogoutModal(true)}
@@ -133,7 +133,7 @@ export function SettingsScreen() {
       {showEndPairingModal && (
         <View style={styles.modalOverlay}>
           <View style={[styles.modalContent, { backgroundColor: theme.colors.surface }]}>
-            <Text variant="title">
+            <Text variant="cardTitle">
               {CONTENT.settings.relationship.confirmEndTitle}
             </Text>
             <Text variant="body" style={{ color: theme.colors.textSecondary, marginTop: Spacing.sm }}>
@@ -162,7 +162,7 @@ export function SettingsScreen() {
       {showLogoutModal && (
         <View style={styles.modalOverlay}>
           <View style={[styles.modalContent, { backgroundColor: theme.colors.surface }]}>
-            <Text variant="title">
+            <Text variant="cardTitle">
               {CONTENT.settings.account.confirmLogoutTitle}
             </Text>
             <Text variant="body" style={{ color: theme.colors.textSecondary, marginTop: Spacing.sm }}>

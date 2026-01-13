@@ -81,13 +81,13 @@ export function DashboardScreen({ navigation }: DashboardScreenProps) {
     <Screen scrollable>
       {/* Header */}
       <View style={styles.headerRow}>
-        <Text variant="title">WithYou</Text>
+        <Text variant="screenTitle">Home</Text>
         <Pressable onPress={clearSession}>
           <FontAwesome6 name="right-from-bracket" size={24} color={theme.colors.text} weight="bold" />
         </Pressable>
       </View>
 
-      {/* Couple Profile Cards - Tinder-style */}
+      {/* Connection Card */}
       <View style={styles.section}>
         <View style={styles.coupleCards}>
           {/* User Card */}
@@ -156,12 +156,12 @@ export function DashboardScreen({ navigation }: DashboardScreenProps) {
         </Pressable>
       </View>
 
-      {/* Private Notes Section */}
+      {/* Notes Section */}
       <View style={styles.section}>
         <View style={styles.sectionHeader}>
-          <Text variant="subtitle">Private Notes</Text>
+          <Text variant="sectionLabel" style={{ color: theme.colors.textSecondary, textTransform: "uppercase", letterSpacing: 0.5 }}>NOTES</Text>
           <Pressable>
-            <Text style={[styles.viewAll, { color: theme.colors.primary }]}>View all</Text>
+            <Text variant="helper" style={{ color: theme.colors.primary }}>View all</Text>
           </Pressable>
         </View>
 
@@ -190,12 +190,12 @@ export function DashboardScreen({ navigation }: DashboardScreenProps) {
         </ScrollView>
       </View>
 
-      {/* Explore Date Ideas - Interest Pills */}
+      {/* Ideas Section */}
       <View style={styles.section}>
         <View style={styles.sectionHeader}>
-          <Text variant="subtitle">Things to do</Text>
+          <Text variant="sectionLabel" style={{ color: theme.colors.textSecondary, textTransform: "uppercase", letterSpacing: 0.5 }}>IDEAS</Text>
           <Pressable onPress={() => (navigation as Record<string, unknown>)?.navigate?.("Ideas")}>
-            <Text style={[styles.viewAll, { color: theme.colors.primary }]}>View all</Text>
+            <Text variant="helper" style={{ color: theme.colors.primary }}>View all</Text>
           </Pressable>
         </View>
 

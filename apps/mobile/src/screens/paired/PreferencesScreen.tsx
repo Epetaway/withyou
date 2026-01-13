@@ -98,14 +98,14 @@ export function PreferencesScreen(_navigation: unknown) {
   return (
     <Screen scrollable>
       {/* Page Header */}
-      <View style={{ marginBottom: Spacing.xl, gap: Spacing.sm }}>
-        <Text variant="title">{c.title}</Text>
-        <Text variant="body" style={{ color: theme.colors.textSecondary }}>{c.body}</Text>
+      <View style={{ marginBottom: 24, gap: 4 }}>
+        <Text variant="screenTitle">Preferences</Text>
+        <Text variant="screenSubtitle" style={{ color: theme.colors.textSecondary }}>These are private and help tailor suggestions.</Text>
       </View>
 
       {/* Activity Style */}
-      <View style={{ marginBottom: Spacing.xl, gap: Spacing.sm }}>
-        <Text variant="subtitle">{c.fields.activityStyleLabel}</Text>
+      <View style={{ marginBottom: 24, gap: 12 }}>
+        <Text variant="sectionLabel" style={{ color: theme.colors.textSecondary, textTransform: "uppercase", letterSpacing: 0.5 }}>ACTIVITY</Text>
         <View style={{ flexDirection: "row", gap: Spacing.sm, flexWrap: "wrap" }}>
           {(["chill", "active", "surprise"] as const).map((style) => (
             <Chip
@@ -119,9 +119,8 @@ export function PreferencesScreen(_navigation: unknown) {
       </View>
 
       {/* Food Types */}
-      <View style={{ marginBottom: Spacing.xl, gap: Spacing.sm }}>
-        <Text variant="subtitle">{c.fields.foodTypesLabel}</Text>
-        <Text variant="body" style={{ color: theme.colors.textSecondary, fontSize: 13 }}>{c.fields.foodTypesHelper}</Text>
+      <View style={{ marginBottom: 24, gap: 12 }}>
+        <Text variant="sectionLabel" style={{ color: theme.colors.textSecondary, textTransform: "uppercase", letterSpacing: 0.5 }}>FOOD</Text>
         <View style={{ flexDirection: "row", flexWrap: "wrap", gap: Spacing.sm }}>
           {CONTENT.lists.foodTypes.map((food) => (
             <Chip
@@ -135,8 +134,8 @@ export function PreferencesScreen(_navigation: unknown) {
       </View>
 
       {/* Budget */}
-      <View style={{ marginBottom: Spacing.xl, gap: Spacing.sm }}>
-        <Text variant="subtitle">{c.fields.budgetLabel}</Text>
+      <View style={{ marginBottom: 24, gap: 12 }}>
+        <Text variant="sectionLabel" style={{ color: theme.colors.textSecondary, textTransform: "uppercase", letterSpacing: 0.5 }}>BUDGET</Text>
         <View style={{ flexDirection: "row", gap: Spacing.sm, flexWrap: "wrap" }}>
           {(["low", "medium", "high"] as const).map((level) => (
             <Chip
@@ -150,9 +149,8 @@ export function PreferencesScreen(_navigation: unknown) {
       </View>
 
       {/* Energy Level */}
-      <View style={{ marginBottom: Spacing.xl, gap: Spacing.sm }}>
-        <Text variant="subtitle">{c.fields.energyLabel}</Text>
-        <Text variant="body" style={{ color: theme.colors.textSecondary, fontSize: 13 }}>{c.fields.energyHelper}</Text>
+      <View style={{ marginBottom: 24, gap: 12 }}>
+        <Text variant="sectionLabel" style={{ color: theme.colors.textSecondary, textTransform: "uppercase", letterSpacing: 0.5 }}>ENERGY</Text>
         <View style={{ flexDirection: "row", gap: Spacing.sm, flexWrap: "wrap" }}>
           {[1, 2, 3, 4, 5].map((level) => (
             <Chip
