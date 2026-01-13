@@ -75,7 +75,11 @@ withyou/
 
 **Frontend**: Expo, React Native, TypeScript, @react-navigation
 
-**Auth**: JWT tokens (7-day expiry), bcrypt password hashing
+**Auth**: JWT tokens (7-day expiry), bcrypt password hashing, OAuth (Google/Apple)
+
+**Email**: AWS SES for verification emails
+
+**Storage**: AWS S3 + CloudFront for avatar images
 
 **Validation**: Zod schemas for runtime type safety
 
@@ -83,16 +87,29 @@ withyou/
 
 ### Authentication
 
-- Email/password registration with confirmation
-- Secure JWT-based sessions
+- Email/password registration with verification
+- **OAuth Sign-In**: Google and Apple Sign-In support
+- **Email Verification**: 6-digit code sent via AWS SES
+- Secure JWT-based sessions (7-day expiry)
 - Password hashing with bcrypt
 
 ### Relationship Pairing
 
+- **Deep Linking**: Share invitation links (`https://withyou.app/join/CODE`)
 - Invite code generation (6-character hex, 7-day expiry)
 - Mutual consent required to pair
 - One active relationship per user
 - Relationship ending with mutual acknowledgment
+
+### User Profile
+
+- **Avatar Upload**: Direct-to-S3 uploads using pre-signed URLs
+- **Profile Setup Wizard**: Optional 4-step onboarding
+  - Step 1: Nickname
+  - Step 2: Relationship goals
+  - Step 3: Privacy settings
+  - Step 4: Notification preferences
+- All setup steps can be skipped
 
 ### Connection Tools
 
@@ -109,14 +126,26 @@ withyou/
 2. Install PostgreSQL locally or use a cloud instance
 3. Clone the repository
 4. Install dependencies: `npm install`
-5. Create `.env` file in root and configure:
-   ```
+5. Create `.env` file in `apps/api/.env` and configure:
+   ```env
    DATABASE_URL="postgresql://user:password@localhost:5432/withyou"
    PORT=3000
-   NODE_ENV="development"
+   JWT_SECRET="your-secret-key"
+   
+   # Optional: OAuth
+   GOOGLE_CLIENT_ID="your-google-client-id"
+   GOOGLE_CLIENT_SECRET="your-google-client-secret"
+   APPLE_CLIENT_ID="com.withyou.app"
+   
+   # Optional: AWS for email/avatars
+   AWS_REGION="us-east-1"
+   AWS_ACCESS_KEY_ID="your-access-key"
+   AWS_SECRET_ACCESS_KEY="your-secret-key"
+   S3_BUCKET_NAME="withyou-avatars"
+   SES_FROM_EMAIL="noreply@withyou.app"
    ```
-6. Run migrations: `npx prisma migrate deploy`
-7. Seed test data: `npm run prisma:seed`
+6. Run migrations: `npx prisma migrate deploy --workspace @withyou/api`
+7. Seed test data: `npm run prisma:seed --workspace @withyou/api`
 
 ### Development Scripts
 

@@ -46,11 +46,45 @@ export type ApiErrorShape = {
 export type AuthResponse = {
   userId: UUID;
   token: string;
+  emailVerified?: boolean;
+};
+
+export type OAuthLoginResponse = {
+  userId: UUID;
+  token: string;
+  isNewUser: boolean;
+  emailVerified: boolean;
+};
+
+export type EmailVerificationSendResponse = {
+  message: string;
+  expiresAt: string;
+};
+
+export type EmailVerificationConfirmResponse = {
+  message: string;
+  verified: boolean;
+};
+
+export type AvatarUploadUrlResponse = {
+  uploadUrl: string;
+  fields: Record<string, string>;
+  avatarUrl: string;
+};
+
+export type AvatarUploadResponse = {
+  avatarUrl: string;
+};
+
+export type ProfileSetupResponse = {
+  message: string;
+  setupCompleted: boolean;
 };
 
 export type InviteResponse = {
   inviteCode: string;
   expiresAt: string;
+  deepLink?: string;
 };
 
 export type RelationshipAcceptResponse = {

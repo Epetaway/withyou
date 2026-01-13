@@ -4,6 +4,7 @@ import { prisma } from "../utils/prisma.js";
 import { AppError } from "../errors/app-error.js";
 import { jwtMiddleware } from "../middleware/jwt-middleware.js";
 import { randomBytes } from "crypto";
+import { env } from "../config/env.js";
 
 const router = Router();
 type AuthedRequest = Request & { user?: { userId?: string } };
@@ -50,9 +51,12 @@ router.post("/relationship/invite", jwtMiddleware, async (req: AuthedRequest, re
       },
     });
 
+    const deepLink = `https://${env.appDeepLinkDomain}/join/${invite.code}`;
+
     res.status(201).json({
       inviteCode: invite.code,
       expiresAt: invite.expiresAt.toISOString(),
+      deepLink,
     });
   } catch (error) {
     next(error);

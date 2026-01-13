@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import { View, StyleSheet, Pressable } from "react-native";
-import { CONTENT, loginSchema, AuthResponse } from "@withyou/shared";
+import { View, StyleSheet, Pressable, Platform } from "react-native";
+import { CONTENT, loginSchema, AuthResponse, OAuthLoginResponse } from "@withyou/shared";
 import { Screen } from "../../ui/components/Screen";
 import { Text } from "../../ui/components/Text";
 import { TextFieldNew } from "../../ui/components/TextFieldNew";
@@ -9,10 +9,11 @@ import { setSession } from "../../state/session";
 import { setToken } from "../../state/appState";
 import { useAsyncAction } from "../../api/hooks";
 import { useTheme } from "../../ui/theme/ThemeProvider";
+import * as AppleAuthentication from "expo-apple-authentication";
 
 type LoginScreenProps = {
   navigation: {
-    navigate: (screen: string) => void;
+    navigate: (screen: string, params?: any) => void;
   };
 };
 
@@ -63,6 +64,40 @@ export function LoginScreen({ navigation }: LoginScreenProps) {
     }
   };
 
+  const handleAppleSignIn = async () => {
+    try {
+      const credential = await AppleAuthentication.signInAsync({
+        requestedScopes: [
+          AppleAuthentication.AppleAuthenticationScope.EMAIL,
+          AppleAuthentication.AppleAuthenticationScope.FULL_NAME,
+        ],
+      });
+
+      // Send ID token to backend
+      const res = await api.request<OAuthLoginResponse>("/auth/apple", {
+        method: "POST",
+        body: JSON.stringify({
+          provider: "apple",
+          idToken: credential.identityToken,
+        }),
+      });
+
+      await setSession(res.token, res.userId);
+      setToken(res.token);
+
+      // If email not verified, navigate to verification
+      if (!res.emailVerified && res.isNewUser) {
+        navigation.navigate("EmailVerification", { email: credential.email || "" });
+      }
+    } catch (err: any) {
+      if (err.code === "ERR_CANCELED") {
+        // User canceled
+        return;
+      }
+      console.error("Apple sign in error:", err);
+    }
+  };
+
   return (
     <Screen scrollable>
       {/* Title Section */}
@@ -71,6 +106,28 @@ export function LoginScreen({ navigation }: LoginScreenProps) {
         <Text variant="screenSubtitle" style={{ color: theme.colors.textSecondary, marginTop: 4 }}>
           Sign in to continue
         </Text>
+      </View>
+
+      {/* OAuth Buttons */}
+      {Platform.OS === "ios" && (
+        <View style={{ gap: 12, marginBottom: 24 }}>
+          <AppleAuthentication.AppleAuthenticationButton
+            buttonType={AppleAuthentication.AppleAuthenticationButtonType.SIGN_IN}
+            buttonStyle={AppleAuthentication.AppleAuthenticationButtonStyle.BLACK}
+            cornerRadius={12}
+            style={{ width: "100%", height: 50 }}
+            onPress={handleAppleSignIn}
+          />
+        </View>
+      )}
+
+      {/* Divider */}
+      <View style={styles.divider}>
+        <View style={[styles.dividerLine, { backgroundColor: theme.colors.textSecondary }]} />
+        <Text variant="helper" style={{ color: theme.colors.textSecondary, paddingHorizontal: 16 }}>
+          or
+        </Text>
+        <View style={[styles.dividerLine, { backgroundColor: theme.colors.textSecondary }]} />
       </View>
 
       {/* Form */}
@@ -137,5 +194,15 @@ const styles = StyleSheet.create({
     paddingVertical: 16,
     paddingHorizontal: 24,
     borderRadius: 12,
+  },
+  divider: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginVertical: 24,
+  },
+  dividerLine: {
+    flex: 1,
+    height: 1,
+    opacity: 0.2,
   },
 });

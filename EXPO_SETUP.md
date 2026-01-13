@@ -308,6 +308,217 @@ expo export --platform web
 - Cache API responses with React Query or SWR
 - Profile with React DevTools Profiler
 
+## Deep Linking Configuration
+
+Deep linking allows users to open the app directly from invitation links.
+
+### 1. Configure app.json
+
+The deep linking configuration has already been added to `app.json`:
+
+```json
+{
+  "expo": {
+    "scheme": "withyou",
+    "ios": {
+      "bundleIdentifier": "com.withyou.app",
+      "associatedDomains": ["applinks:withyou.app"]
+    },
+    "android": {
+      "package": "com.withyou.app",
+      "intentFilters": [
+        {
+          "action": "VIEW",
+          "autoVerify": true,
+          "data": [
+            {
+              "scheme": "https",
+              "host": "withyou.app",
+              "pathPrefix": "/join"
+            }
+          ],
+          "category": ["BROWSABLE", "DEFAULT"]
+        }
+      ]
+    },
+    "plugins": [
+      ["expo-apple-authentication"]
+    ]
+  }
+}
+```
+
+### 2. Domain Verification (Production)
+
+#### iOS Universal Links
+
+Create `/.well-known/apple-app-site-association` on your domain (withyou.app):
+
+```json
+{
+  "applinks": {
+    "apps": [],
+    "details": [
+      {
+        "appID": "TEAM_ID.com.withyou.app",
+        "paths": ["/join/*"]
+      }
+    ]
+  }
+}
+```
+
+Host this file at:
+- `https://withyou.app/.well-known/apple-app-site-association`
+- Content-Type: `application/json`
+- No file extension
+
+#### Android App Links
+
+Create `/.well-known/assetlinks.json` on your domain:
+
+```json
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.withyou.app",
+      "sha256_cert_fingerprints": [
+        "YOUR_SHA256_FINGERPRINT_HERE"
+      ]
+    }
+  }
+]
+```
+
+Get SHA256 fingerprint:
+```bash
+keytool -list -v -keystore ~/.android/debug.keystore -alias androiddebugkey -storepass android -keypass android | grep SHA256
+```
+
+Host this file at:
+- `https://withyou.app/.well-known/assetlinks.json`
+- Content-Type: `application/json`
+
+### 3. Handle Deep Links in App
+
+Add to `App.tsx` or create a deep link handler:
+
+```typescript
+import * as Linking from 'expo-linking';
+import { useEffect } from 'react';
+
+function DeepLinkHandler({ navigation }: { navigation: any }) {
+  useEffect(() => {
+    // Handle initial URL if app was opened from a link
+    const handleInitialURL = async () => {
+      const url = await Linking.getInitialURL();
+      if (url) {
+        handleDeepLink(url);
+      }
+    };
+
+    // Handle URLs when app is already open
+    const subscription = Linking.addEventListener('url', ({ url }) => {
+      handleDeepLink(url);
+    });
+
+    handleInitialURL();
+
+    return () => subscription.remove();
+  }, []);
+
+  const handleDeepLink = (url: string) => {
+    const { path, queryParams } = Linking.parse(url);
+    
+    // Handle: https://withyou.app/join/ABC123 or withyou://join/ABC123
+    if (path === 'join' || path?.startsWith('join/')) {
+      const inviteCode = path.split('/')[1] || queryParams?.code;
+      if (inviteCode) {
+        navigation.navigate('PairAccept', { inviteCode });
+      }
+    }
+  };
+
+  return null;
+}
+
+// In your navigation setup:
+export function RootNavigator() {
+  return (
+    <NavigationContainer>
+      <DeepLinkHandler navigation={navigation} />
+      {/* Your navigation stack */}
+    </NavigationContainer>
+  );
+}
+```
+
+### 4. Testing Deep Links
+
+#### iOS Simulator
+
+```bash
+xcrun simctl openurl booted "withyou://join/ABC123"
+# or
+xcrun simctl openurl booted "https://withyou.app/join/ABC123"
+```
+
+#### Android Emulator
+
+```bash
+adb shell am start -W -a android.intent.action.VIEW -d "withyou://join/ABC123" com.withyou.app
+# or
+adb shell am start -W -a android.intent.action.VIEW -d "https://withyou.app/join/ABC123" com.withyou.app
+```
+
+#### Expo Go (Development)
+
+```bash
+npx uri-scheme open "withyou://join/ABC123" --ios
+# or
+npx uri-scheme open "withyou://join/ABC123" --android
+```
+
+### 5. Update PairAcceptScreen
+
+Modify the screen to accept invite code from route params:
+
+```typescript
+export function PairAcceptScreen({ navigation, route }: Props) {
+  const [inviteCode, setInviteCode] = useState(route.params?.inviteCode || '');
+  
+  // Auto-submit if code provided via deep link
+  useEffect(() => {
+    if (route.params?.inviteCode && route.params.inviteCode.length === 6) {
+      handleSubmit();
+    }
+  }, [route.params?.inviteCode]);
+  
+  // ... rest of component
+}
+```
+
+### 6. Share Links
+
+Use the native share sheet to share invitation links:
+
+```typescript
+import { Share } from 'react-native';
+
+const shareInvite = async (deepLink: string, inviteCode: string) => {
+  try {
+    await Share.share({
+      message: `Join me on WithYou! Use code ${inviteCode} or click: ${deepLink}`,
+      url: deepLink, // iOS will show this separately
+    });
+  } catch (error) {
+    console.error('Share error:', error);
+  }
+};
+```
+
 ## Common Issues
 
 ### "Cannot connect to API"
