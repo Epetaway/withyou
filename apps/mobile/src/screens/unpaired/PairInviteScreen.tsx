@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { View, ScrollView, StyleSheet, Pressable } from "react-native";
+import { View, ScrollView, StyleSheet, Pressable, Share } from "react-native";
 import { FontAwesome6 } from "@expo/vector-icons";
 import { CONTENT, InviteResponse } from "@withyou/shared";
 import { Screen } from "../../ui/components/Screen";
@@ -23,6 +23,7 @@ export function PairInviteScreen({ navigation }: PairInviteScreenProps) {
 
   const [inviteCode, setInviteCode] = useState<string | null>(null);
   const [expiresAt, setExpiresAt] = useState<string | null>(null);
+  const [deepLink, setDeepLink] = useState<string | null>(null);
 
   const { run, loading, errorText } = useAsyncAction(async () => {
     const res = await api.request<InviteResponse>("/relationship/invite", {
@@ -30,18 +31,31 @@ export function PairInviteScreen({ navigation }: PairInviteScreenProps) {
     });
     setInviteCode(res.inviteCode);
     setExpiresAt(res.expiresAt);
+    setDeepLink(res.deepLink || null);
     return res;
   });
 
   const copyLink = async () => {
-    if (!inviteCode) return;
-    const link = `withyou://pair?code=${inviteCode}`;
-    await Clipboard.setStringAsync(link);
+    if (!deepLink) return;
+    await Clipboard.setStringAsync(deepLink);
   };
 
   const copyCode = async () => {
     if (!inviteCode) return;
     await Clipboard.setStringAsync(inviteCode);
+  };
+
+  const shareLink = async () => {
+    if (!deepLink) return;
+    
+    try {
+      await Share.share({
+        message: `Join me on WithYou! Use this link to pair: ${deepLink}`,
+        url: deepLink,
+      });
+    } catch (error) {
+      console.error("Share error:", error);
+    }
   };
 
   return (
@@ -99,6 +113,17 @@ export function PairInviteScreen({ navigation }: PairInviteScreenProps) {
                   >
                     <FontAwesome6 name="link" size={18} color={theme.primary} weight="bold" />
                     <Text style={{ color: theme.primary, fontWeight: "600" }}>Copy Link</Text>
+                  </Pressable>
+                  
+                  <Pressable
+                    onPress={shareLink}
+                    style={({ pressed }) => [
+                      styles.actionButton,
+                      { backgroundColor: pressed ? theme.surface : "transparent" }
+                    ]}
+                  >
+                    <FontAwesome6 name="share-nodes" size={18} color={theme.primary} weight="bold" />
+                    <Text style={{ color: theme.primary, fontWeight: "600" }}>Share</Text>
                   </Pressable>
                 </View>
 
