@@ -1,8 +1,14 @@
-import React from "react";
+import React, { useState } from "react";
 import { View, StyleSheet, Pressable } from "react-native";
 import { FontAwesome6 } from "@expo/vector-icons";
+import { CONTENT, loginSchema, AuthResponse } from "@withyou/shared";
 import { Screen } from "../../ui/components/Screen";
 import { Text } from "../../ui/components/Text";
+import { TextFieldNew } from "../../ui/components/TextFieldNew";
+import { api } from "../../state/appState";
+import { setSession } from "../../state/session";
+import { setToken } from "../../state/appState";
+import { useAsyncAction } from "../../api/hooks";
 import { useTheme } from "../../ui/theme/ThemeProvider";
 
 type LoginScreenProps = {
@@ -12,226 +18,125 @@ type LoginScreenProps = {
 };
 
 export function LoginScreen({ navigation }: LoginScreenProps) {
+  const c = CONTENT.auth.login;
   const theme = useTheme();
 
-  const handlePhoneLogin = () => {
-    // TODO: Implement phone login
-    navigation.navigate("Register");
-  };
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
 
-  const handleGoogleLogin = () => {
-    // TODO: Implement Google login
-    navigation.navigate("Register");
+  const { run, loading, errorText, setErrorText } = useAsyncAction(async () => {
+    const parsed = loginSchema.safeParse({ email, password });
+
+    if (!parsed.success) {
+      setErrorText(null);
+      const next: Record<string, string> = {};
+      for (const issue of parsed.error.issues) {
+        const key = String(issue.path[0] ?? "form");
+        if (key === "email") {
+          next.email =
+            issue.code === "invalid_string"
+              ? c.validation.emailInvalid
+              : c.validation.emailRequired;
+        } else if (key === "password") {
+          next.password = c.validation.passwordRequired;
+        }
+      }
+      setFieldErrors(next);
+      throw new Error("Validation failed");
+    }
+
+    const res = await api.request<AuthResponse>("/auth/login", {
+      method: "POST",
+      body: JSON.stringify({ email, password }),
+    });
+
+    await setSession(res.token, res.userId);
+    setToken(res.token);
+  });
+
+  const onSubmit = async () => {
+    setFieldErrors({});
+    try {
+      await run();
+    } catch {
+      // Error handled in useAsyncAction
+    }
   };
 
   return (
-    <Screen>
-      <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
-        {/* Circular Avatar Layout */}
-        <View style={styles.avatarSection}>
-          {/* Outer gradient circles */}
-          <View style={[styles.gradientCircle, styles.outerCircle]} />
-          <View style={[styles.gradientCircle, styles.middleCircle]} />
-          
-          {/* Center avatar placeholder */}
-          <View style={[styles.avatar, styles.centerAvatar]}>
-            <FontAwesome6 name="user" size={40} color="#A78BFA" weight="bold" />
-          </View>
-          
-          {/* Orbiting avatars */}
-          <View style={[styles.avatar, styles.avatar1]}>
-            <FontAwesome6 name="user" size={20} color="#A78BFA" weight="regular" />
-          </View>
-          <View style={[styles.avatar, styles.avatar2]}>
-            <FontAwesome6 name="user" size={20} color="#A78BFA" weight="regular" />
-          </View>
-          <View style={[styles.avatar, styles.avatar3]}>
-            <FontAwesome6 name="user" size={20} color="#A78BFA" weight="regular" />
-          </View>
-          <View style={[styles.avatar, styles.avatar4]}>
-            <FontAwesome6 name="user" size={20} color="#A78BFA" weight="regular" />
-          </View>
-          <View style={[styles.avatar, styles.avatar5]}>
-            <FontAwesome6 name="user" size={20} color="#A78BFA" weight="regular" />
-          </View>
-          <View style={[styles.avatar, styles.avatar6]}>
-            <FontAwesome6 name="user" size={20} color="#A78BFA" weight="regular" />
-          </View>
-          <View style={[styles.avatar, styles.avatar7]}>
-            <FontAwesome6 name="user" size={20} color="#A78BFA" weight="regular" />
-          </View>
-          <View style={[styles.avatar, styles.avatar8]}>
-            <FontAwesome6 name="user" size={20} color="#A78BFA" weight="regular" />
-          </View>
+    <Screen scrollable>
+      {/* Title Section */}
+      <View style={{ marginBottom: 32, marginTop: 40 }}>
+        <Text variant="screenTitle">Welcome Back</Text>
+        <Text variant="screenSubtitle" style={{ color: theme.colors.textSecondary, marginTop: 4 }}>
+          Sign in to continue
+        </Text>
+      </View>
 
-          {/* Decorative icons */}
-          <View style={[styles.decorIcon, styles.heartIcon]}>
-            <FontAwesome6 name="heart" size={24} color="#D946EF" weight="solid" />
-          </View>
-          <View style={[styles.decorIcon, styles.chatIcon]}>
-            <FontAwesome6 name="message" size={24} color="#D946EF" weight="solid" />
-          </View>
-        </View>
+      {/* Form */}
+      <View style={{ gap: 16, marginBottom: 24 }}>
+        <TextFieldNew
+          label={c.fields.emailLabel}
+          value={email}
+          onChangeText={setEmail}
+          keyboardType="email-address"
+          autoCapitalize="none"
+          error={fieldErrors.email}
+        />
+        
+        <TextFieldNew
+          label={c.fields.passwordLabel}
+          value={password}
+          onChangeText={setPassword}
+          secureTextEntry
+          autoCapitalize="none"
+          error={fieldErrors.password}
+        />
 
-        {/* Title */}
-        <View style={{ marginBottom: 40, alignItems: "center" }}>
-          <Text variant="screenTitle" style={{ textAlign: "center" }}>Let&apos;s meeting new</Text>
-          <Text variant="screenTitle" style={{ textAlign: "center" }}>people around you</Text>
-        </View>
-
-        {/* Buttons */}
-        <View style={{ gap: 16, width: "100%", paddingHorizontal: 24 }}>
-          <Pressable
-            style={[styles.primaryButton, { backgroundColor: theme.colors.primary }]}
-            onPress={handlePhoneLogin}
-          >
-            <FontAwesome6 name="phone" size={24} color={theme.colors.background} weight="bold" />
-            <Text style={{ color: theme.colors.background, fontSize: 16, fontWeight: "600", marginLeft: 12 }}>Login with Phone</Text>
-          </Pressable>
-
-          <Pressable
-            style={styles.secondaryButton}
-            onPress={handleGoogleLogin}
-          >
-            <FontAwesome6 name="google" size={24} color="#4285F4" weight="bold" />
-            <Text style={{ color: theme.colors.text, fontSize: 16, fontWeight: "600", marginLeft: 12 }}>Login with Google</Text>
-          </Pressable>
-        </View>
-
-        {/* Sign Up Link */}
-        <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "center", marginTop: 24 }}>
-          <Text variant="helper" style={{ color: theme.colors.textSecondary }}>
-            Don&apos;t have an account?{" "}
+        {errorText ? (
+          <Text variant="helper" style={{ color: theme.colors.error, marginTop: 8 }}>
+            {errorText}
           </Text>
-          <Pressable onPress={() => navigation.navigate("Register")}>
-            <Text variant="helper" style={{ color: theme.colors.primary, fontWeight: "600" }}>
-              Sign Up
-            </Text>
-          </Pressable>
-        </View>
+        ) : null}
+
+        <Pressable
+          style={[
+            styles.primaryButton,
+            { backgroundColor: theme.colors.primary },
+            loading && { opacity: 0.6 }
+          ]}
+          onPress={onSubmit}
+          disabled={loading}
+        >
+          <Text style={{ color: theme.colors.background, fontSize: 16, fontWeight: "600" }}>
+            {loading ? CONTENT.app.common.loading : c.actions.primary}
+          </Text>
+        </Pressable>
+      </View>
+
+      {/* Sign Up Link */}
+      <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "center" }}>
+        <Text variant="helper" style={{ color: theme.colors.textSecondary }}>
+          Don&apos;t have an account?{" "}
+        </Text>
+        <Pressable onPress={() => navigation.navigate("Register")}>
+          <Text variant="helper" style={{ color: theme.colors.primary, fontWeight: "600" }}>
+            Sign Up
+          </Text>
+        </Pressable>
       </View>
     </Screen>
   );
 }
 
 const styles = StyleSheet.create({
-  avatarSection: {
-    width: 300,
-    height: 300,
-    alignItems: "center",
-    justifyContent: "center",
-    marginBottom: 40,
-    position: "relative",
-  },
-  gradientCircle: {
-    position: "absolute",
-    borderRadius: 9999,
-    backgroundColor: "rgba(233, 213, 255, 0.3)",
-  },
-  outerCircle: {
-    width: 280,
-    height: 280,
-  },
-  middleCircle: {
-    width: 200,
-    height: 200,
-    backgroundColor: "rgba(233, 213, 255, 0.5)",
-  },
-  avatar: {
-    position: "absolute",
-    backgroundColor: "#F3E8FF",
-    borderRadius: 9999,
-    alignItems: "center",
-    justifyContent: "center",
-    borderWidth: 3,
-    borderColor: "#FFFFFF",
-  },
-  centerAvatar: {
-    width: 80,
-    height: 80,
-  },
-  avatar1: {
-    width: 50,
-    height: 50,
-    top: 20,
-    left: 50,
-  },
-  avatar2: {
-    width: 50,
-    height: 50,
-    top: 20,
-    right: 50,
-  },
-  avatar3: {
-    width: 50,
-    height: 50,
-    bottom: 20,
-    left: 50,
-  },
-  avatar4: {
-    width: 50,
-    height: 50,
-    bottom: 20,
-    right: 50,
-  },
-  avatar5: {
-    width: 45,
-    height: 45,
-    top: 80,
-    left: 10,
-  },
-  avatar6: {
-    width: 45,
-    height: 45,
-    top: 80,
-    right: 10,
-  },
-  avatar7: {
-    width: 45,
-    height: 45,
-    bottom: 80,
-    left: 10,
-  },
-  avatar8: {
-    width: 45,
-    height: 45,
-    bottom: 80,
-    right: 10,
-  },
-  decorIcon: {
-    position: "absolute",
-    backgroundColor: "#FCEEF8",
-    borderRadius: 9999,
-    width: 40,
-    height: 40,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  heartIcon: {
-    top: 10,
-    right: 30,
-  },
-  chatIcon: {
-    bottom: 30,
-    left: 20,
-  },
   primaryButton: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
     paddingVertical: 16,
     paddingHorizontal: 24,
-    borderRadius: 50,
-  },
-  secondaryButton: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    backgroundColor: "#F9FAFB",
-    paddingVertical: 16,
-    paddingHorizontal: 24,
-    borderRadius: 50,
-    borderWidth: 1,
-    borderColor: "#E5E7EB",
+    borderRadius: 12,
   },
 });
