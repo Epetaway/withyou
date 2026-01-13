@@ -156,7 +156,7 @@ function scoreLocalIdea(params: z.infer<typeof ideasQuerySchema>, idea: typeof c
   const distanceFactor = Math.max(0, radius - dist);
   score += distanceFactor; // closer -> higher score
 
-  const filters = (params.filters ?? []).map((f) => f.toLowerCase());
+  const filters = (params.filters ?? []).map((f: string) => f.toLowerCase());
 
   // Category affinity based on simple filters
   if (filters.includes("outdoors") && idea.category.toLowerCase() === "outdoor") score += 5;
@@ -197,7 +197,7 @@ router.post("/query", jwtMiddleware, async (req: AuthedRequest, res, next) => {
           userId,
           relationshipId: relationship.id,
           type: params.type,
-          params: params as Record<string, unknown>,
+          params: params as any, // Prisma JSON type
         },
       });
     }
@@ -205,7 +205,7 @@ router.post("/query", jwtMiddleware, async (req: AuthedRequest, res, next) => {
     // Return curated local ideas with filtering and ranking (mock)
     if (params.type === "LOCAL") {
       const radius = params.radiusMiles ?? 10;
-      const filters = (params.filters ?? []).map((f) => f.toLowerCase());
+      const filters = (params.filters ?? []).map((f: string) => f.toLowerCase());
 
       const filtered = curatedLocalIdeas.filter((idea) => {
         const dist = idea.metadata.distanceMiles ?? Infinity;
@@ -280,7 +280,7 @@ router.post("/recipes", jwtMiddleware, async (req: AuthedRequest, res, next) => 
           userId,
           relationshipId: relationship.id,
           type: "FOOD",
-          params: params as Record<string, unknown>,
+          params: params as any, // Prisma JSON type
         },
       });
     }

@@ -101,15 +101,18 @@ router.put("/activity-preferences", jwtMiddleware, async (req: AuthedRequest, re
       return next(new AppError("Invalid input", 400, "VALIDATION_ERROR", parsed.error.issues));
     }
 
+    // Filter out undefined values for Prisma compatibility with exactOptionalPropertyTypes
+    const dataToUpdate = Object.fromEntries(
+      Object.entries(parsed.data).filter(([_, v]) => v !== undefined)
+    );
+
     const prefs = await prisma.activityPreferences.upsert({
       where: { userId },
       create: {
         userId,
-        ...parsed.data,
+        ...dataToUpdate,
       },
-      update: {
-        ...parsed.data,
-      },
+      update: dataToUpdate,
     });
 
     res.json({
