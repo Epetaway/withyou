@@ -1,5 +1,6 @@
 import { Router } from "express";
 import type { Request } from "express";
+import type { Prisma } from "@prisma/client";
 import {
   ideasQuerySchema,
   recipesQuerySchema,
@@ -197,7 +198,7 @@ router.post("/query", jwtMiddleware, async (req: AuthedRequest, res, next) => {
           userId,
           relationshipId: relationship.id,
           type: params.type,
-          params: params as any, // Prisma JSON type
+          params: params as unknown as Prisma.InputJsonValue,
         },
       });
     }
@@ -280,7 +281,7 @@ router.post("/recipes", jwtMiddleware, async (req: AuthedRequest, res, next) => 
           userId,
           relationshipId: relationship.id,
           type: "FOOD",
-          params: params as any, // Prisma JSON type
+          params: params as unknown as Prisma.InputJsonValue,
         },
       });
     }
