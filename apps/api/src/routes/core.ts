@@ -67,6 +67,35 @@ router.get("/dashboard", jwtMiddleware, async (req: AuthedRequest, res, next) =>
   }
 });
 
+router.get("/checkins", jwtMiddleware, async (req: AuthedRequest, res, next) => {
+  try {
+    const userId = req.user?.userId;
+    if (!userId) {
+      return next(new AppError("Unauthorized", 401, "UNAUTHORIZED"));
+    }
+
+    const parsedLimit = Number.parseInt(String(req.query.limit ?? "10"), 10);
+    const limit = Number.isFinite(parsedLimit) && parsedLimit > 0 ? parsedLimit : 10;
+
+    const checkins = await prisma.checkin.findMany({
+      where: { userId },
+      orderBy: { createdAt: "desc" },
+      take: limit,
+      select: {
+        id: true,
+        moodLevel: true,
+        note: true,
+        shared: true,
+        createdAt: true,
+      },
+    });
+
+    res.json({ checkins });
+  } catch (error) {
+    next(error);
+  }
+});
+
 router.post("/checkins", jwtMiddleware, async (req: AuthedRequest, res, next) => {
   try {
     const userId = req.user?.userId;
