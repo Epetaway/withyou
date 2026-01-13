@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { View, StyleSheet, Pressable, Dimensions } from "react-native";
+import { View, StyleSheet, Pressable, Dimensions, ScrollView } from "react-native";
 import { FontAwesome6 } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import { CONTENT, DashboardResponse, Note, NoteType, NotesResponse } from "@withyou/shared";
@@ -370,38 +370,44 @@ export function DashboardScreen({ navigation }: DashboardScreenProps) {
           </Pressable>
         </View>
 
-        {/* Notes feed */}
-        <View style={styles.notesList}>
-          {notes.length === 0 ? (
-            <Text variant="helper" style={{ color: theme.colors.textSecondary }}>No notes yet.</Text>
-          ) : (
-            notes.map((note) => (
-              <View key={note.id} style={[styles.noteRow, { borderColor: theme.colors.border }]}> 
-                <View style={styles.noteIconWrap}>
-                  <FontAwesome6
-                    name={note.type === "VOICE" ? "microphone" : note.type === "VIDEO" ? "video" : "message"}
-                    size={16}
-                    color={theme.colors.primary}
-                    weight="solid"
-                  />
-                </View>
+        {/* Notes feed - Card Grid */}
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.notesScroll}>
+          {/* Add note card */}
+          <Pressable 
+            style={[styles.noteCard, styles.addNoteCard, { borderColor: theme.colors.border }]}
+            onPress={() => {
+              setNoteType("TEXT");
+              setNoteMediaUrl("");
+            }}
+          >
+            <FontAwesome6 name="plus" size={32} color={theme.colors.primary} weight="light" />
+            <Text style={[styles.addNoteText, { color: theme.colors.textSecondary }]}>Send a note</Text>
+          </Pressable>
+
+          {/* Note cards */}
+          {notes.map((note) => {
+            let bgColor = "#FEF3C7"; // yellow for TEXT
+            if (note.type === "VOICE") bgColor = "#DBEAFE"; // light blue
+            if (note.type === "VIDEO") bgColor = "#F5D4FF"; // light purple
+            
+            return (
+              <View key={note.id} style={[styles.noteCard, { backgroundColor: bgColor }]}>
                 <View style={{ flex: 1 }}>
-                  <Text variant="body" style={{ color: theme.colors.text }} numberOfLines={2}>
-                    {note.content || (note.type === "VOICE" ? "Voice note" : "Video note")}
-                  </Text>
-                  {note.media_url ? (
-                    <Text variant="helper" style={{ color: theme.colors.primary, marginTop: 4 }} numberOfLines={1}>
-                      {note.media_url}
-                    </Text>
-                  ) : null}
-                  <Text variant="helper" style={{ color: theme.colors.textSecondary, marginTop: 4 }}>
-                    {new Date(note.createdAt).toLocaleString()}
+                  <Text 
+                    variant="body" 
+                    style={{ color: "#1F2937", fontWeight: "600", marginBottom: 8 }}
+                    numberOfLines={3}
+                  >
+                    {note.content || (note.type === "VOICE" ? "🎤 Voice note" : "🎥 Video note")}
                   </Text>
                 </View>
+                <Text variant="helper" style={{ color: "#6B7280" }}>
+                  {new Date(note.createdAt).toLocaleString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
+                </Text>
               </View>
-            ))
-          )}
-        </View>
+            );
+          })}
+        </ScrollView>
       </View>
 
       {/* Ideas Section */}
@@ -574,14 +580,15 @@ const styles = StyleSheet.create({
   },
   notesScroll: {
     gap: 12,
+    paddingVertical: 4,
   },
   noteCard: {
-    width: 140,
-    height: 120,
+    width: 160,
+    height: 140,
     borderRadius: 16,
-    padding: 12,
+    padding: 14,
     justifyContent: 'space-between',
-    minWidth: 140,
+    minWidth: 160,
   },
   addNoteCard: {
     backgroundColor: 'transparent',
@@ -591,7 +598,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   addNoteText: {
-    fontSize: 12,
+    fontSize: 13,
     marginTop: 8,
     fontWeight: '600',
   },
@@ -627,25 +634,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     paddingVertical: 12,
     borderRadius: 10,
-  },
-  notesList: {
-    gap: 10,
-  },
-  noteRow: {
-    flexDirection: 'row',
-    gap: 12,
-    padding: 12,
-    borderWidth: 1,
-    borderRadius: 12,
-    alignItems: 'center',
-  },
-  noteIconWrap: {
-    width: 34,
-    height: 34,
-    borderRadius: 17,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#F3F4F6',
   },
   ideasPills: {
     flexDirection: 'row',
