@@ -25,13 +25,9 @@ export interface OAuthUserInfo {
 export async function verifyGoogleToken(idToken: string): Promise<OAuthUserInfo> {
   const client = getGoogleClient();
 
-  if (!env.googleClientId) {
-    throw new Error('Google OAuth is not configured');
-  }
-
   const ticket = await client.verifyIdToken({
     idToken,
-    audience: env.googleClientId,
+    audience: env.googleClientId!,
   });
 
   const payload = ticket.getPayload();
