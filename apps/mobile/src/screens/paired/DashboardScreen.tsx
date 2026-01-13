@@ -8,7 +8,6 @@ import { Text } from "../../ui/components/Text";
 import { clearSession } from "../../state/session";
 import { api } from "../../state/appState";
 import { useTheme } from "../../ui/theme/ThemeProvider";
-import { TextField } from "../../ui/components/TextField";
 
 const { width } = Dimensions.get('window');
 const _CARD_WIDTH = (width - 60) / 2;
@@ -82,44 +81,15 @@ export function DashboardScreen({ navigation }: DashboardScreenProps) {
   const [dashboard, setDashboard] = useState<DashboardResponse | null>(null);
   const [userMood, setUserMood] = useState<number | null>(null);
   const [notes, setNotes] = useState<Note[]>([]);
-  const [noteType, setNoteType] = useState<NoteType>("TEXT");
-  const [noteContent, setNoteContent] = useState("");
-  const [noteMediaUrl, setNoteMediaUrl] = useState("");
-  const [noteSubmitting, setNoteSubmitting] = useState(false);
+  const [_noteType, setNoteType] = useState<NoteType>("TEXT");
+  const [_noteContent, _setNoteContent] = useState("");
+  const [_noteMediaUrl, setNoteMediaUrl] = useState("");
   const [loading, setLoading] = useState(true);
   const [_errorText, setErrorText] = useState("");
 
   const partnerMood = dashboard?.partnerLastCheckIn?.mood_level ?? null;
   const moodTip = getMoodTip(userMood, partnerMood);
   const blendedColors = [getMoodColor(userMood ?? 3), getMoodColor(partnerMood ?? 3)];
-
-  const submitNote = async () => {
-    if (noteSubmitting) return;
-
-    if (noteType === "TEXT" && !noteContent.trim()) return;
-    if (noteType !== "TEXT" && !noteMediaUrl.trim()) return;
-
-    try {
-      setNoteSubmitting(true);
-      const payload = {
-        type: noteType,
-        content: noteContent.trim() || undefined,
-        media_url: noteType === "TEXT" ? undefined : noteMediaUrl.trim(),
-      };
-
-      const res = await api.request<{ note: Note }>("/notes", {
-        method: "POST",
-        body: JSON.stringify(payload),
-      });
-
-      setNotes((prev) => [res.note, ...prev].slice(0, 10));
-      setNoteContent("");
-      setNoteMediaUrl("");
-      setNoteType("TEXT");
-    } finally {
-      setNoteSubmitting(false);
-    }
-  };
 
   useEffect(() => {
     const fetchData = async () => {
@@ -309,64 +279,9 @@ export function DashboardScreen({ navigation }: DashboardScreenProps) {
       {/* Notes Section */}
       <View style={styles.section}>
         <View style={styles.sectionHeader}>
-          <Text variant="sectionLabel" style={{ color: theme.colors.textSecondary, textTransform: "uppercase", letterSpacing: 0.5 }}>NOTES</Text>
+          <Text variant="sectionLabel" style={{ color: theme.colors.textSecondary, textTransform: "uppercase", letterSpacing: 0.5 }}>PRIVATE NOTES</Text>
           <Pressable>
             <Text variant="helper" style={{ color: theme.colors.primary }}>View all</Text>
-          </Pressable>
-        </View>
-
-        {/* Composer */}
-        <View style={[styles.noteComposer, { borderColor: theme.colors.border, backgroundColor: theme.colors.surface }]}> 
-          <View style={styles.noteTypeRow}>
-            {["TEXT", "VOICE", "VIDEO"].map((type) => (
-              <Pressable
-                key={type}
-                onPress={() => setNoteType(type as NoteType)}
-                style={[
-                  styles.noteTypePill,
-                  {
-                    backgroundColor: noteType === type ? theme.colors.primary + "20" : theme.colors.background,
-                    borderColor: noteType === type ? theme.colors.primary : theme.colors.border,
-                  },
-                ]}
-              >
-                <Text variant="helper" style={{ color: noteType === type ? theme.colors.primary : theme.colors.textSecondary }}>
-                  {type === "TEXT" ? "Text" : type === "VOICE" ? "Voice" : "Video"}
-                </Text>
-              </Pressable>
-            ))}
-          </View>
-
-          <TextField
-            value={noteContent}
-            onChangeText={setNoteContent}
-            placeholder={noteType === "TEXT" ? "Type a short note" : "Add a caption (optional)"}
-            multiline
-            numberOfLines={noteType === "TEXT" ? 3 : 2}
-          />
-
-          {noteType !== "TEXT" ? (
-            <TextField
-              value={noteMediaUrl}
-              onChangeText={setNoteMediaUrl}
-              placeholder={noteType === "VOICE" ? "Voice clip URL" : "Video clip URL"}
-              autoCapitalize="none"
-            />
-          ) : null}
-
-          <Pressable
-            style={[
-              styles.sendNoteButton,
-              { backgroundColor: theme.colors.primary },
-              noteSubmitting && { opacity: 0.6 },
-            ]}
-            disabled={noteSubmitting}
-            onPress={submitNote}
-          >
-            <FontAwesome6 name="paper-plane" size={16} color={theme.colors.background} weight="solid" />
-            <Text style={{ color: theme.colors.background, fontWeight: "700", marginLeft: 8 }}>
-              {noteSubmitting ? CONTENT.app.common.loading : "Send"}
-            </Text>
           </Pressable>
         </View>
 
@@ -376,12 +291,13 @@ export function DashboardScreen({ navigation }: DashboardScreenProps) {
           <Pressable 
             style={[styles.noteCard, styles.addNoteCard, { borderColor: theme.colors.border }]}
             onPress={() => {
+              // TODO: Open note composer modal
               setNoteType("TEXT");
               setNoteMediaUrl("");
             }}
           >
-            <FontAwesome6 name="plus" size={32} color={theme.colors.primary} weight="light" />
-            <Text style={[styles.addNoteText, { color: theme.colors.textSecondary }]}>Send a note</Text>
+            <FontAwesome6 name="question" size={32} color={theme.colors.primary} weight="light" />
+            <Text style={[styles.addNoteText, { color: theme.colors.text }]}>Send a note</Text>
           </Pressable>
 
           {/* Note cards */}
@@ -611,29 +527,6 @@ const styles = StyleSheet.create({
     fontSize: 11,
     color: '#6B7280',
     marginTop: 4,
-  },
-  noteComposer: {
-    borderWidth: 1,
-    borderRadius: 12,
-    padding: 12,
-    gap: 12,
-  },
-  noteTypeRow: {
-    flexDirection: 'row',
-    gap: 8,
-  },
-  noteTypePill: {
-    paddingVertical: 6,
-    paddingHorizontal: 12,
-    borderRadius: 999,
-    borderWidth: 1,
-  },
-  sendNoteButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: 12,
-    borderRadius: 10,
   },
   ideasPills: {
     flexDirection: 'row',
