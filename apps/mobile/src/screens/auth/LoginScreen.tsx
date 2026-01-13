@@ -98,9 +98,6 @@ export function LoginScreen({ navigation }: LoginScreenProps) {
     }
   };
 
-  // Note: Google Sign-In would require expo-auth-session setup with OAuth client IDs
-  // For now, just showing Apple as an example
-
   return (
     <Screen scrollable>
       {/* Title Section */}

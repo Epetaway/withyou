@@ -23,6 +23,7 @@ function getSESClient(): SESClient {
 
 export function generateVerificationCode(): string {
   // Use cryptographically secure random number generation
+  // Range is 100000 to 999999 (inclusive) to ensure exactly 6 digits
   return randomInt(100000, 1000000).toString();
 }
 
