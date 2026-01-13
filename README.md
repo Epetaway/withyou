@@ -1,6 +1,6 @@
 # WithYou
 
-**[View Landing Page](./docs/landing/index.html)** | **[Beta Checklist](./BETA_CHECKLIST.md)** | **[API Docs](./API.md)**
+**[View Landing Page](./docs/landing/index.html)** | **[Beta Checklist](./BETA_CHECKLIST.md)** | **[API Docs](./API.md)** | **[v1.1 Summary](./V1_1_IMPLEMENTATION_SUMMARY.md)**
 
 WithYou is a private, mobile-first application designed to help couples communicate needs and plan intentional connection time without pressure, surveillance, or judgment.
 
@@ -11,12 +11,21 @@ Built as a **beta-ready v1** to demonstrate full-stack product engineering, With
 - **Privacy-First**: Data is encrypted, never shared or monetized
 - **Intentional Connection**: Ideas generated from preferences, not algorithms
 
-## ✅ Project Status: Beta v1 - Feature Complete
+## ✅ Project Status: v1.1 - Enhanced Check-ins + Planning
 
-All 16 core implementation tasks completed:
+**New in v1.1**:
+- 🎨 **Mood Ring v2 Check-ins**: Rich emotional check-ins with color, emotion labels, and energy levels
+- 🤝 **Reveal Logic**: Partner moods visible only after both check in
+- 🌈 **Mood Gradients**: Visual blend of both moods with contextual insights and tips
+- 📅 **Plan Management**: Save date plans with calendar export (ICS format)
+- 🔒 **Enhanced Pairing UX**: Clearer messaging for one-relationship-per-user rule
+
+See **[V1_1_IMPLEMENTATION_SUMMARY.md](./V1_1_IMPLEMENTATION_SUMMARY.md)** for full v1.1 feature details.
+
+All v1.0 core features remain:
 - ✅ Database schema and migrations
-- ✅ Mobile frontend (8 screens across 3 flows)
-- ✅ Backend API (5 route groups, 10+ endpoints)
+- ✅ Mobile frontend (8+ screens across 3 flows)
+- ✅ Backend API (6 route groups, 15+ endpoints)
 - ✅ Authentication and authorization
 - ✅ Rate limiting and logging
 - ✅ E2E testing and CI/CD
@@ -113,9 +122,20 @@ withyou/
 
 ### Connection Tools
 
-- **Check-ins**: Log daily mood (1-5) with optional shared note
+- **Check-ins v2** ✨: Rich emotional check-ins with:
+  - Mood color selection (7 colors)
+  - Emotion label (10 emotions)
+  - Energy level (low/medium/high)
+  - Optional note
+  - Reveal logic (partner mood shown only after both check in)
+  - Mood gradient with insights and actionable tips
+- **Check-ins v1**: Original 1-5 mood scale (still supported)
 - **Preferences**: Activity style (chill/active/surprise), food types, budget, energy level
 - **Ideas**: AI-generated date suggestions based on preferences and context
+- **Plans** ✨: Save and organize date plans with:
+  - Title, description, location details
+  - Calendar export (ICS format)
+  - Scheduled dates
 - **Dashboard**: Real-time view of partner status and recent activity
 
 ## Development
@@ -236,21 +256,34 @@ withyou/
 - Implement CSRF protection for web dashboard
 - Set appropriate CORS origins for production domain
 
-## Roadmap (v1.1+)
+## Roadmap (v1.2+)
 
-### Known Limitations (v1.0)
+### Completed in v1.1 ✅
+- ✅ Mood Ring v2 check-ins (color, emotion, energy)
+- ✅ Check-in reveal logic (both partners must check in)
+- ✅ Mood gradient visualizations with insights
+- ✅ Plan management with calendar export
+- ✅ Enhanced pairing integrity UX
+
+### Known Limitations (v1.1)
 - Logout does not immediately reset app state (workaround: force restart)
 - No offline mode (requires internet connection)
 - No push notifications for partner activity
+- No nearby discovery (Google Places API integration pending)
 - No video/audio calling support
-- No file uploads (avatars, photos)
 - Limited analytics and insights
 
-### Planned Features (v2)
+### Planned Features (v1.2)
+- [ ] Google Places API integration for nearby discovery
+- [ ] Advanced filters (budget, distance, kid-friendly, indoor/outdoor)
+- [ ] Map view for local activities
+- [ ] Push notifications (daily check-in reminders, partner activity)
+- [ ] Native calendar integration (iOS/Android)
+- [ ] UI system hardening (theme centralization, dark mode fixes)
+
+### Planned Features (v2.0)
 - [ ] Refresh tokens for better session security
-- [ ] Email verification and password reset
-- [ ] Push notifications for partner activity
-- [ ] Activity history and insights
+- [ ] Activity history and insights dashboard
 - [ ] Admin dashboard for support
 - [ ] Offline support with local persistence
 - [ ] Video calling integration (Twilio/Daily)

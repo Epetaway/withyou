@@ -31,10 +31,10 @@ router.post("/relationship/invite", jwtMiddleware, async (req: AuthedRequest, re
     if (existingRelationship) {
       return next(
         new AppError(
-          "You are already paired",
+          "You must end your current pairing before pairing with someone else",
           400,
           "ALREADY_PAIRED",
-          { reason: "End your current pairing to create a new invite." }
+          { reason: "Only one active relationship is allowed at a time. Please end your current pairing first." }
         )
       );
     }
@@ -141,9 +141,10 @@ router.post("/relationship/accept", jwtMiddleware, async (req: AuthedRequest, re
     if (accepterHasActiveRelationship) {
       return next(
         new AppError(
-          "You must end your current pairing first",
+          "You must end your current pairing before pairing with someone else",
           400,
-          "SELF_ALREADY_PAIRED"
+          "SELF_ALREADY_PAIRED",
+          { reason: "Only one active relationship is allowed at a time. Please end your current pairing first." }
         )
       );
     }
