@@ -25,8 +25,8 @@ export function LoginScreen({ navigation }: LoginScreenProps) {
   };
 
   return (
-    <Screen style={styles.container}>
-      <View style={styles.content}>
+    <Screen>
+      <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
         {/* Circular Avatar Layout */}
         <View style={styles.avatarSection}>
           {/* Outer gradient circles */}
@@ -74,19 +74,19 @@ export function LoginScreen({ navigation }: LoginScreenProps) {
         </View>
 
         {/* Title */}
-        <View style={styles.titleSection}>
-          <Text style={styles.title}>Let&apos;s meeting new</Text>
-          <Text style={styles.title}>people around you</Text>
+        <View style={{ marginBottom: 40, alignItems: "center" }}>
+          <Text variant="screenTitle" style={{ textAlign: "center" }}>Let&apos;s meeting new</Text>
+          <Text variant="screenTitle" style={{ textAlign: "center" }}>people around you</Text>
         </View>
 
         {/* Buttons */}
-        <View style={styles.buttonSection}>
+        <View style={{ gap: 16, width: "100%", paddingHorizontal: 24 }}>
           <Pressable
-            style={styles.primaryButton}
+            style={[styles.primaryButton, { backgroundColor: theme.colors.primary }]}
             onPress={handlePhoneLogin}
           >
-            <FontAwesome6 name="phone" size={24} color="#FFFFFF" weight="bold" />
-            <Text style={styles.primaryButtonText}>Login with Phone</Text>
+            <FontAwesome6 name="phone" size={24} color={theme.colors.background} weight="bold" />
+            <Text style={{ color: theme.colors.background, fontSize: 16, fontWeight: "600", marginLeft: 12 }}>Login with Phone</Text>
           </Pressable>
 
           <Pressable
@@ -94,17 +94,17 @@ export function LoginScreen({ navigation }: LoginScreenProps) {
             onPress={handleGoogleLogin}
           >
             <FontAwesome6 name="google" size={24} color="#4285F4" weight="bold" />
-            <Text style={styles.secondaryButtonText}>Login with Google</Text>
+            <Text style={{ color: theme.colors.text, fontSize: 16, fontWeight: "600", marginLeft: 12 }}>Login with Google</Text>
           </Pressable>
         </View>
 
         {/* Sign Up Link */}
-        <View style={styles.signupSection}>
-          <Text style={[styles.signupText, { color: theme.colors.text2 }]}>
+        <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "center", marginTop: 24 }}>
+          <Text variant="helper" style={{ color: theme.colors.textSecondary }}>
             Don&apos;t have an account?{" "}
           </Text>
           <Pressable onPress={() => navigation.navigate("Register")}>
-            <Text style={[styles.signupLink, { color: theme.colors.primary }]}>
+            <Text variant="helper" style={{ color: theme.colors.primary, fontWeight: "600" }}>
               Sign Up
             </Text>
           </Pressable>
@@ -115,16 +115,6 @@ export function LoginScreen({ navigation }: LoginScreenProps) {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#FFFFFF",
-  },
-  content: {
-    flex: 1,
-    paddingHorizontal: 24,
-    paddingTop: 40,
-    alignItems: "center",
-  },
   avatarSection: {
     width: 300,
     height: 300,
@@ -225,35 +215,13 @@ const styles = StyleSheet.create({
     bottom: 30,
     left: 20,
   },
-  titleSection: {
-    alignItems: "center",
-    marginBottom: 40,
-  },
-  title: {
-    fontSize: 28,
-    fontWeight: "700",
-    color: "#1F2937",
-    textAlign: "center",
-  },
-  buttonSection: {
-    width: "100%",
-    gap: 16,
-    marginBottom: 24,
-  },
   primaryButton: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: "#4C1D95",
     paddingVertical: 16,
     paddingHorizontal: 24,
     borderRadius: 50,
-    gap: 12,
-  },
-  primaryButtonText: {
-    color: "#FFFFFF",
-    fontSize: 16,
-    fontWeight: "600",
   },
   secondaryButton: {
     flexDirection: "row",
@@ -263,24 +231,7 @@ const styles = StyleSheet.create({
     paddingVertical: 16,
     paddingHorizontal: 24,
     borderRadius: 50,
-    gap: 12,
     borderWidth: 1,
     borderColor: "#E5E7EB",
-  },
-  secondaryButtonText: {
-    color: "#1F2937",
-    fontSize: 16,
-    fontWeight: "600",
-  },
-  signupSection: {
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  signupText: {
-    fontSize: 14,
-  },
-  signupLink: {
-    fontSize: 14,
-    fontWeight: "600",
   },
 });

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { View, StyleSheet, Pressable, ScrollView } from "react-native";
+import { View, StyleSheet, Pressable } from "react-native";
 import { FontAwesome6 } from "@expo/vector-icons";
 import { CONTENT, registerSchema, AuthResponse } from "@withyou/shared";
 import { Screen } from "../../ui/components/Screen";
@@ -72,104 +72,91 @@ export function RegisterScreen({ navigation }: RegisterScreenProps) {
   };
 
   return (
-    <Screen style={styles.container}>
-      <ScrollView 
-        contentContainerStyle={styles.scrollContent}
-        showsVerticalScrollIndicator={false}
-      >
-        {/* Header with back button */}
-        <View style={styles.header}>
-          <Pressable 
-            style={styles.backButton}
-            onPress={() => navigation.navigate("Login")}
-          >
-            <FontAwesome6 name="arrow-left" size={24} color={theme.colors.text} weight="bold" />
-          </Pressable>
-        </View>
+    <Screen scrollable>
+      {/* Header with back button */}
+      <View style={styles.header}>
+        <Pressable 
+          style={styles.backButton}
+          onPress={() => navigation.navigate("Login")}
+        >
+          <FontAwesome6 name="arrow-left" size={24} color={theme.colors.text} weight="bold" />
+        </Pressable>
+      </View>
 
-        {/* Title Section */}
-        <View style={styles.titleSection}>
-          <Text style={styles.title}>Create Account</Text>
-          <Text style={[styles.subtitle, { color: theme.colors.text2 }]}>
-            Sign up to get started
+      {/* Title Section */}
+      <View style={{ marginBottom: 32, marginTop: 8 }}>
+        <Text variant="screenTitle">Create Account</Text>
+        <Text variant="screenSubtitle" style={{ color: theme.colors.textSecondary, marginTop: 4 }}>
+          Sign up to get started
+        </Text>
+      </View>
+
+      {/* Form */}
+      <View style={{ gap: 16, marginBottom: 24 }}>
+        <TextFieldNew
+          label={c.fields.emailLabel}
+          value={email}
+          onChangeText={setEmail}
+          keyboardType="email-address"
+          autoCapitalize="none"
+          error={fieldErrors.email}
+        />
+        
+        <TextFieldNew
+          label={c.fields.passwordLabel}
+          value={password}
+          onChangeText={setPassword}
+          secureTextEntry
+          autoCapitalize="none"
+          error={fieldErrors.password}
+        />
+        
+        <TextFieldNew
+          label={c.fields.confirmPasswordLabel}
+          value={confirmPassword}
+          onChangeText={setConfirmPassword}
+          secureTextEntry
+          autoCapitalize="none"
+          error={fieldErrors.confirmPassword}
+        />
+
+        {errorText ? (
+          <Text variant="helper" style={{ color: theme.colors.error, marginTop: 8 }}>
+            {errorText}
           </Text>
-        </View>
+        ) : null}
 
-        {/* Form */}
-        <View style={styles.formSection}>
-          <TextFieldNew
-            label={c.fields.emailLabel}
-            value={email}
-            onChangeText={setEmail}
-            keyboardType="email-address"
-            autoCapitalize="none"
-            error={fieldErrors.email}
-          />
-          
-          <TextFieldNew
-            label={c.fields.passwordLabel}
-            value={password}
-            onChangeText={setPassword}
-            secureTextEntry
-            autoCapitalize="none"
-            error={fieldErrors.password}
-          />
-          
-          <TextFieldNew
-            label={c.fields.confirmPasswordLabel}
-            value={confirmPassword}
-            onChangeText={setConfirmPassword}
-            secureTextEntry
-            autoCapitalize="none"
-            error={fieldErrors.confirmPassword}
-          />
-
-          {errorText ? (
-            <Text variant="muted" style={{ color: "#B00020", marginTop: 8 }}>
-              {errorText}
-            </Text>
-          ) : null}
-
-          <Pressable
-            style={[
-              styles.primaryButton,
-              loading && styles.disabledButton
-            ]}
-            onPress={onSubmit}
-            disabled={loading}
-          >
-            <Text style={styles.primaryButtonText}>
-              {loading ? CONTENT.app.common.loading : c.actions.primary}
-            </Text>
-          </Pressable>
-        </View>
-
-        {/* Login Link */}
-        <View style={styles.loginSection}>
-          <Text style={[styles.loginText, { color: theme.colors.text2 }]}>
-            Already have an account?{" "}
+        <Pressable
+          style={[
+            styles.primaryButton,
+            { backgroundColor: theme.colors.primary },
+            loading && { opacity: 0.6 }
+          ]}
+          onPress={onSubmit}
+          disabled={loading}
+        >
+          <Text style={{ color: theme.colors.background, fontSize: 16, fontWeight: "600" }}>
+            {loading ? CONTENT.app.common.loading : c.actions.primary}
           </Text>
-          <Pressable onPress={() => navigation.navigate("Login")}>
-            <Text style={[styles.loginLink, { color: theme.colors.primary }]}>
-              Login
-            </Text>
-          </Pressable>
-        </View>
-      </ScrollView>
+        </Pressable>
+      </View>
+
+      {/* Login Link */}
+      <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "center" }}>
+        <Text variant="helper" style={{ color: theme.colors.textSecondary }}>
+          Already have an account?{" "}
+        </Text>
+        <Pressable onPress={() => navigation.navigate("Login")}>
+          <Text variant="helper" style={{ color: theme.colors.primary, fontWeight: "600" }}>
+            Login
+          </Text>
+        </Pressable>
+      </View>
     </Screen>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#FFFFFF",
-  },
-  scrollContent: {
-    paddingHorizontal: 24,
-    paddingTop: 20,
-    paddingBottom: 40,
-  },
   header: {
     marginBottom: 24,
   },
@@ -179,49 +166,12 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
-  titleSection: {
-    marginBottom: 32,
-  },
-  title: {
-    fontSize: 32,
-    fontWeight: "700",
-    color: "#1F2937",
-    marginBottom: 8,
-  },
-  subtitle: {
-    fontSize: 16,
-  },
-  formSection: {
-    gap: 16,
-    marginBottom: 24,
-  },
   primaryButton: {
-    backgroundColor: "#4C1D95",
     paddingVertical: 16,
     paddingHorizontal: 24,
     borderRadius: 50,
     alignItems: "center",
     justifyContent: "center",
     marginTop: 8,
-  },
-  disabledButton: {
-    opacity: 0.6,
-  },
-  primaryButtonText: {
-    color: "#FFFFFF",
-    fontSize: 16,
-    fontWeight: "600",
-  },
-  loginSection: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  loginText: {
-    fontSize: 14,
-  },
-  loginLink: {
-    fontSize: 14,
-    fontWeight: "600",
   },
 });
