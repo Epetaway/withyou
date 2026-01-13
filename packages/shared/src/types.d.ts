@@ -4,6 +4,26 @@ export type RelationshipStatus = "active" | "ended";
 export type ActivityStyle = "chill" | "active" | "surprise";
 export type BudgetLevel = "low" | "medium" | "high";
 export type MoodLevel = 1 | 2 | 3 | 4 | 5;
+export type MoodState = "energetic" | "calm" | "playful" | "romantic" | "adventurous" | "relaxed" | "stressed" | "happy";
+export type TimeOfDay = "morning" | "afternoon" | "evening" | "night";
+export type WeatherPreference = "indoor" | "outdoor" | "any";
+export type NoteType = "TEXT" | "VOICE" | "VIDEO";
+export type Note = {
+    id: UUID;
+    type: NoteType;
+    content: string | null;
+    media_url: string | null;
+    authorId: UUID;
+    createdAt: string;
+};
+export type NoteCreatePayload = {
+    type: NoteType;
+    content?: string | null;
+    media_url?: string | null;
+};
+export type NotesResponse = {
+    notes: Note[];
+};
 export type ApiErrorShape = {
     error: {
         code: string;
@@ -14,10 +34,38 @@ export type ApiErrorShape = {
 export type AuthResponse = {
     userId: UUID;
     token: string;
+    emailVerified?: boolean;
+};
+export type OAuthLoginResponse = {
+    userId: UUID;
+    token: string;
+    isNewUser: boolean;
+    emailVerified: boolean;
+};
+export type EmailVerificationSendResponse = {
+    message: string;
+    expiresAt: string;
+};
+export type EmailVerificationConfirmResponse = {
+    message: string;
+    verified: boolean;
+};
+export type AvatarUploadUrlResponse = {
+    uploadUrl: string;
+    fields: Record<string, string>;
+    avatarUrl: string;
+};
+export type AvatarUploadResponse = {
+    avatarUrl: string;
+};
+export type ProfileSetupResponse = {
+    message: string;
+    setupCompleted: boolean;
 };
 export type InviteResponse = {
     inviteCode: string;
     expiresAt: string;
+    deepLink?: string;
 };
 export type RelationshipAcceptResponse = {
     relationshipId: UUID;
@@ -48,5 +96,65 @@ export type IdeasResponse = {
 export type SavedIdeaResponse = {
     id: UUID;
     createdAt: string;
+};
+export type MoodCheckinPayload = {
+    moodState: MoodState;
+};
+export type MoodCheckinResponse = {
+    id: UUID;
+    moodState: MoodState;
+    createdAt: string;
+};
+export type ActivityPreferences = {
+    id: UUID;
+    interests: string[];
+    dietaryRestrictions: string[];
+    hasChildren: boolean;
+    accessibilityNeeds: string[];
+    budgetLevel: BudgetLevel;
+    maxDistance: number;
+    preferredTimeOfDay: TimeOfDay[];
+    weatherPreference: WeatherPreference;
+    createdAt: string;
+    updatedAt: string;
+};
+export type ActivityPreferencesPayload = {
+    interests?: string[];
+    dietaryRestrictions?: string[];
+    hasChildren?: boolean;
+    accessibilityNeeds?: string[];
+    budgetLevel?: BudgetLevel;
+    maxDistance?: number;
+    preferredTimeOfDay?: TimeOfDay[];
+    weatherPreference?: WeatherPreference;
+};
+export type ActivityFilters = {
+    distance?: number;
+    priceLevel?: BudgetLevel;
+    timeOfDay?: TimeOfDay;
+    weatherPreference?: WeatherPreference;
+    familyFriendly?: boolean;
+    accessible?: boolean;
+    interests?: string[];
+};
+export type Activity = {
+    id: string;
+    title: string;
+    description: string;
+    category: string;
+    imageUrl?: string;
+    address?: string;
+    distance?: number;
+    priceLevel: BudgetLevel;
+    rating?: number;
+    tags: string[];
+    isFamilyFriendly: boolean;
+    isAccessible: boolean;
+    hours?: string;
+    bookingUrl?: string;
+};
+export type ActivitiesResponse = {
+    activities: Activity[];
+    count: number;
 };
 //# sourceMappingURL=types.d.ts.map

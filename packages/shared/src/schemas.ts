@@ -19,6 +19,45 @@ export const loginSchema = z.object({
   password: z.string().min(1),
 });
 
+// OAuth schemas
+export const oauthProviderSchema = z.union([
+  z.literal("google"),
+  z.literal("apple"),
+]);
+
+export const oauthLoginSchema = z.object({
+  provider: oauthProviderSchema,
+  idToken: z.string().min(1),
+});
+
+// Email verification schemas
+export const emailVerifySchema = z.object({
+  code: z.string().length(6).regex(/^\d{6}$/, "Code must be 6 digits"),
+});
+
+export const emailVerifySendSchema = z.object({
+  email: emailSchema.optional(),
+});
+
+// Avatar upload schemas
+export const avatarUploadSchema = z.object({
+  fileType: z.union([
+    z.literal("image/jpeg"),
+    z.literal("image/png"),
+    z.literal("image/webp"),
+  ]),
+  fileSize: z.number().max(5 * 1024 * 1024, "File size must be less than 5MB"),
+});
+
+// Profile setup schemas
+export const profileSetupSchema = z.object({
+  nickname: z.string().trim().max(50).optional(),
+  anniversary: z.string().datetime().optional(),
+  goals: z.array(z.string()).optional(),
+  privacySettings: z.record(z.string(), z.boolean()).optional(),
+  notificationTimes: z.array(z.string()).optional(),
+});
+
 export const inviteAcceptSchema = z.object({
   inviteCode: z.string().trim().min(1),
 });
