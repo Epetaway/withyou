@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, StyleSheet, ScrollView } from 'react-native';
+import { View, StyleSheet } from 'react-native';
 import { Screen } from '../../ui/components/Screen';
 import { Text } from '../../ui/components/Text';
 import { Button } from '../../ui/components/Button';
@@ -20,7 +20,7 @@ interface CheckInV2ScreenProps {
   };
 }
 
-export function CheckInV2Screen({ navigation }: CheckInV2ScreenProps) {
+export function CheckInV2Screen({ navigation: _navigation }: CheckInV2ScreenProps) {
   const theme = useTheme();
   const [moodColor, setMoodColor] = useState<MoodColor | undefined>();
   const [emotionLabel, setEmotionLabel] = useState<EmotionLabel | undefined>();
@@ -89,7 +89,7 @@ export function CheckInV2Screen({ navigation }: CheckInV2ScreenProps) {
       ) : todayData?.userCheckin && !todayData?.partnerCheckin ? (
         <View style={[styles.waitingCard, { backgroundColor: theme.colors.surface2 }]}>
           <Text style={[styles.waitingText, { color: theme.colors.textSecondary }]}>
-            ✓ You've checked in! Waiting for your partner to check in to reveal the mood blend.
+            ✓ You&apos;ve checked in! Waiting for your partner to check in to reveal the mood blend.
           </Text>
         </View>
       ) : null}

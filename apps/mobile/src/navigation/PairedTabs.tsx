@@ -3,7 +3,6 @@ import { View, StyleSheet, Pressable } from "react-native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { FontAwesome6 } from "@expo/vector-icons";
 import { DashboardScreen } from "../screens/paired/DashboardScreen";
-import { CheckInScreen } from "../screens/paired/CheckInScreen";
 import { CheckInV2Screen } from "../screens/paired/CheckInV2Screen";
 import { PreferencesScreen } from "../screens/paired/PreferencesScreen";
 import { LocalMapScreen } from "../screens/paired/LocalMapScreen";

@@ -67,7 +67,7 @@ export function EmailVerificationScreen({ navigation, route }: EmailVerification
     
     try {
       await sendVerification();
-    } catch (err) {
+    } catch (_err) {
       setError("Failed to resend code. Please try again.");
     }
   };
@@ -76,7 +76,7 @@ export function EmailVerificationScreen({ navigation, route }: EmailVerification
     setError(null);
     try {
       await verifyCode();
-    } catch (err) {
+    } catch (_err) {
       setError("Invalid or expired code. Please try again.");
     }
   }, [verifyCode]);

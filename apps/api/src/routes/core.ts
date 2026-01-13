@@ -380,7 +380,7 @@ router.post("/checkins/v2", jwtMiddleware, async (req: AuthedRequest, res, next)
     const checkin = await prisma.checkin.create({
       data: {
         userId,
-        relationshipId: relationship?.id,
+        relationshipId: relationship?.id ?? null,
         moodLevel: 3, // Default for backwards compatibility
         moodColor,
         emotionLabel,

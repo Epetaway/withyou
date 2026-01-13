@@ -31,19 +31,19 @@ router.post("/", jwtMiddleware, async (req: AuthedRequest, res, next) => {
     const plan = await prisma.plan.create({
       data: {
         userId,
-        relationshipId: relationship?.id,
-        ideaId: parsed.data.ideaId,
+        relationshipId: relationship?.id ?? null,
+        ideaId: parsed.data.ideaId ?? null,
         title: parsed.data.title,
-        description: parsed.data.description,
-        placeId: parsed.data.placeId,
-        address: parsed.data.address,
-        lat: parsed.data.lat,
-        lng: parsed.data.lng,
-        websiteUrl: parsed.data.websiteUrl,
-        phoneNumber: parsed.data.phoneNumber,
-        priceLevel: parsed.data.priceLevel,
+        description: parsed.data.description ?? null,
+        placeId: parsed.data.placeId ?? null,
+        address: parsed.data.address ?? null,
+        lat: parsed.data.lat ?? null,
+        lng: parsed.data.lng ?? null,
+        websiteUrl: parsed.data.websiteUrl ?? null,
+        phoneNumber: parsed.data.phoneNumber ?? null,
+        priceLevel: parsed.data.priceLevel ?? null,
         scheduledDate: parsed.data.scheduledDate ? new Date(parsed.data.scheduledDate) : null,
-        notes: parsed.data.notes,
+        notes: parsed.data.notes ?? null,
       },
     });
 
@@ -139,14 +139,24 @@ router.post("/calendar/event", jwtMiddleware, async (req: AuthedRequest, res, ne
     const { title, description, location, startDate, endDate, allDay } = parsed.data;
 
     // Generate ICS format calendar event
-    const icsContent = generateICS({
+    const eventData: {
+      title: string;
+      description?: string;
+      location?: string;
+      startDate: Date;
+      endDate: Date;
+      allDay: boolean;
+    } = {
       title,
-      description,
-      location,
       startDate: new Date(startDate),
       endDate: endDate ? new Date(endDate) : new Date(new Date(startDate).getTime() + 60 * 60 * 1000),
       allDay: allDay || false,
-    });
+    };
+    
+    if (description) eventData.description = description;
+    if (location) eventData.location = location;
+    
+    const icsContent = generateICS(eventData);
 
     // Return ICS content as downloadable
     res.setHeader("Content-Type", "text/calendar");

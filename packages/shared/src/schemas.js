@@ -63,6 +63,39 @@ export const checkinCreateSchema = z.object({
     note: z.string().max(500).optional().nullable(),
     shared: z.boolean().default(false),
 });
+// Mood Ring v2 Schemas
+export const moodColorSchema = z.union([
+    z.literal("red"),
+    z.literal("orange"),
+    z.literal("yellow"),
+    z.literal("green"),
+    z.literal("blue"),
+    z.literal("purple"),
+    z.literal("pink"),
+]);
+export const emotionLabelSchema = z.union([
+    z.literal("happy"),
+    z.literal("excited"),
+    z.literal("calm"),
+    z.literal("loved"),
+    z.literal("tired"),
+    z.literal("stressed"),
+    z.literal("anxious"),
+    z.literal("sad"),
+    z.literal("frustrated"),
+    z.literal("content"),
+]);
+export const energyLevelSchema = z.union([
+    z.literal("low"),
+    z.literal("medium"),
+    z.literal("high"),
+]);
+export const checkinV2Schema = z.object({
+    moodColor: moodColorSchema,
+    emotionLabel: emotionLabelSchema,
+    energyLevel: energyLevelSchema,
+    note: z.string().max(500).optional(),
+});
 export const activityStyleSchema = z.union([
     z.literal("chill"),
     z.literal("active"),
@@ -262,5 +295,28 @@ export const savedIdeasResponseSchema = z.object({
         notes: z.string().nullable(),
         createdAt: z.string(),
     })),
+});
+// Plan schemas
+export const planPayloadSchema = z.object({
+    ideaId: z.string().optional(),
+    title: z.string().min(1).max(200),
+    description: z.string().max(1000).optional(),
+    placeId: z.string().optional(),
+    address: z.string().max(500).optional(),
+    lat: z.number().optional(),
+    lng: z.number().optional(),
+    websiteUrl: z.string().url().optional(),
+    phoneNumber: z.string().max(50).optional(),
+    priceLevel: z.number().int().min(0).max(4).optional(),
+    scheduledDate: z.string().datetime().optional(),
+    notes: z.string().max(1000).optional(),
+});
+export const calendarEventPayloadSchema = z.object({
+    title: z.string().min(1).max(200),
+    description: z.string().max(1000).optional(),
+    location: z.string().max(500).optional(),
+    startDate: z.string().datetime(),
+    endDate: z.string().datetime().optional(),
+    allDay: z.boolean().optional(),
 });
 //# sourceMappingURL=schemas.js.map

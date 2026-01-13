@@ -1,9 +1,8 @@
 import { z } from "zod";
 import { Router } from "express";
-import type { Request } from "express";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-import { registerSchema, loginSchema, oauthLoginSchema, emailVerifySchema, emailVerifySendSchema } from "@withyou/shared";
+import { registerSchema, loginSchema, oauthLoginSchema, emailVerifySchema } from "@withyou/shared";
 import { prisma } from "../utils/prisma.js";
 import { env } from "../config/env.js";
 import { AppError } from "../errors/app-error.js";
