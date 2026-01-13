@@ -13,7 +13,7 @@ import * as AppleAuthentication from "expo-apple-authentication";
 
 type LoginScreenProps = {
   navigation: {
-    navigate: (screen: string, params?: any) => void;
+    navigate: (screen: string, params?: Record<string, unknown>) => void;
   };
 };
 
@@ -89,8 +89,8 @@ export function LoginScreen({ navigation }: LoginScreenProps) {
       if (!res.emailVerified && res.isNewUser) {
         navigation.navigate("EmailVerification", { email: credential.email || "" });
       }
-    } catch (err: any) {
-      if (err.code === "ERR_CANCELED") {
+    } catch (err: unknown) {
+      if (err && typeof err === 'object' && 'code' in err && err.code === "ERR_CANCELED") {
         // User canceled
         return;
       }

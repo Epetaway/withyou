@@ -147,7 +147,7 @@ router.get("/activities", jwtMiddleware, async (req: AuthedRequest, res, next) =
     }
 
     // Get user's preferences and partner's preferences (if paired)
-    const userPrefs = await prisma.activityPreferences.findUnique({
+    const _userPrefs = await prisma.activityPreferences.findUnique({
       where: { userId },
     });
 
@@ -158,10 +158,10 @@ router.get("/activities", jwtMiddleware, async (req: AuthedRequest, res, next) =
       },
     });
 
-    let partnerPrefs = null;
+    let _partnerPrefs = null;
     if (relationship) {
       const partnerId = relationship.userAId === userId ? relationship.userBId : relationship.userAId;
-      partnerPrefs = await prisma.activityPreferences.findUnique({
+      _partnerPrefs = await prisma.activityPreferences.findUnique({
         where: { userId: partnerId },
       });
     }

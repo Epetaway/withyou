@@ -41,6 +41,15 @@ export declare const checkinCreateSchema: z.ZodObject<{
     note: z.ZodNullable<z.ZodOptional<z.ZodString>>;
     shared: z.ZodDefault<z.ZodBoolean>;
 }, z.core.$strip>;
+export declare const moodColorSchema: z.ZodUnion<readonly [z.ZodLiteral<"red">, z.ZodLiteral<"orange">, z.ZodLiteral<"yellow">, z.ZodLiteral<"green">, z.ZodLiteral<"blue">, z.ZodLiteral<"purple">, z.ZodLiteral<"pink">]>;
+export declare const emotionLabelSchema: z.ZodUnion<readonly [z.ZodLiteral<"happy">, z.ZodLiteral<"excited">, z.ZodLiteral<"calm">, z.ZodLiteral<"loved">, z.ZodLiteral<"tired">, z.ZodLiteral<"stressed">, z.ZodLiteral<"anxious">, z.ZodLiteral<"sad">, z.ZodLiteral<"frustrated">, z.ZodLiteral<"content">]>;
+export declare const energyLevelSchema: z.ZodUnion<readonly [z.ZodLiteral<"low">, z.ZodLiteral<"medium">, z.ZodLiteral<"high">]>;
+export declare const checkinV2Schema: z.ZodObject<{
+    moodColor: z.ZodUnion<readonly [z.ZodLiteral<"red">, z.ZodLiteral<"orange">, z.ZodLiteral<"yellow">, z.ZodLiteral<"green">, z.ZodLiteral<"blue">, z.ZodLiteral<"purple">, z.ZodLiteral<"pink">]>;
+    emotionLabel: z.ZodUnion<readonly [z.ZodLiteral<"happy">, z.ZodLiteral<"excited">, z.ZodLiteral<"calm">, z.ZodLiteral<"loved">, z.ZodLiteral<"tired">, z.ZodLiteral<"stressed">, z.ZodLiteral<"anxious">, z.ZodLiteral<"sad">, z.ZodLiteral<"frustrated">, z.ZodLiteral<"content">]>;
+    energyLevel: z.ZodUnion<readonly [z.ZodLiteral<"low">, z.ZodLiteral<"medium">, z.ZodLiteral<"high">]>;
+    note: z.ZodOptional<z.ZodString>;
+}, z.core.$strip>;
 export declare const activityStyleSchema: z.ZodUnion<readonly [z.ZodLiteral<"chill">, z.ZodLiteral<"active">, z.ZodLiteral<"surprise">]>;
 export declare const budgetLevelSchema: z.ZodUnion<readonly [z.ZodLiteral<"low">, z.ZodLiteral<"medium">, z.ZodLiteral<"high">]>;
 export declare const preferencesSchema: z.ZodObject<{
@@ -164,5 +173,27 @@ export declare const savedIdeasResponseSchema: z.ZodObject<{
         notes: z.ZodNullable<z.ZodString>;
         createdAt: z.ZodString;
     }, z.core.$strip>>;
+}, z.core.$strip>;
+export declare const planPayloadSchema: z.ZodObject<{
+    ideaId: z.ZodOptional<z.ZodString>;
+    title: z.ZodString;
+    description: z.ZodOptional<z.ZodString>;
+    placeId: z.ZodOptional<z.ZodString>;
+    address: z.ZodOptional<z.ZodString>;
+    lat: z.ZodOptional<z.ZodNumber>;
+    lng: z.ZodOptional<z.ZodNumber>;
+    websiteUrl: z.ZodOptional<z.ZodString>;
+    phoneNumber: z.ZodOptional<z.ZodString>;
+    priceLevel: z.ZodOptional<z.ZodNumber>;
+    scheduledDate: z.ZodOptional<z.ZodString>;
+    notes: z.ZodOptional<z.ZodString>;
+}, z.core.$strip>;
+export declare const calendarEventPayloadSchema: z.ZodObject<{
+    title: z.ZodString;
+    description: z.ZodOptional<z.ZodString>;
+    location: z.ZodOptional<z.ZodString>;
+    startDate: z.ZodString;
+    endDate: z.ZodOptional<z.ZodString>;
+    allDay: z.ZodOptional<z.ZodBoolean>;
 }, z.core.$strip>;
 //# sourceMappingURL=schemas.d.ts.map

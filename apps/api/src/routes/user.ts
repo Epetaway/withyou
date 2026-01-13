@@ -89,7 +89,7 @@ router.post("/user/setup", jwtMiddleware, async (req: AuthenticatedRequest, res,
       return next(new AppError("Unauthorized", 401, "UNAUTHORIZED"));
     }
     
-    const payload = profileSetupSchema.parse(req.body);
+    const _payload = profileSetupSchema.parse(req.body);
 
     // Update user setup completion
     await prisma.user.update({

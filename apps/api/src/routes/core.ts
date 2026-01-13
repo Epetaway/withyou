@@ -351,4 +351,194 @@ router.get("/ideas", jwtMiddleware, async (req: AuthedRequest, res, next) => {
   }
 });
 
+// Mood Ring v2 Endpoints
+
+// POST /checkins/v2 - Create a mood ring v2 check-in
+router.post("/checkins/v2", jwtMiddleware, async (req: AuthedRequest, res, next) => {
+  try {
+    const userId = req.user?.userId;
+    if (!userId) {
+      return next(new AppError("Unauthorized", 401, "UNAUTHORIZED"));
+    }
+
+    const { checkinV2Schema } = await import("@withyou/shared");
+    const parsed = checkinV2Schema.safeParse(req.body);
+    if (!parsed.success) {
+      return next(new AppError("Invalid input", 400, "VALIDATION_ERROR", parsed.error.issues));
+    }
+
+    const { moodColor, emotionLabel, energyLevel, note } = parsed.data;
+
+    // Get relationship if paired
+    const relationship = await prisma.relationship.findFirst({
+      where: {
+        OR: [{ userAId: userId }, { userBId: userId }],
+        status: "active",
+      },
+    });
+
+    const checkin = await prisma.checkin.create({
+      data: {
+        userId,
+        relationshipId: relationship?.id ?? null,
+        moodLevel: 3, // Default for backwards compatibility
+        moodColor,
+        emotionLabel,
+        energyLevel: energyLevel === "low" ? 1 : energyLevel === "high" ? 3 : 2,
+        note: note || null,
+        shared: false,
+      },
+    });
+
+    res.json({
+      id: checkin.id,
+      moodColor: checkin.moodColor,
+      emotionLabel: checkin.emotionLabel,
+      energyLevel: checkin.energyLevel === 1 ? "low" : checkin.energyLevel === 3 ? "high" : "medium",
+      note: checkin.note,
+      createdAt: checkin.createdAt.toISOString(),
+      revealed: false,
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+
+// GET /checkins/today - Get today's check-ins with reveal logic
+router.get("/checkins/today", jwtMiddleware, async (req: AuthedRequest, res, next) => {
+  try {
+    const userId = req.user?.userId;
+    if (!userId) {
+      return next(new AppError("Unauthorized", 401, "UNAUTHORIZED"));
+    }
+
+    // Get relationship if paired
+    const relationship = await prisma.relationship.findFirst({
+      where: {
+        OR: [{ userAId: userId }, { userBId: userId }],
+        status: "active",
+      },
+    });
+
+    // Get today's date range
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const tomorrow = new Date(today);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+
+    // Get user's check-in for today
+    const userCheckin = await prisma.checkin.findFirst({
+      where: {
+        userId,
+        createdAt: {
+          gte: today,
+          lt: tomorrow,
+        },
+        moodColor: {
+          not: null,
+        },
+      },
+      orderBy: { createdAt: "desc" },
+    });
+
+    let partnerCheckin = null;
+    let gradient = null;
+
+    if (relationship) {
+      const partnerId = relationship.userAId === userId ? relationship.userBId : relationship.userAId;
+      
+      // Get partner's check-in for today
+      partnerCheckin = await prisma.checkin.findFirst({
+        where: {
+          userId: partnerId,
+          createdAt: {
+            gte: today,
+            lt: tomorrow,
+          },
+          moodColor: {
+            not: null,
+          },
+        },
+        orderBy: { createdAt: "desc" },
+      });
+
+      // Reveal only if both have checked in
+      if (userCheckin && partnerCheckin) {
+        gradient = {
+          colors: [userCheckin.moodColor, partnerCheckin.moodColor] as [string, string],
+          insight: getMoodGradientInsight(userCheckin.moodColor!, partnerCheckin.moodColor!),
+          tips: getMoodGradientTips(userCheckin.moodColor!, partnerCheckin.moodColor!),
+        };
+      }
+    }
+
+    const formatCheckin = (checkin: typeof userCheckin) => {
+      if (!checkin) return null;
+      return {
+        id: checkin.id,
+        moodColor: checkin.moodColor!,
+        emotionLabel: checkin.emotionLabel!,
+        energyLevel: checkin.energyLevel === 1 ? "low" as const : checkin.energyLevel === 3 ? "high" as const : "medium" as const,
+        note: checkin.note,
+        createdAt: checkin.createdAt.toISOString(),
+        revealed: !!(userCheckin && partnerCheckin),
+      };
+    };
+
+    res.json({
+      userCheckin: formatCheckin(userCheckin),
+      partnerCheckin: userCheckin && partnerCheckin ? formatCheckin(partnerCheckin) : null,
+      gradient,
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+
+// Helper functions for mood gradient insights
+function getMoodGradientInsight(color1: string, color2: string): string {
+  const insights: Record<string, string> = {
+    "red-red": "Both feeling intense - you're on the same wavelength",
+    "red-blue": "Contrasting energies - one fiery, one calm",
+    "red-green": "Mixed signals - communicate what you need",
+    "blue-blue": "Peaceful harmony - enjoy the calm together",
+    "blue-yellow": "Gentle contrast - balance and support each other",
+    "green-green": "Grounded together - steady and balanced",
+    "yellow-yellow": "Bright and optimistic - celebrate together",
+    "purple-purple": "Creative and reflective - deep connection",
+    "pink-pink": "Loving and tender - sweet connection",
+    "orange-orange": "Energized together - enthusiastic vibes",
+  };
+
+  const key = [color1, color2].sort().join("-");
+  return insights[key] || "Unique blend - explore what this means for you both";
+}
+
+function getMoodGradientTips(color1: string, color2: string): string[] {
+  const energyMap: Record<string, number> = {
+    red: 5, orange: 4, yellow: 3, green: 3, blue: 2, purple: 3, pink: 3,
+  };
+
+  const energy1 = energyMap[color1] || 3;
+  const energy2 = energyMap[color2] || 3;
+  const avgEnergy = (energy1 + energy2) / 2;
+
+  if (avgEnergy >= 4) {
+    return [
+      "Channel this energy into a fun activity together",
+      "Go for a walk or try something new",
+    ];
+  } else if (avgEnergy <= 2) {
+    return [
+      "Rest together - movie night or quiet time",
+      "Be gentle with yourselves and each other",
+    ];
+  } else {
+    return [
+      "Find balance - one active, one restful activity",
+      "Check in about what each of you needs",
+    ];
+  }
+}
+
 export default router;

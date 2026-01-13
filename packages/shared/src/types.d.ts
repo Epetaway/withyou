@@ -75,6 +75,33 @@ export type CheckinCreateResponse = {
     checkinId: UUID;
     createdAt: string;
 };
+export type MoodColor = "red" | "orange" | "yellow" | "green" | "blue" | "purple" | "pink";
+export type EmotionLabel = "happy" | "excited" | "calm" | "loved" | "tired" | "stressed" | "anxious" | "sad" | "frustrated" | "content";
+export type EnergyLevel = "low" | "medium" | "high";
+export type CheckinV2Payload = {
+    moodColor: MoodColor;
+    emotionLabel: EmotionLabel;
+    energyLevel: EnergyLevel;
+    note?: string;
+};
+export type CheckinV2Response = {
+    id: UUID;
+    moodColor: MoodColor;
+    emotionLabel: EmotionLabel;
+    energyLevel: EnergyLevel;
+    note?: string;
+    createdAt: string;
+    revealed: boolean;
+};
+export type CheckinTodayResponse = {
+    userCheckin: CheckinV2Response | null;
+    partnerCheckin: CheckinV2Response | null;
+    gradient?: {
+        colors: [MoodColor, MoodColor];
+        insight: string;
+        tips: string[];
+    };
+};
 export type DashboardResponse = {
     relationshipStage: RelationshipStage | null;
     partnerLastCheckIn: null | {
@@ -156,5 +183,57 @@ export type Activity = {
 export type ActivitiesResponse = {
     activities: Activity[];
     count: number;
+};
+export type Plan = {
+    id: UUID;
+    userId: UUID;
+    relationshipId?: UUID;
+    ideaId?: UUID;
+    title: string;
+    description?: string;
+    placeId?: string;
+    address?: string;
+    lat?: number;
+    lng?: number;
+    websiteUrl?: string;
+    phoneNumber?: string;
+    priceLevel?: number;
+    scheduledDate?: string;
+    notes?: string;
+    createdAt: string;
+    updatedAt: string;
+};
+export type PlanPayload = {
+    ideaId?: UUID;
+    title: string;
+    description?: string;
+    placeId?: string;
+    address?: string;
+    lat?: number;
+    lng?: number;
+    websiteUrl?: string;
+    phoneNumber?: string;
+    priceLevel?: number;
+    scheduledDate?: string;
+    notes?: string;
+};
+export type PlanResponse = {
+    plan: Plan;
+};
+export type PlansListResponse = {
+    plans: Plan[];
+    count: number;
+};
+export type CalendarEventPayload = {
+    title: string;
+    description?: string;
+    location?: string;
+    startDate: string;
+    endDate?: string;
+    allDay?: boolean;
+};
+export type CalendarEventResponse = {
+    success: boolean;
+    icsUrl?: string;
 };
 //# sourceMappingURL=types.d.ts.map

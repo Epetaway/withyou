@@ -3,7 +3,7 @@ import { View, StyleSheet, Pressable } from "react-native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { FontAwesome6 } from "@expo/vector-icons";
 import { DashboardScreen } from "../screens/paired/DashboardScreen";
-import { CheckInScreen } from "../screens/paired/CheckInScreen";
+import { CheckInV2Screen } from "../screens/paired/CheckInV2Screen";
 import { PreferencesScreen } from "../screens/paired/PreferencesScreen";
 import { LocalMapScreen } from "../screens/paired/LocalMapScreen";
 import { IdeasNavigator } from "./IdeasNavigator";
@@ -65,7 +65,7 @@ export function PairedTabs() {
 
   const navigationConfig: Record<string, React.ComponentType<Record<string, unknown>>> = {
     Dashboard: DashboardScreen,
-    CheckIn: CheckInScreen,
+    CheckIn: CheckInV2Screen,
     Ideas: IdeasNavigator,
     Preferences: PreferencesScreen,
     Settings: SettingsScreen,

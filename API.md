@@ -603,6 +603,111 @@ POST /checkins
 }
 ```
 
+### Create Check-in v2 ✨ NEW
+
+Create a rich emotional check-in with mood color, emotion label, and energy level.
+
+```http
+POST /checkins/v2
+```
+
+**Auth Required**: Yes
+
+**Request Body**:
+
+```json
+{
+  "moodColor": "blue",
+  "emotionLabel": "calm",
+  "energyLevel": "medium",
+  "note": "Feeling peaceful after a good weekend"
+}
+```
+
+**Validation**:
+
+- `moodColor`: "red" | "orange" | "yellow" | "green" | "blue" | "purple" | "pink"
+- `emotionLabel`: "happy" | "excited" | "calm" | "loved" | "tired" | "stressed" | "anxious" | "sad" | "frustrated" | "content"
+- `energyLevel`: "low" | "medium" | "high"
+- `note`: Optional, max 500 characters
+
+**Response (200 OK)**:
+
+```json
+{
+  "id": "770e8400-e29b-41d4-a716-446655440003",
+  "moodColor": "blue",
+  "emotionLabel": "calm",
+  "energyLevel": "medium",
+  "note": "Feeling peaceful after a good weekend",
+  "createdAt": "2024-01-01T12:00:00Z",
+  "revealed": false
+}
+```
+
+### Get Today's Check-ins ✨ NEW
+
+Get today's check-ins with reveal logic. Partner's check-in is only visible after both have checked in.
+
+```http
+GET /checkins/today
+```
+
+**Auth Required**: Yes
+
+**Response (200 OK)**:
+
+When both partners have checked in:
+
+```json
+{
+  "userCheckin": {
+    "id": "770e8400-e29b-41d4-a716-446655440003",
+    "moodColor": "blue",
+    "emotionLabel": "calm",
+    "energyLevel": "medium",
+    "note": "Feeling peaceful",
+    "createdAt": "2024-01-01T12:00:00Z",
+    "revealed": true
+  },
+  "partnerCheckin": {
+    "id": "880e8400-e29b-41d4-a716-446655440004",
+    "moodColor": "yellow",
+    "emotionLabel": "happy",
+    "energyLevel": "high",
+    "note": "Great day!",
+    "createdAt": "2024-01-01T11:30:00Z",
+    "revealed": true
+  },
+  "gradient": {
+    "colors": ["blue", "yellow"],
+    "insight": "Gentle contrast - balance and support each other",
+    "tips": [
+      "Find balance - one active, one restful activity",
+      "Check in about what each of you needs"
+    ]
+  }
+}
+```
+
+When only one partner has checked in:
+
+```json
+{
+  "userCheckin": {
+    "id": "770e8400-e29b-41d4-a716-446655440003",
+    "moodColor": "blue",
+    "emotionLabel": "calm",
+    "energyLevel": "medium",
+    "note": "Feeling peaceful",
+    "createdAt": "2024-01-01T12:00:00Z",
+    "revealed": false
+  },
+  "partnerCheckin": null,
+  "gradient": null
+}
+```
+
 ### Set Preferences
 
 Update your preferences (activity style, food, budget, energy).
@@ -769,4 +874,180 @@ curl -X POST http://localhost:3000/checkins \
 # 7. User A gets ideas
 curl -X GET "http://localhost:3000/ideas" \
   -H "Authorization: Bearer $TOKEN_A"
+```
+
+---
+
+## Plans ✨ NEW
+
+Manage saved date plans with calendar export.
+
+### Create Plan
+
+Save a new date plan.
+
+```http
+POST /plans
+```
+
+**Auth Required**: Yes
+
+**Request Body**:
+
+```json
+{
+  "title": "Dinner at The Italian Place",
+  "description": "Try their pasta special",
+  "address": "123 Main St, Seattle, WA 98101",
+  "placeId": "ChIJrTLr-GyuEmsRBfy61i59si0",
+  "lat": 47.6062,
+  "lng": -122.3321,
+  "websiteUrl": "https://example.com",
+  "phoneNumber": "(206) 555-1234",
+  "priceLevel": 2,
+  "scheduledDate": "2026-01-20T19:00:00Z",
+  "notes": "Make reservation for 7pm"
+}
+```
+
+**Validation**:
+
+- `title`: Required, max 200 characters
+- `description`: Optional, max 1000 characters
+- `address`: Optional, max 500 characters
+- `placeId`: Optional Google Places ID
+- `lat`, `lng`: Optional coordinates
+- `websiteUrl`: Optional valid URL
+- `phoneNumber`: Optional, max 50 characters
+- `priceLevel`: Optional integer 0-4
+- `scheduledDate`: Optional ISO 8601 datetime
+- `notes`: Optional, max 1000 characters
+- `ideaId`: Optional reference to an Idea
+
+**Response (200 OK)**:
+
+```json
+{
+  "plan": {
+    "id": "990e8400-e29b-41d4-a716-446655440005",
+    "userId": "550e8400-e29b-41d4-a716-446655440000",
+    "relationshipId": "660e8400-e29b-41d4-a716-446655440001",
+    "title": "Dinner at The Italian Place",
+    "description": "Try their pasta special",
+    "address": "123 Main St, Seattle, WA 98101",
+    "placeId": "ChIJrTLr-GyuEmsRBfy61i59si0",
+    "lat": 47.6062,
+    "lng": -122.3321,
+    "websiteUrl": "https://example.com",
+    "phoneNumber": "(206) 555-1234",
+    "priceLevel": 2,
+    "scheduledDate": "2026-01-20T19:00:00Z",
+    "notes": "Make reservation for 7pm",
+    "createdAt": "2026-01-13T14:00:00Z",
+    "updatedAt": "2026-01-13T14:00:00Z"
+  }
+}
+```
+
+### List Plans
+
+Get all saved plans for the current user/relationship.
+
+```http
+GET /plans
+```
+
+**Auth Required**: Yes
+
+**Response (200 OK)**:
+
+```json
+{
+  "plans": [
+    {
+      "id": "990e8400-e29b-41d4-a716-446655440005",
+      "userId": "550e8400-e29b-41d4-a716-446655440000",
+      "relationshipId": "660e8400-e29b-41d4-a716-446655440001",
+      "title": "Dinner at The Italian Place",
+      "description": "Try their pasta special",
+      "scheduledDate": "2026-01-20T19:00:00Z",
+      "createdAt": "2026-01-13T14:00:00Z",
+      "updatedAt": "2026-01-13T14:00:00Z"
+    }
+  ],
+  "count": 1
+}
+```
+
+### Export to Calendar
+
+Generate a calendar event in ICS format for download.
+
+```http
+POST /calendar/event
+```
+
+**Auth Required**: Yes
+
+**Request Body**:
+
+```json
+{
+  "title": "Date Night - Italian Restaurant",
+  "description": "Dinner at The Italian Place",
+  "location": "123 Main St, Seattle, WA 98101",
+  "startDate": "2026-01-20T19:00:00Z",
+  "endDate": "2026-01-20T21:00:00Z",
+  "allDay": false
+}
+```
+
+**Validation**:
+
+- `title`: Required, max 200 characters
+- `description`: Optional, max 1000 characters
+- `location`: Optional, max 500 characters
+- `startDate`: Required ISO 8601 datetime
+- `endDate`: Optional ISO 8601 datetime (defaults to 1 hour after start)
+- `allDay`: Optional boolean (defaults to false)
+
+**Response (200 OK)**:
+
+Returns an `.ics` file download with `Content-Type: text/calendar`.
+
+Compatible with:
+- Google Calendar
+- Apple Calendar
+- Microsoft Outlook
+- Most calendar applications
+
+---
+
+## Example Workflows (Updated)
+
+See existing examples above, plus:
+
+```bash
+# Create a mood ring v2 check-in
+curl -X POST http://localhost:3000/checkins/v2 \
+  -H "Authorization: Bearer $TOKEN_A" \
+  -H "Content-Type: application/json" \
+  -d '{"moodColor":"blue","emotionLabel":"calm","energyLevel":"medium","note":"Peaceful weekend"}'
+
+# Get today's check-ins with gradient
+curl -X GET http://localhost:3000/checkins/today \
+  -H "Authorization: Bearer $TOKEN_A"
+
+# Create a plan
+curl -X POST http://localhost:3000/plans \
+  -H "Authorization: Bearer $TOKEN_A" \
+  -H "Content-Type: application/json" \
+  -d '{"title":"Dinner Date","scheduledDate":"2026-01-20T19:00:00Z","address":"123 Main St"}'
+
+# Export to calendar
+curl -X POST http://localhost:3000/calendar/event \
+  -H "Authorization: Bearer $TOKEN_A" \
+  -H "Content-Type: application/json" \
+  -d '{"title":"Date Night","startDate":"2026-01-20T19:00:00Z","endDate":"2026-01-20T21:00:00Z","location":"123 Main St"}' \
+  --output date-night.ics
 ```

@@ -35,6 +35,18 @@ export type {
 	ActivityFilters,
 	Activity,
 	ActivitiesResponse,
+	MoodColor,
+	EmotionLabel,
+	EnergyLevel,
+	CheckinV2Payload,
+	CheckinV2Response,
+	CheckinTodayResponse,
+	Plan,
+	PlanPayload,
+	PlanResponse,
+	PlansListResponse,
+	CalendarEventPayload,
+	CalendarEventResponse,
 } from "./types.js";
 
 export {
@@ -75,6 +87,12 @@ export {
 	ideaMetadataHomeSchema,
 	ideaResponseSchema,
 	savedIdeasResponseSchema,
+	moodColorSchema,
+	emotionLabelSchema,
+	energyLevelSchema,
+	checkinV2Schema,
+	planPayloadSchema,
+	calendarEventPayloadSchema,
 } from "./schemas.js";
 
 export { CONTENT } from "./content.js";

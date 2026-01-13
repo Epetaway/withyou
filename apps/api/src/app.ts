@@ -9,6 +9,7 @@ import coreRouter from './routes/core.js';
 import ideasRouter from './routes/ideas.js';
 import activitiesRouter from './routes/activities.js';
 import userRouter from './routes/user.js';
+import plansRouter from './routes/plans.js';
 import { errorHandler } from './middleware/error-handler.js';
 import { generalLimiter, authLimiter, inviteLimiter } from './middleware/rate-limit.js';
 
@@ -47,6 +48,8 @@ app.use(relationshipRouter);
 app.use('/ideas', ideasRouter);
 
 app.use(activitiesRouter);
+
+app.use('/plans', plansRouter);
 
 app.use(coreRouter);
 
