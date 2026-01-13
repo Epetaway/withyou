@@ -200,12 +200,7 @@ export function DashboardScreen({ navigation }: DashboardScreenProps) {
 
       {/* Mood board */}
       <View style={[styles.section, styles.moodBoard]}>
-        <View style={styles.sectionHeader}>
-          <Text variant="sectionLabel" style={{ color: theme.colors.textSecondary, textTransform: "uppercase", letterSpacing: 0.5 }}>MOOD BOARD</Text>
-          <Text variant="helper" style={{ color: theme.colors.textSecondary }}>
-            Updated after both check-ins
-          </Text>
-        </View>
+        <Text variant="sectionLabel" style={{ color: theme.colors.textSecondary, textTransform: "uppercase", letterSpacing: 0.5, marginBottom: 12 }}>MOOD BOARD</Text>
 
         <View style={styles.moodPairRow}>
           <View style={styles.moodPill}>
@@ -279,14 +274,14 @@ export function DashboardScreen({ navigation }: DashboardScreenProps) {
       {/* Notes Section */}
       <View style={styles.section}>
         <View style={styles.sectionHeader}>
-          <Text variant="sectionLabel" style={{ color: theme.colors.textSecondary, textTransform: "uppercase", letterSpacing: 0.5 }}>PRIVATE NOTES</Text>
+          <Text variant="sectionLabel" style={{ color: theme.colors.textSecondary, textTransform: "uppercase", letterSpacing: 0.5 }}>Private Notes</Text>
           <Pressable>
             <Text variant="helper" style={{ color: theme.colors.primary }}>View all</Text>
           </Pressable>
         </View>
 
         {/* Notes feed - Card Grid */}
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.notesScroll}>
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 12 }}>
           {/* Add note card */}
           <Pressable 
             style={[styles.noteCard, styles.addNoteCard, { borderColor: theme.colors.border }]}
@@ -296,7 +291,7 @@ export function DashboardScreen({ navigation }: DashboardScreenProps) {
               setNoteMediaUrl("");
             }}
           >
-            <FontAwesome6 name="question" size={32} color={theme.colors.primary} weight="light" />
+            <FontAwesome6 name="plus" size={32} color={theme.colors.primary} weight="light" />
             <Text style={[styles.addNoteText, { color: theme.colors.text }]}>Send a note</Text>
           </Pressable>
 
@@ -329,7 +324,7 @@ export function DashboardScreen({ navigation }: DashboardScreenProps) {
       {/* Ideas Section */}
       <View style={styles.section}>
         <View style={styles.sectionHeader}>
-          <Text variant="sectionLabel" style={{ color: theme.colors.textSecondary, textTransform: "uppercase", letterSpacing: 0.5 }}>IDEAS</Text>
+          <Text variant="sectionLabel" style={{ color: theme.colors.textSecondary, textTransform: "uppercase", letterSpacing: 0.5 }}>Things to do</Text>
           <Pressable onPress={() => (navigation as Record<string, unknown>)?.navigate?.("Ideas")}>
             <Text variant="helper" style={{ color: theme.colors.primary }}>View all</Text>
           </Pressable>
@@ -374,13 +369,13 @@ const styles = StyleSheet.create({
     marginBottom: 24,
   },
   section: {
-    marginBottom: 24,
-    gap: 12,
+    marginBottom: 32,
   },
   sectionHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+    marginBottom: 16,
   },
   viewAll: {
     fontSize: 14,
@@ -431,11 +426,12 @@ const styles = StyleSheet.create({
     borderColor: '#FFFFFF',
   },
   moodBoard: {
-    gap: 12,
+    marginBottom: 32,
   },
   moodPairRow: {
     flexDirection: 'row',
     gap: 12,
+    marginBottom: 12,
   },
   moodPill: {
     flex: 1,
@@ -456,6 +452,7 @@ const styles = StyleSheet.create({
   blendBar: {
     height: 12,
     borderRadius: 999,
+    marginBottom: 12,
   },
   tipCard: {
     flexDirection: 'row',
@@ -480,6 +477,7 @@ const styles = StyleSheet.create({
   actionRow: {
     flexDirection: 'row',
     gap: 12,
+    marginBottom: 32,
   },
   actionButton: {
     flex: 1,
@@ -493,10 +491,6 @@ const styles = StyleSheet.create({
   actionText: {
     fontSize: 14,
     fontWeight: '600',
-  },
-  notesScroll: {
-    gap: 12,
-    paddingVertical: 4,
   },
   noteCard: {
     width: 160,

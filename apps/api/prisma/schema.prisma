@@ -57,6 +57,30 @@ enum NoteType {
   VIDEO
 }
 
+enum MoodState {
+  energetic
+  calm
+  playful
+  romantic
+  adventurous
+  relaxed
+  stressed
+  happy
+}
+
+enum TimeOfDay {
+  morning
+  afternoon
+  evening
+  night
+}
+
+enum WeatherPreference {
+  indoor
+  outdoor
+  any
+}
+
 model User {
   id           String      @id @default(cuid())
   email        String      @unique
@@ -72,6 +96,8 @@ model User {
   savedIdeas   SavedIdea[]
   ideaRequests IdeaRequest[]
   notes        Note[]
+  moodCheckins MoodCheckin[]
+  activityPreferences ActivityPreferences?
 }
 
 model Relationship {
@@ -202,4 +228,32 @@ model IdeaRequest {
 
   @@index([userId])
   @@index([type])
+}
+
+model MoodCheckin {
+  id              String        @id @default(cuid())
+  userId          String
+  moodState       MoodState
+  createdAt       DateTime      @default(now())
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@index([userId, createdAt])
+}
+
+model ActivityPreferences {
+  id                  String        @id @default(cuid())
+  userId              String        @unique
+  interests           String[]      @default([])
+  dietaryRestrictions String[]      @default([])
+  hasChildren         Boolean       @default(false)
+  accessibilityNeeds  String[]      @default([])
+  budgetLevel         BudgetLevel   @default(medium)
+  maxDistance         Int           @default(10)
+  preferredTimeOfDay  TimeOfDay[]   @default([])
+  weatherPreference   WeatherPreference @default(any)
+  createdAt           DateTime      @default(now())
+  updatedAt           DateTime      @updatedAt
+
+  user User @relation(fields: [userId], references: [id])
 }

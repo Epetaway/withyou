@@ -7,6 +7,7 @@ import authRouter from './routes/auth.js';
 import relationshipRouter from './routes/relationship.js';
 import coreRouter from './routes/core.js';
 import ideasRouter from './routes/ideas.js';
+import activitiesRouter from './routes/activities.js';
 import { errorHandler } from './middleware/error-handler.js';
 import { generalLimiter, authLimiter, inviteLimiter } from './middleware/rate-limit.js';
 
@@ -40,6 +41,8 @@ app.use('/relationship/invite', inviteLimiter);
 app.use(relationshipRouter);
 
 app.use('/ideas', ideasRouter);
+
+app.use(activitiesRouter);
 
 app.use(coreRouter);
 

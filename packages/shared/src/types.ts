@@ -8,6 +8,12 @@ export type BudgetLevel = "low" | "medium" | "high";
 
 export type MoodLevel = 1 | 2 | 3 | 4 | 5;
 
+export type MoodState = "energetic" | "calm" | "playful" | "romantic" | "adventurous" | "relaxed" | "stressed" | "happy";
+
+export type TimeOfDay = "morning" | "afternoon" | "evening" | "night";
+
+export type WeatherPreference = "indoor" | "outdoor" | "any";
+
 export type NoteType = "TEXT" | "VOICE" | "VIDEO";
 
 export type Note = {
@@ -81,4 +87,71 @@ export type IdeasResponse = {
 export type SavedIdeaResponse = {
   id: UUID;
   createdAt: string;
+};
+
+export type MoodCheckinPayload = {
+  moodState: MoodState;
+};
+
+export type MoodCheckinResponse = {
+  id: UUID;
+  moodState: MoodState;
+  createdAt: string;
+};
+
+export type ActivityPreferences = {
+  id: UUID;
+  interests: string[];
+  dietaryRestrictions: string[];
+  hasChildren: boolean;
+  accessibilityNeeds: string[];
+  budgetLevel: BudgetLevel;
+  maxDistance: number;
+  preferredTimeOfDay: TimeOfDay[];
+  weatherPreference: WeatherPreference;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type ActivityPreferencesPayload = {
+  interests?: string[];
+  dietaryRestrictions?: string[];
+  hasChildren?: boolean;
+  accessibilityNeeds?: string[];
+  budgetLevel?: BudgetLevel;
+  maxDistance?: number;
+  preferredTimeOfDay?: TimeOfDay[];
+  weatherPreference?: WeatherPreference;
+};
+
+export type ActivityFilters = {
+  distance?: number;
+  priceLevel?: BudgetLevel;
+  timeOfDay?: TimeOfDay;
+  weatherPreference?: WeatherPreference;
+  familyFriendly?: boolean;
+  accessible?: boolean;
+  interests?: string[];
+};
+
+export type Activity = {
+  id: string;
+  title: string;
+  description: string;
+  category: string;
+  imageUrl?: string;
+  address?: string;
+  distance?: number;
+  priceLevel: BudgetLevel;
+  rating?: number;
+  tags: string[];
+  isFamilyFriendly: boolean;
+  isAccessible: boolean;
+  hours?: string;
+  bookingUrl?: string;
+};
+
+export type ActivitiesResponse = {
+  activities: Activity[];
+  count: number;
 };

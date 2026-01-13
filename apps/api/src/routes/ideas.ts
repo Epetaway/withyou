@@ -146,6 +146,33 @@ const curatedMovies = [
 ];
 
 // POST /ideas/query - Get local ideas based on filters
+// Simple scoring for curated local ideas based on filters and distance
+function scoreLocalIdea(params: z.infer<typeof ideasQuerySchema>, idea: typeof curatedLocalIdeas[number]) {
+  let score = 0;
+  const radius = params.radiusMiles ?? 10;
+
+  // Prefer within radius; farther distances reduce score
+  const dist = idea.metadata.distanceMiles ?? radius;
+  const distanceFactor = Math.max(0, radius - dist);
+  score += distanceFactor; // closer -> higher score
+
+  const filters = (params.filters ?? []).map((f) => f.toLowerCase());
+
+  // Category affinity based on simple filters
+  if (filters.includes("outdoors") && idea.category.toLowerCase() === "outdoor") score += 5;
+  if (filters.includes("entertainment") && idea.category.toLowerCase() === "entertainment") score += 5;
+  if (filters.includes("food") && idea.category.toLowerCase() === "food") score += 3; // none in curated currently
+  if (filters.includes("lowcost")) {
+    const price = idea.metadata.priceLevel ?? 2;
+    if (price <= 1) score += 4; else score -= 2;
+  }
+
+  // Light boost for website presence
+  if (idea.metadata.websiteUrl) score += 1;
+
+  return score;
+}
+
 router.post("/query", jwtMiddleware, async (req: AuthedRequest, res, next) => {
   try {
     const userId = req.user?.userId;
@@ -175,9 +202,37 @@ router.post("/query", jwtMiddleware, async (req: AuthedRequest, res, next) => {
       });
     }
 
-    // Return curated local ideas for now (mock)
+    // Return curated local ideas with filtering and ranking (mock)
     if (params.type === "LOCAL") {
-      const ideas = curatedLocalIdeas.map((idea) => ({
+      const radius = params.radiusMiles ?? 10;
+      const filters = (params.filters ?? []).map((f) => f.toLowerCase());
+
+      const filtered = curatedLocalIdeas.filter((idea) => {
+        const dist = idea.metadata.distanceMiles ?? Infinity;
+        const withinRadius = isFinite(dist) ? dist <= radius : true;
+        // Basic category matching if filters supplied
+        const hasFilter = filters.length === 0
+          ? true
+          : (
+              (filters.includes("outdoors") && idea.category.toLowerCase() === "outdoor") ||
+              (filters.includes("entertainment") && idea.category.toLowerCase() === "entertainment") ||
+              (filters.includes("food") && idea.category.toLowerCase() === "food") ||
+              (filters.includes("lowcost") && (idea.metadata.priceLevel ?? 2) <= 1)
+            );
+        return withinRadius && hasFilter;
+      });
+
+      const ranked = filtered
+        .map((idea) => ({ idea, score: scoreLocalIdea(params, idea) }))
+        .sort((a, b) => {
+          if (b.score !== a.score) return b.score - a.score;
+          const ad = a.idea.metadata.distanceMiles ?? Infinity;
+          const bd = b.idea.metadata.distanceMiles ?? Infinity;
+          return ad - bd; // tie-breaker: closer first
+        })
+        .map(({ idea }) => idea);
+
+      const ideas = ranked.map((idea) => ({
         id: idea.title.replace(/\s+/g, "-").toLowerCase(),
         type: idea.type,
         title: idea.title,

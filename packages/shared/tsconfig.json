@@ -6,6 +6,7 @@
     "module": "NodeNext",
     "moduleResolution": "NodeNext",
     "types": [],
+    "declaration": true,
     "emitDeclarationOnly": false
   },
   "include": ["src/**/*"]

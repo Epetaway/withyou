@@ -110,6 +110,55 @@ export const relationshipStageSchema = z.union([
   z.literal("married"),
 ]);
 
+export const moodStateSchema = z.union([
+  z.literal("energetic"),
+  z.literal("calm"),
+  z.literal("playful"),
+  z.literal("romantic"),
+  z.literal("adventurous"),
+  z.literal("relaxed"),
+  z.literal("stressed"),
+  z.literal("happy"),
+]);
+
+export const timeOfDaySchema = z.union([
+  z.literal("morning"),
+  z.literal("afternoon"),
+  z.literal("evening"),
+  z.literal("night"),
+]);
+
+export const weatherPreferenceSchema = z.union([
+  z.literal("indoor"),
+  z.literal("outdoor"),
+  z.literal("any"),
+]);
+
+export const moodCheckinSchema = z.object({
+  moodState: moodStateSchema,
+});
+
+export const activityPreferencesSchema = z.object({
+  interests: z.array(z.string()).optional(),
+  dietaryRestrictions: z.array(z.string()).optional(),
+  hasChildren: z.boolean().optional(),
+  accessibilityNeeds: z.array(z.string()).optional(),
+  budgetLevel: budgetLevelSchema.optional(),
+  maxDistance: z.number().int().positive().optional(),
+  preferredTimeOfDay: z.array(timeOfDaySchema).optional(),
+  weatherPreference: weatherPreferenceSchema.optional(),
+});
+
+export const activityFiltersSchema = z.object({
+  distance: z.number().positive().optional(),
+  priceLevel: budgetLevelSchema.optional(),
+  timeOfDay: timeOfDaySchema.optional(),
+  weatherPreference: weatherPreferenceSchema.optional(),
+  familyFriendly: z.boolean().optional(),
+  accessible: z.boolean().optional(),
+  interests: z.array(z.string()).optional(),
+});
+
 export const apiErrorSchema = z.object({
   error: z.object({
     code: z.string(),

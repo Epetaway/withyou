@@ -8,7 +8,7 @@
   "types": "dist/index.d.ts",
   "files": ["dist"],
   "scripts": {
-    "build": "tsc --module NodeNext --target esnext --declaration --outDir dist --rootDir src src/**/*.ts",
+    "build": "tsc -p tsconfig.json",
     "lint": "eslint ."
   },
   "dependencies": {
