@@ -122,6 +122,280 @@ POST /auth/login
 }
 ```
 
+### Google Sign-In
+
+Authenticate with Google OAuth.
+
+```http
+POST /auth/google
+```
+
+**Request Body**:
+
+```json
+{
+  "provider": "google",
+  "idToken": "eyJhbGciOiJSUzI1NiIsImtpZCI6..." 
+}
+```
+
+**Response (200 OK)**:
+
+```json
+{
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "userId": "550e8400-e29b-41d4-a716-446655440000",
+  "isNewUser": true,
+  "emailVerified": true
+}
+```
+
+**Error (400 Bad Request)**:
+
+```json
+{
+  "error": {
+    "code": "EMAIL_CONFLICT",
+    "message": "Email already registered with different sign-in method",
+    "details": {
+      "email": "This email is already registered. Please use your original sign-in method."
+    }
+  }
+}
+```
+
+### Apple Sign-In
+
+Authenticate with Apple ID.
+
+```http
+POST /auth/apple
+```
+
+**Request Body**:
+
+```json
+{
+  "provider": "apple",
+  "idToken": "eyJraWQiOiJlWGF1bm1MIiwiYWxnIjoiUlMyNTYifQ..."
+}
+```
+
+**Response (200 OK)**:
+
+```json
+{
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "userId": "550e8400-e29b-41d4-a716-446655440000",
+  "isNewUser": false,
+  "emailVerified": true
+}
+```
+
+### Send Email Verification
+
+Send a 6-digit verification code to the user's email.
+
+```http
+POST /auth/verify/send
+```
+
+**Auth Required**: Yes
+
+**Request Body**: Empty JSON object
+
+```json
+{}
+```
+
+**Response (200 OK)**:
+
+```json
+{
+  "message": "Verification code sent",
+  "expiresAt": "2024-01-01T12:15:00Z"
+}
+```
+
+**Error (429 Too Many Requests)**:
+
+```json
+{
+  "error": {
+    "code": "RATE_LIMIT_EXCEEDED",
+    "message": "Too many verification requests. Please try again later.",
+    "details": null
+  }
+}
+```
+
+**Rate Limit**: 3 requests per 15 minutes per user
+
+### Confirm Email Verification
+
+Verify the email with the 6-digit code.
+
+```http
+POST /auth/verify/confirm
+```
+
+**Auth Required**: Yes
+
+**Request Body**:
+
+```json
+{
+  "code": "123456"
+}
+```
+
+**Response (200 OK)**:
+
+```json
+{
+  "message": "Email verified successfully",
+  "verified": true
+}
+```
+
+**Error (400 Bad Request)**:
+
+```json
+{
+  "error": {
+    "code": "INVALID_CODE",
+    "message": "Invalid or expired verification code",
+    "details": null
+  }
+}
+```
+
+### Resend Email Verification
+
+Resend the verification code.
+
+```http
+POST /auth/verify/resend
+```
+
+**Auth Required**: Yes
+
+**Request Body**: Empty JSON object
+
+```json
+{}
+```
+
+**Response (200 OK)**:
+
+```json
+{
+  "message": "Verification code sent",
+  "expiresAt": "2024-01-01T12:15:00Z"
+}
+```
+
+**Rate Limit**: Same as `/auth/verify/send` (3 per 15 minutes)
+
+---
+
+## User Profile
+
+### Get Avatar Upload URL
+
+Get a pre-signed URL for uploading an avatar directly to S3.
+
+```http
+GET /user/avatar/upload-url?fileType=image/jpeg&fileSize=102400
+```
+
+**Auth Required**: Yes
+
+**Query Parameters**:
+- `fileType`: MIME type (image/jpeg, image/png, image/webp)
+- `fileSize`: File size in bytes (max 5MB)
+
+**Response (200 OK)**:
+
+```json
+{
+  "uploadUrl": "https://withyou-avatars.s3.amazonaws.com",
+  "fields": {
+    "key": "avatars/user-id/1234567890.jpg",
+    "policy": "eyJleHBpcmF0aW9uIjo...",
+    "signature": "abcd1234...",
+    "x-amz-algorithm": "AWS4-HMAC-SHA256",
+    "x-amz-credential": "...",
+    "x-amz-date": "20240101T120000Z"
+  },
+  "avatarUrl": "https://cdn.withyou.app/avatars/user-id/1234567890.jpg"
+}
+```
+
+**Usage**: Upload file using multipart/form-data POST to `uploadUrl` with the `fields` as form data, plus your file with key "file".
+
+### Confirm Avatar Upload
+
+Update the user's avatar URL after successful S3 upload.
+
+```http
+POST /user/avatar
+```
+
+**Auth Required**: Yes
+
+**Request Body**:
+
+```json
+{
+  "avatarUrl": "https://cdn.withyou.app/avatars/user-id/1234567890.jpg"
+}
+```
+
+**Response (200 OK)**:
+
+```json
+{
+  "avatarUrl": "https://cdn.withyou.app/avatars/user-id/1234567890.jpg"
+}
+```
+
+### Complete Profile Setup
+
+Mark profile setup as complete (saves setup preferences).
+
+```http
+POST /user/setup
+```
+
+**Auth Required**: Yes
+
+**Request Body**:
+
+```json
+{
+  "nickname": "Johnny",
+  "anniversary": "2023-06-15T00:00:00Z",
+  "goals": ["communication", "quality-time"],
+  "privacySettings": {
+    "shareLocation": true,
+    "shareActivity": false
+  },
+  "notificationTimes": ["09:00", "21:00"]
+}
+```
+
+All fields are optional.
+
+**Response (200 OK)**:
+
+```json
+{
+  "message": "Profile setup completed",
+  "setupCompleted": true
+}
+```
+
 ---
 
 ## Relationship Pairing
@@ -148,7 +422,7 @@ POST /relationship/invite
 {
   "code": "a1b2c3",
   "expiresAt": "2024-01-08T12:00:00Z",
-  "link": "https://withyou.app/invite/a1b2c3"
+  "deepLink": "https://withyou.app/join/a1b2c3"
 }
 ```
 
