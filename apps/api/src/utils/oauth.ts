@@ -2,7 +2,17 @@ import { OAuth2Client } from 'google-auth-library';
 import appleSignin from 'apple-signin-auth';
 import { env } from '../config/env.js';
 
-const googleClient = new OAuth2Client(env.googleClientId);
+let googleClient: OAuth2Client | null = null;
+
+function getGoogleClient(): OAuth2Client {
+  if (!googleClient && env.googleClientId) {
+    googleClient = new OAuth2Client(env.googleClientId);
+  }
+  if (!googleClient) {
+    throw new Error('Google OAuth is not configured');
+  }
+  return googleClient;
+}
 
 export interface OAuthUserInfo {
   email: string;
@@ -13,11 +23,9 @@ export interface OAuthUserInfo {
 }
 
 export async function verifyGoogleToken(idToken: string): Promise<OAuthUserInfo> {
-  if (!env.googleClientId) {
-    throw new Error('Google OAuth is not configured');
-  }
+  const client = getGoogleClient();
 
-  const ticket = await googleClient.verifyIdToken({
+  const ticket = await client.verifyIdToken({
     idToken,
     audience: env.googleClientId,
   });

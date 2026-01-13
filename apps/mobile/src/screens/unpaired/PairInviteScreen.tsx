@@ -37,12 +37,20 @@ export function PairInviteScreen({ navigation }: PairInviteScreenProps) {
 
   const copyLink = async () => {
     if (!deepLink) return;
-    await Clipboard.setStringAsync(deepLink);
+    try {
+      await Clipboard.setStringAsync(deepLink);
+    } catch (error) {
+      console.error("Clipboard error:", error);
+    }
   };
 
   const copyCode = async () => {
     if (!inviteCode) return;
-    await Clipboard.setStringAsync(inviteCode);
+    try {
+      await Clipboard.setStringAsync(inviteCode);
+    } catch (error) {
+      console.error("Clipboard error:", error);
+    }
   };
 
   const shareLink = async () => {

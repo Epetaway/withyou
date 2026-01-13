@@ -1,4 +1,5 @@
 import { SESClient, SendEmailCommand } from '@aws-sdk/client-ses';
+import { randomInt } from 'crypto';
 import { env } from '../config/env.js';
 
 let sesClient: SESClient | null = null;
@@ -21,7 +22,8 @@ function getSESClient(): SESClient {
 }
 
 export function generateVerificationCode(): string {
-  return Math.floor(100000 + Math.random() * 900000).toString();
+  // Use cryptographically secure random number generation
+  return randomInt(100000, 1000000).toString();
 }
 
 export async function sendVerificationEmail(email: string, code: string): Promise<void> {

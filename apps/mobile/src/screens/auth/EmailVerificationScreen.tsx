@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { View, StyleSheet, Pressable } from "react-native";
 import { Screen } from "../../ui/components/Screen";
 import { Text } from "../../ui/components/Text";
@@ -72,21 +72,21 @@ export function EmailVerificationScreen({ navigation, route }: EmailVerification
     }
   };
 
-  const handleVerify = async () => {
+  const handleVerify = useCallback(async () => {
     setError(null);
     try {
       await verifyCode();
     } catch (err) {
       setError("Invalid or expired code. Please try again.");
     }
-  };
+  }, [verifyCode]);
 
   // Auto-submit when 6 digits entered
   useEffect(() => {
     if (code.length === 6 && !verifying) {
       handleVerify();
     }
-  }, [code]);
+  }, [code, verifying, handleVerify]);
 
   return (
     <Screen scrollable>
