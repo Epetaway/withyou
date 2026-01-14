@@ -60,14 +60,9 @@ export function IdeasScreen({ navigation }: { navigation: Navigation }) {
 
           <View style={styles.actionsRow}>
             <Button
-              label="See local ideas"
-              onPress={() => navigation.navigate("LocalResults", { radiusMiles: radius, filters: filtersArray })}
+              label="Find near me"
+              onPress={() => navigation.navigate("LocalMap", { radiusMiles: radius, filters: filtersArray })}
               variant="primary"
-            />
-            <Button
-              label="Adjust filters"
-              onPress={() => navigation.navigate("LocalFilters", { radiusMiles: radius, filters: filtersArray })}
-              variant="secondary"
             />
           </View>
         </View>

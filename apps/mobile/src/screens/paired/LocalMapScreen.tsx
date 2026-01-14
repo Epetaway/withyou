@@ -1,32 +1,103 @@
-import React, { useState } from "react";
-import { View, StyleSheet, Pressable, ScrollView } from "react-native";
+import React, { useState, useEffect } from "react";
+import { View, StyleSheet, Pressable, ScrollView, ActivityIndicator, Linking, Alert } from "react-native";
 import { FontAwesome6 } from "@expo/vector-icons";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useRoute } from "@react-navigation/native";
 import { Screen } from "../../ui/components/Screen";
 import { Text } from "../../ui/components/Text";
 import { useTheme } from "../../ui/theme/ThemeProvider";
+import { api } from "../../state/appState";
 
-const nearbyPlaces = [
-  { id: 1, name: "Coffee House", icon: "mug-hot", category: "Cafe", distance: "0.5 km", rating: 4.8 },
-  { id: 2, name: "Park", icon: "tree", category: "Outdoor", distance: "1.2 km", rating: 4.5 },
-  { id: 3, name: "Cinema", icon: "film", category: "Entertainment", distance: "0.8 km", rating: 4.7 },
-  { id: 4, name: "Restaurant", icon: "utensils", category: "Food", distance: "1.5 km", rating: 4.6 },
-  { id: 5, name: "Museum", icon: "palette", category: "Culture", distance: "2 km", rating: 4.9 },
-  { id: 6, name: "Hiking Trail", icon: "person-hiking", category: "Adventure", distance: "3 km", rating: 4.8 },
-];
+type LocalIdea = {
+  id: string;
+  type: string;
+  title: string;
+  description: string;
+  category: string;
+  source: string;
+  metadata: {
+    address?: string;
+    lat?: number;
+    lng?: number;
+    distanceMiles?: number;
+    websiteUrl?: string;
+    priceLevel?: number;
+  };
+};
 
 const categories = [
-  { name: "All", icon: "border-all" },
-  { name: "Food", icon: "utensils" },
-  { name: "Outdoor", icon: "tree" },
-  { name: "Entertainment", icon: "film" },
-  { name: "Culture", icon: "palette" },
+  { name: "All", filter: null },
+  { name: "Food", filter: "food" },
+  { name: "Outdoor", filter: "outdoors" },
+  { name: "Entertainment", filter: "entertainment" },
+  { name: "Low Cost", filter: "lowcost" },
 ];
+
+const getCategoryIcon = (category: string) => {
+  const cat = category.toLowerCase();
+  if (cat.includes("outdoor")) return "tree";
+  if (cat.includes("entertainment")) return "film";
+  if (cat.includes("food") || cat.includes("shopping")) return "utensils";
+  if (cat.includes("culture")) return "palette";
+  return "location-dot";
+};
+
+const getPriceLevel = (level?: number) => {
+  if (!level || level === 0) return "Free";
+  return "$".repeat(Math.min(level, 3));
+};
 
 export function LocalMapScreen() {
   const theme = useTheme();
   const navigation = useNavigation();
+  const route = useRoute();
+  const params = route.params as { radiusMiles?: number; filters?: string[] } | undefined;
+  
   const [selectedCategory, setSelectedCategory] = useState("All");
+  const [ideas, setIdeas] = useState<LocalIdea[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [radiusMiles, setRadiusMiles] = useState(params?.radiusMiles || 10);
+
+  useEffect(() => {
+    fetchIdeas();
+  }, [selectedCategory, radiusMiles]);
+
+  const fetchIdeas = async () => {
+    try {
+      setLoading(true);
+      const selectedFilter = categories.find(c => c.name === selectedCategory)?.filter;
+      const filters = selectedFilter ? [selectedFilter] : (params?.filters || []);
+      
+      const response = await api.request<{ ideas: LocalIdea[] }>("/ideas/query", {
+        method: "POST",
+        body: {
+          type: "LOCAL",
+          radiusMiles,
+          filters,
+        },
+      });
+      
+      setIdeas(response.ideas || []);
+    } catch (error) {
+      console.error("Failed to fetch ideas:", error);
+      Alert.alert("Error", "Failed to load nearby places. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const openInMaps = (idea: LocalIdea) => {
+    if (idea.metadata.lat && idea.metadata.lng) {
+      const url = `https://www.google.com/maps/search/?api=1&query=${idea.metadata.lat},${idea.metadata.lng}`;
+      Linking.openURL(url);
+    } else if (idea.metadata.address) {
+      const url = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(idea.metadata.address)}`;
+      Linking.openURL(url);
+    }
+  };
+
+  const openWebsite = (url: string) => {
+    Linking.openURL(url);
+  };
 
   return (
     <Screen style={{ paddingHorizontal: 0 }}>
@@ -39,10 +110,15 @@ export function LocalMapScreen() {
         <View style={{ width: 24 }} />
       </View>
 
-      {/* Map Placeholder */}
-      <View style={[styles.mapContainer, { backgroundColor: '#E5E7EB' }]}>
-        <FontAwesome6 name="map" size={48} color="#A78BFA" weight="bold" />
-        <Text style={styles.mapPlaceholder}>Your Location Map</Text>
+      {/* Map Placeholder - Shows location count */}
+      <View style={[styles.mapContainer, { backgroundColor: theme.colors.primary + "20" }]}>
+        <FontAwesome6 name="map-location-dot" size={48} color={theme.colors.primary} weight="bold" />
+        <Text style={[styles.mapPlaceholder, { color: theme.colors.primary }]}>
+          {ideas.length} places nearby
+        </Text>
+        <Text variant="helper" style={{ color: theme.colors.textSecondary, marginTop: 4 }}>
+          Within {radiusMiles} miles
+        </Text>
       </View>
 
       {/* Filter Categories */}
@@ -56,16 +132,10 @@ export function LocalMapScreen() {
             key={cat.name}
             style={[
               styles.categoryPill,
-              selectedCategory === cat.name && styles.categoryPillActive
+              selectedCategory === cat.name && [styles.categoryPillActive, { backgroundColor: theme.colors.primary, borderColor: theme.colors.primary }]
             ]}
             onPress={() => setSelectedCategory(cat.name)}
           >
-            <FontAwesome6 
-              name={cat.icon as "border-all" | "utensils" | "tree" | "film" | "palette"}
-              size={14} 
-              color={selectedCategory === cat.name ? "#FFFFFF" : "#A78BFA"}
-              weight="bold"
-            />
             <Text 
               style={[
                 styles.categoryText,
@@ -79,50 +149,86 @@ export function LocalMapScreen() {
       </ScrollView>
 
       {/* Nearby Places List */}
-      <ScrollView 
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={styles.listContent}
-      >
-        {nearbyPlaces.map((place) => (
-          <Pressable key={place.id} style={[styles.placeCard, { backgroundColor: theme.colors.surface }]}>
-            <View style={styles.placeLeft}>
-              <View style={styles.placeIconContainer}>
-                <FontAwesome6 
-                  name={place.icon as "mug-hot" | "tree" | "film" | "utensils" | "palette" | "person-hiking"}
-                  size={20}
-                  color={theme.colors.primary}
-                  weight="bold"
-                />
-              </View>
-              <View style={styles.placeInfo}>
-                <Text style={[styles.placeName, { color: theme.colors.text }]}>
-                  {place.name}
-                </Text>
-                <View style={styles.placeDetails}>
-                  <Text style={[styles.placeCategory, { color: theme.colors.secondary }]}>
-                    {place.category}
+      {loading ? (
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color={theme.colors.primary} />
+          <Text variant="body" style={{ marginTop: 16, color: theme.colors.textSecondary }}>
+            Finding nearby places...
+          </Text>
+        </View>
+      ) : ideas.length === 0 ? (
+        <View style={styles.emptyContainer}>
+          <FontAwesome6 name="map-location-dot" size={48} color={theme.colors.textSecondary} style={{ marginBottom: 16 }} />
+          <Text variant="subtitle" style={{ color: theme.colors.text, marginBottom: 8 }}>
+            No places found
+          </Text>
+          <Text variant="body" style={{ color: theme.colors.textSecondary, textAlign: "center", paddingHorizontal: 40 }}>
+            Try adjusting your filters or increasing the radius
+          </Text>
+        </View>
+      ) : (
+        <ScrollView 
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={styles.listContent}
+        >
+          {ideas.map((idea) => (
+            <View key={idea.id} style={[styles.placeCard, { backgroundColor: theme.colors.surface }]}>
+              <View style={styles.placeLeft}>
+                <View style={[styles.placeIconContainer, { backgroundColor: theme.colors.primary + "20" }]}>
+                  <FontAwesome6 
+                    name={getCategoryIcon(idea.category)}
+                    size={20}
+                    color={theme.colors.primary}
+                    weight="bold"
+                  />
+                </View>
+                <View style={styles.placeInfo}>
+                  <Text style={[styles.placeName, { color: theme.colors.text }]}>
+                    {idea.title}
                   </Text>
-                  <Text style={[styles.placeDistance, { color: theme.colors.primary }]}>
-                    {place.distance}
+                  <Text variant="helper" style={{ color: theme.colors.textSecondary, marginBottom: 4 }}>
+                    {idea.description}
                   </Text>
+                  <View style={styles.placeDetails}>
+                    <Text style={[styles.placeCategory, { color: theme.colors.secondary }]}>
+                      {idea.category}
+                    </Text>
+                    {idea.metadata.distanceMiles && (
+                      <Text style={[styles.placeDistance, { color: theme.colors.primary }]}>
+                        {idea.metadata.distanceMiles.toFixed(1)} mi
+                      </Text>
+                    )}
+                    <View style={styles.priceBadge}>
+                      <Text style={[styles.priceText, { color: "#10B981" }]}>
+                        {getPriceLevel(idea.metadata.priceLevel)}
+                      </Text>
+                    </View>
+                  </View>
                 </View>
               </View>
-            </View>
-            <View style={styles.placeRight}>
-              <View style={styles.ratingBadge}>
-                <FontAwesome6 name="star" size={12} color="#F59E0B" weight="solid" />
-                <Text style={styles.ratingText}>{place.rating}</Text>
+              <View style={styles.placeRight}>
+                {idea.metadata.websiteUrl && (
+                  <Pressable 
+                    style={[styles.actionButton, { backgroundColor: theme.colors.primary + "20" }]}
+                    onPress={() => openWebsite(idea.metadata.websiteUrl!)}
+                  >
+                    <FontAwesome6 name="globe" size={16} color={theme.colors.primary} weight="bold" />
+                  </Pressable>
+                )}
+                <Pressable 
+                  style={[styles.selectButton, { backgroundColor: theme.colors.primary }]}
+                  onPress={() => openInMaps(idea)}
+                >
+                  <FontAwesome6 name="location-arrow" size={16} color="#FFFFFF" weight="bold" />
+                </Pressable>
               </View>
-              <Pressable style={[styles.selectButton, { backgroundColor: theme.colors.primary }]}>
-                <FontAwesome6 name="arrow-right" size={16} color="#FFFFFF" weight="bold" />
-              </Pressable>
             </View>
-          </Pressable>
-        ))}
+          ))}
 
-        {/* Bottom Spacing */}
-        <View style={{ height: 100 }} />
-      </ScrollView>
+          {/* Bottom Spacing */}
+          <View style={{ height: 100 }} />
+        </ScrollView>
+      )}
     </Screen>
   );
 }
@@ -149,10 +255,21 @@ const styles = StyleSheet.create({
     borderBottomRightRadius: 24,
   },
   mapPlaceholder: {
-    fontSize: 14,
-    color: '#A78BFA',
+    fontSize: 16,
     marginTop: 12,
     fontWeight: '600',
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingVertical: 60,
+  },
+  emptyContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingVertical: 60,
   },
   categoriesScroll: {
     paddingHorizontal: 20,
@@ -163,8 +280,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
-    paddingHorizontal: 14,
-    paddingVertical: 8,
+    paddingHorizontal: 16,
+    paddingVertical: 10,
     borderRadius: 20,
     backgroundColor: '#F3F4F6',
     borderWidth: 1,
@@ -175,9 +292,9 @@ const styles = StyleSheet.create({
     borderColor: '#A78BFA',
   },
   categoryText: {
-    fontSize: 13,
+    fontSize: 14,
     fontWeight: '600',
-    color: '#A78BFA',
+    color: '#6B7280',
   },
   categoryTextActive: {
     color: '#FFFFFF',
@@ -236,21 +353,24 @@ const styles = StyleSheet.create({
   placeRight: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 12,
+    gap: 8,
   },
-  ratingBadge: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
+  priceBadge: {
     paddingHorizontal: 8,
     paddingVertical: 4,
-    borderRadius: 12,
-    backgroundColor: '#FEF3C7',
+    borderRadius: 8,
+    backgroundColor: '#D1FAE5',
   },
-  ratingText: {
+  priceText: {
     fontSize: 12,
     fontWeight: '700',
-    color: '#F59E0B',
+  },
+  actionButton: {
+    width: 36,
+    height: 36,
+    borderRadius: 10,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   selectButton: {
     width: 40,
