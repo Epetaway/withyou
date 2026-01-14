@@ -9,6 +9,8 @@ import { PreferencesScreen } from "../screens/paired/PreferencesScreen";
 import { LocalMapScreen } from "../screens/paired/LocalMapScreen";
 import { IdeasScreen } from "../screens/paired/IdeasScreen";
 import { SettingsScreen } from "../screens/shared/SettingsScreen";
+import { NoteComposeScreen } from "../screens/paired/NoteComposeScreen";
+import { NotesListScreen } from "../screens/paired/NotesListScreen";
 import { useTheme } from "../ui/theme/ThemeProvider";
 
 const Stack = createNativeStackNavigator();
@@ -20,6 +22,8 @@ type PairedStackParamList = {
   Preferences: undefined;
   Settings: undefined;
   LocalMap: undefined;
+  NoteCompose: undefined;
+  NotesList: undefined;
 };
 
 function FloatingNav() {
@@ -124,6 +128,8 @@ export function PairedTabs() {
         )}
       </Stack.Screen>
       <Stack.Screen name="LocalMap" component={LocalMapScreen} />
+      <Stack.Screen name="NoteCompose" component={NoteComposeScreen} />
+      <Stack.Screen name="NotesList" component={NotesListScreen} />
     </Stack.Navigator>
   );
 }
