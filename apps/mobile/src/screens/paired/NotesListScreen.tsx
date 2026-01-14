@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useCallback } from "react";
 import { View, StyleSheet, Pressable, FlatList, RefreshControl } from "react-native";
 import { FontAwesome6 } from "@expo/vector-icons";
 import { useNavigation, useFocusEffect } from "@react-navigation/native";
@@ -107,7 +107,7 @@ export function NotesListScreen() {
           <FontAwesome6 name="arrow-left" size={24} color={theme.colors.text} />
         </Pressable>
         <Text variant="screenTitle">Notes</Text>
-        <Pressable onPress={() => (navigation as any).navigate("NoteCompose")}>
+        <Pressable onPress={() => (navigation as { navigate: (screen: string) => void }).navigate("NoteCompose")}>
           <FontAwesome6 name="plus" size={24} color={theme.colors.primary} />
         </Pressable>
       </View>
@@ -127,7 +127,7 @@ export function NotesListScreen() {
           </Text>
           <Pressable
             style={[styles.emptyButton, { backgroundColor: theme.colors.primary }]}
-            onPress={() => (navigation as any).navigate("NoteCompose")}
+            onPress={() => (navigation as { navigate: (screen: string) => void }).navigate("NoteCompose")}
           >
             <Text style={{ color: "#FFFFFF", fontWeight: "600" }}>Send your first note</Text>
           </Pressable>

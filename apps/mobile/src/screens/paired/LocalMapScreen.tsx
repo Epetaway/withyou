@@ -55,11 +55,11 @@ export function LocalMapScreen() {
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [ideas, setIdeas] = useState<LocalIdea[]>([]);
   const [loading, setLoading] = useState(true);
-  const [radiusMiles, setRadiusMiles] = useState(params?.radiusMiles || 10);
+  const [_radiusMiles, _setRadiusMiles] = useState(params?.radiusMiles || 10);
 
   useEffect(() => {
     fetchIdeas();
-  }, [selectedCategory, radiusMiles]);
+  }, [selectedCategory, _radiusMiles]);
 
   const fetchIdeas = async () => {
     try {
@@ -71,7 +71,7 @@ export function LocalMapScreen() {
         method: "POST",
         body: {
           type: "LOCAL",
-          radiusMiles,
+          radiusMiles: _radiusMiles,
           filters,
         },
       });
@@ -117,7 +117,7 @@ export function LocalMapScreen() {
           {ideas.length} places nearby
         </Text>
         <Text variant="helper" style={{ color: theme.colors.textSecondary, marginTop: 4 }}>
-          Within {radiusMiles} miles
+          Within {_radiusMiles} miles
         </Text>
       </View>
 
