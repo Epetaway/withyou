@@ -66,28 +66,65 @@ function FloatingNav() {
   );
 }
 
+// Wrapper component that adds FloatingNav to each screen
+function ScreenWithNav({ children }: { children: React.ReactNode }) {
+  return (
+    <View style={{ flex: 1 }}>
+      {children}
+      <FloatingNav />
+    </View>
+  );
+}
+
 export function PairedTabs() {
   const theme = useTheme();
 
   return (
-    <View style={{ flex: 1, backgroundColor: theme.colors.background }}>
-      <Stack.Navigator
-        initialRouteName="Dashboard"
-        screenOptions={{
-          headerShown: false,
-          animation: 'none',
-        }}
-      >
-        <Stack.Screen name="Dashboard" component={DashboardScreen} />
-        <Stack.Screen name="CheckIn" component={CheckInV2Screen} />
-        <Stack.Screen name="Ideas" component={IdeasScreen} />
-        <Stack.Screen name="Preferences" component={PreferencesScreen} />
-        <Stack.Screen name="Settings" component={SettingsScreen} />
-        <Stack.Screen name="LocalMap" component={LocalMapScreen} />
-      </Stack.Navigator>
-      <FloatingNav
-      />
-    </View>
+    <Stack.Navigator
+      initialRouteName="Dashboard"
+      screenOptions={{
+        headerShown: false,
+        animation: 'none',
+        contentStyle: { backgroundColor: theme.colors.background },
+      }}
+    >
+      <Stack.Screen name="Dashboard">
+        {() => (
+          <ScreenWithNav>
+            <DashboardScreen />
+          </ScreenWithNav>
+        )}
+      </Stack.Screen>
+      <Stack.Screen name="CheckIn">
+        {() => (
+          <ScreenWithNav>
+            <CheckInV2Screen />
+          </ScreenWithNav>
+        )}
+      </Stack.Screen>
+      <Stack.Screen name="Ideas">
+        {() => (
+          <ScreenWithNav>
+            <IdeasScreen />
+          </ScreenWithNav>
+        )}
+      </Stack.Screen>
+      <Stack.Screen name="Preferences">
+        {() => (
+          <ScreenWithNav>
+            <PreferencesScreen />
+          </ScreenWithNav>
+        )}
+      </Stack.Screen>
+      <Stack.Screen name="Settings">
+        {() => (
+          <ScreenWithNav>
+            <SettingsScreen />
+          </ScreenWithNav>
+        )}
+      </Stack.Screen>
+      <Stack.Screen name="LocalMap" component={LocalMapScreen} />
+    </Stack.Navigator>
   );
 }
 
