@@ -1,13 +1,10 @@
 import React, { useState } from "react";
 import { View, StyleSheet, Pressable, ScrollView } from "react-native";
 import { FontAwesome6 } from "@expo/vector-icons";
+import { useNavigation } from "@react-navigation/native";
 import { Screen } from "../../ui/components/Screen";
 import { Text } from "../../ui/components/Text";
 import { useTheme } from "../../ui/theme/ThemeProvider";
-
-type LocalMapScreenProps = {
-  navigation?: Record<string, unknown>;
-};
 
 const nearbyPlaces = [
   { id: 1, name: "Coffee House", icon: "mug-hot", category: "Cafe", distance: "0.5 km", rating: 4.8 },
@@ -26,15 +23,16 @@ const categories = [
   { name: "Culture", icon: "palette" },
 ];
 
-export function LocalMapScreen({ navigation }: LocalMapScreenProps) {
+export function LocalMapScreen() {
   const theme = useTheme();
+  const navigation = useNavigation();
   const [selectedCategory, setSelectedCategory] = useState("All");
 
   return (
     <Screen style={{ paddingHorizontal: 0 }}>
       {/* Header */}
       <View style={[styles.header, { backgroundColor: theme.colors.primary }]}>
-        <Pressable onPress={() => (navigation as Record<string, unknown>)?.goBack?.()}>
+        <Pressable onPress={() => navigation.goBack()}>
           <FontAwesome6 name="arrow-left" size={24} color="#FFFFFF" weight="bold" />
         </Pressable>
         <Text style={styles.headerTitle}>Find Together</Text>

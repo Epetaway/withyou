@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { View, StyleSheet, Pressable, Dimensions, ScrollView } from "react-native";
 import { FontAwesome6 } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
+import { useNavigation, NavigationProp } from "@react-navigation/native";
 import { CONTENT, DashboardResponse, Note, NoteType, NotesResponse } from "@withyou/shared";
 import { Screen } from "../../ui/components/Screen";
 import { Text } from "../../ui/components/Text";
@@ -12,8 +13,13 @@ import { useTheme } from "../../ui/theme/ThemeProvider";
 const { width } = Dimensions.get('window');
 const _CARD_WIDTH = (width - 60) / 2;
 
-type DashboardScreenProps = {
-  navigation: unknown;
+type PairedStackParamList = {
+  Dashboard: undefined;
+  CheckIn: undefined;
+  Ideas: undefined;
+  Preferences: undefined;
+  Settings: undefined;
+  LocalMap: undefined;
 };
 
 const dateIdeas = [
@@ -76,8 +82,9 @@ function getMoodTip(userMood: number | null, partnerMood: number | null): string
   return "Check in with each other: ask what would feel supportive right now. Small gestures (a quick hug or a listening ear) go a long way.";
 }
 
-export function DashboardScreen({ navigation }: DashboardScreenProps) {
+export function DashboardScreen() {
   const theme = useTheme();
+  const navigation = useNavigation<NavigationProp<PairedStackParamList>>();
   const [dashboard, setDashboard] = useState<DashboardResponse | null>(null);
   const [userMood, setUserMood] = useState<number | null>(null);
   const [notes, setNotes] = useState<Note[]>([]);
@@ -253,7 +260,7 @@ export function DashboardScreen({ navigation }: DashboardScreenProps) {
       <View style={styles.actionRow}>
         <Pressable 
           style={[styles.actionButton, { backgroundColor: theme.colors.primary + "20" }]}
-          onPress={() => (navigation as Record<string, unknown>)?.navigate?.("CheckIn")}
+          onPress={() => navigation.navigate("CheckIn")}
         >
           <FontAwesome6 name="heart" size={20} color={theme.colors.primary} weight="solid" />
           <Text style={[styles.actionText, { color: theme.colors.primary }]}>Check In</Text>
@@ -325,7 +332,7 @@ export function DashboardScreen({ navigation }: DashboardScreenProps) {
       <View style={styles.section}>
         <View style={styles.sectionHeader}>
           <Text variant="sectionLabel" style={{ color: theme.colors.textSecondary, textTransform: "uppercase", letterSpacing: 0.5 }}>Things to do</Text>
-          <Pressable onPress={() => (navigation as Record<string, unknown>)?.navigate?.("Ideas")}>
+          <Pressable onPress={() => navigation.navigate("Ideas")}>
             <Text variant="helper" style={{ color: theme.colors.primary }}>View all</Text>
           </Pressable>
         </View>
@@ -350,7 +357,7 @@ export function DashboardScreen({ navigation }: DashboardScreenProps) {
         {/* Find Near Me Button */}
         <Pressable 
           style={[styles.findNearMeButton, { backgroundColor: theme.colors.primary }]}
-          onPress={() => (navigation as Record<string, unknown>)?.navigate?.("LocalMap")}
+          onPress={() => navigation.navigate("LocalMap")}
         >
           <FontAwesome6 name="map" size={18} color="#FFFFFF" weight="bold" />
           <Text style={styles.findNearMeText}>Find near me</Text>

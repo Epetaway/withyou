@@ -1,31 +1,38 @@
-import React, { useState } from "react";
+import React from "react";
 import { View, StyleSheet, Pressable } from "react-native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import { useNavigation, useRoute, NavigationProp } from "@react-navigation/native";
 import { FontAwesome6 } from "@expo/vector-icons";
 import { DashboardScreen } from "../screens/paired/DashboardScreen";
 import { CheckInV2Screen } from "../screens/paired/CheckInV2Screen";
 import { PreferencesScreen } from "../screens/paired/PreferencesScreen";
 import { LocalMapScreen } from "../screens/paired/LocalMapScreen";
-import { IdeasNavigator } from "./IdeasNavigator";
+import { IdeasScreen } from "../screens/paired/IdeasScreen";
 import { SettingsScreen } from "../screens/shared/SettingsScreen";
 import { useTheme } from "../ui/theme/ThemeProvider";
 
 const Stack = createNativeStackNavigator();
 
-interface FloatingNavProps {
-  currentRoute: string;
-  onNavigate: (route: string) => void;
-}
+type PairedStackParamList = {
+  Dashboard: undefined;
+  CheckIn: undefined;
+  Ideas: undefined;
+  Preferences: undefined;
+  Settings: undefined;
+  LocalMap: undefined;
+};
 
-function FloatingNav({ currentRoute, onNavigate }: FloatingNavProps) {
+function FloatingNav() {
   const theme = useTheme();
+  const navigation = useNavigation<NavigationProp<PairedStackParamList>>();
+  const route = useRoute();
 
   const navigationItems = [
-    { name: "Dashboard", icon: "house", label: "Home" },
-    { name: "CheckIn", icon: "heart", label: "Discover" },
-    { name: "Ideas", icon: "plus", label: "Ideas" },
-    { name: "Preferences", icon: "handshake", label: "Connect" },
-    { name: "Settings", icon: "comments", label: "Messages" },
+    { name: "Dashboard" as const, icon: "house", label: "Home" },
+    { name: "CheckIn" as const, icon: "heart", label: "Discover" },
+    { name: "Ideas" as const, icon: "plus", label: "Ideas" },
+    { name: "Preferences" as const, icon: "handshake", label: "Connect" },
+    { name: "Settings" as const, icon: "comments", label: "Messages" },
   ];
 
   return (
@@ -38,7 +45,7 @@ function FloatingNav({ currentRoute, onNavigate }: FloatingNavProps) {
               styles.navItem,
               item.name === "Ideas" && styles.centerButtonWrapper,
             ]}
-            onPress={() => onNavigate(item.name)}
+            onPress={() => navigation.navigate(item.name)}
           >
             {item.name === "Ideas" ? (
               <View style={[styles.centerButton, { backgroundColor: theme.colors.primary }]}>
@@ -48,8 +55,8 @@ function FloatingNav({ currentRoute, onNavigate }: FloatingNavProps) {
               <FontAwesome6
                 name={item.icon}
                 size={22}
-                color={currentRoute === item.name ? theme.colors.primary : "#9CA3AF"}
-                weight={currentRoute === item.name ? "bold" : "regular"}
+                color={route.name === item.name ? theme.colors.primary : "#9CA3AF"}
+                weight={route.name === item.name ? "bold" : "regular"}
               />
             )}
           </Pressable>
@@ -60,44 +67,25 @@ function FloatingNav({ currentRoute, onNavigate }: FloatingNavProps) {
 }
 
 export function PairedTabs() {
-  const [currentRoute, setCurrentRoute] = useState("Dashboard");
   const theme = useTheme();
-
-  const navigationConfig: Record<string, React.ComponentType<Record<string, unknown>>> = {
-    Dashboard: DashboardScreen,
-    CheckIn: CheckInV2Screen,
-    Ideas: IdeasNavigator,
-    Preferences: PreferencesScreen,
-    Settings: SettingsScreen,
-    LocalMap: LocalMapScreen,
-  };
-
-  const renderScreen = () => {
-    const Screen = navigationConfig[currentRoute];
-    if (!Screen) return null;
-    
-    return (
-      <Stack.Navigator
-        screenOptions={{
-          headerShown: false,
-          animationEnabled: false,
-        }}
-      >
-        <Stack.Screen
-          name={currentRoute}
-          component={Screen as React.ComponentType<Record<string, unknown>>}
-          options={{ animationEnabled: false }}
-        />
-      </Stack.Navigator>
-    );
-  };
 
   return (
     <View style={{ flex: 1, backgroundColor: theme.colors.background }}>
-      {renderScreen()}
-      <FloatingNav 
-        currentRoute={currentRoute} 
-        onNavigate={setCurrentRoute}
+      <Stack.Navigator
+        initialRouteName="Dashboard"
+        screenOptions={{
+          headerShown: false,
+          animation: 'none',
+        }}
+      >
+        <Stack.Screen name="Dashboard" component={DashboardScreen} />
+        <Stack.Screen name="CheckIn" component={CheckInV2Screen} />
+        <Stack.Screen name="Ideas" component={IdeasScreen} />
+        <Stack.Screen name="Preferences" component={PreferencesScreen} />
+        <Stack.Screen name="Settings" component={SettingsScreen} />
+        <Stack.Screen name="LocalMap" component={LocalMapScreen} />
+      </Stack.Navigator>
+      <FloatingNav
       />
     </View>
   );
