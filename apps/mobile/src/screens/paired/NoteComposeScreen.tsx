@@ -80,9 +80,13 @@ export function NoteComposeScreen() {
   };
 
   const uploadMedia = async (uri: string): Promise<string> => {
-    // For now, we'll just return the local URI
-    // In production, this would upload to S3 or similar
-    // TODO: Implement secure media upload
+    // TODO: Implement secure media upload to S3 or similar storage
+    // For now, this is a placeholder that returns the local URI
+    // In production, this should:
+    // 1. Upload the media file to S3 using pre-signed URL
+    // 2. Return the public/secure URL for the uploaded file
+    // 3. Handle upload failures with retry logic
+    console.warn("Media upload not implemented - using local URI as placeholder");
     return uri;
   };
 

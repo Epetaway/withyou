@@ -1,16 +1,20 @@
 import React, { useState, useCallback } from "react";
 import { View, StyleSheet, Pressable, FlatList, RefreshControl } from "react-native";
 import { FontAwesome6 } from "@expo/vector-icons";
-import { useNavigation, useFocusEffect } from "@react-navigation/native";
+import { useNavigation, useFocusEffect, NavigationProp } from "@react-navigation/native";
 import { Screen } from "../../ui/components/Screen";
 import { Text } from "../../ui/components/Text";
 import { useTheme } from "../../ui/theme/ThemeProvider";
 import { api } from "../../state/appState";
 import { Note, NotesResponse } from "@withyou/shared";
 
+type NotesNavigationProp = NavigationProp<{
+  NoteCompose: undefined;
+}>;
+
 export function NotesListScreen() {
   const theme = useTheme();
-  const navigation = useNavigation();
+  const navigation = useNavigation<NotesNavigationProp>();
   const [notes, setNotes] = useState<Note[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -107,7 +111,7 @@ export function NotesListScreen() {
           <FontAwesome6 name="arrow-left" size={24} color={theme.colors.text} />
         </Pressable>
         <Text variant="screenTitle">Notes</Text>
-        <Pressable onPress={() => (navigation as { navigate: (screen: string) => void }).navigate("NoteCompose")}>
+        <Pressable onPress={() => navigation.navigate("NoteCompose")}>
           <FontAwesome6 name="plus" size={24} color={theme.colors.primary} />
         </Pressable>
       </View>
@@ -127,7 +131,7 @@ export function NotesListScreen() {
           </Text>
           <Pressable
             style={[styles.emptyButton, { backgroundColor: theme.colors.primary }]}
-            onPress={() => (navigation as { navigate: (screen: string) => void }).navigate("NoteCompose")}
+            onPress={() => navigation.navigate("NoteCompose")}
           >
             <Text style={{ color: "#FFFFFF", fontWeight: "600" }}>Send your first note</Text>
           </Pressable>
