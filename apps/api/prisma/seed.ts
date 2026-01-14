@@ -415,7 +415,7 @@ async function main() {
         description: idea.description,
         category: idea.category,
         source: idea.source,
-        metadata: idea.metadata as Record<string, unknown>,
+        metadata: idea.metadata as unknown,
       },
     });
   }
@@ -423,14 +423,16 @@ async function main() {
   console.log(`Seeded curated ideas catalog (${allCurated.length} items)`);
 
   // Create saved ideas for paired users (linking to curated catalog)
-  const curatedIds = allCurated.map((i) => i.title.replace(/\s+/g, "-").toLowerCase());
-  const pick = (idx: number) => curatedIds[idx % curatedIds.length];
+  const pickIdea = (idx: number) => {
+    const idea = allCurated[idx % allCurated.length];
+    return idea?.id;
+  };
 
   await prisma.savedIdea.create({
     data: {
       userId: alice.id,
       relationshipId: relationship.id,
-      ideaId: pick(0),
+      ideaId: pickIdea(0) || "",
       notes: "Looks fun for this weekend",
     },
   });
@@ -439,7 +441,7 @@ async function main() {
     data: {
       userId: bob.id,
       relationshipId: relationship.id,
-      ideaId: pick(4),
+      ideaId: pickIdea(4) || "",
       notes: "Let's book tickets",
     },
   });
@@ -448,7 +450,7 @@ async function main() {
     data: {
       userId: charlie.id,
       relationshipId: relationship2.id,
-      ideaId: pick(1),
+      ideaId: pickIdea(1) || "",
       notes: "Add to our shortlist",
     },
   });
@@ -457,7 +459,7 @@ async function main() {
     data: {
       userId: diana.id,
       relationshipId: relationship2.id,
-      ideaId: pick(5),
+      ideaId: pickIdea(5) || "",
       notes: "Cozy night in",
     },
   });
@@ -466,7 +468,7 @@ async function main() {
     data: {
       userId: beta1.id,
       relationshipId: relationship3.id,
-      ideaId: pick(2),
+      ideaId: pickIdea(2) || "",
       notes: "Date night idea",
     },
   });
@@ -475,7 +477,7 @@ async function main() {
     data: {
       userId: beta2.id,
       relationshipId: relationship3.id,
-      ideaId: pick(6),
+      ideaId: pickIdea(6) || "",
       notes: "Try this recipe",
     },
   });
