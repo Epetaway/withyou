@@ -15,7 +15,6 @@ export function SettingsScreen() {
   const [showEndPairingModal, setShowEndPairingModal] = useState(false);
   const [showLogoutModal, setShowLogoutModal] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
-  const [darkMode, setDarkMode] = useState(false);
 
   const { run: runEndPairing, loading: endPairingLoading } = useAsyncAction(
     async () => {
@@ -78,15 +77,15 @@ export function SettingsScreen() {
           padding: Spacing.md,
         }}>
           <Pressable
-            onPress={() => setDarkMode(!darkMode)}
+            onPress={() => theme.toggle()}
             style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}
           >
             <Text variant="body">
               Dark Mode
             </Text>
             <Switch
-              value={darkMode}
-              onValueChange={setDarkMode}
+              value={theme.mode === 'dark'}
+              onValueChange={() => theme.toggle()}
               trackColor={{ false: theme.colors.border, true: theme.colors.primary }}
               thumbColor={theme.colors.background}
             />

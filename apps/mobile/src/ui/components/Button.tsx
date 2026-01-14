@@ -19,7 +19,7 @@ export function Button({
 }: Props) {
   const getMode = () => {
     if (variant === "primary") return "contained";
-    if (variant === "danger") return "outlined";
+    if (variant === "danger") return "contained";
     return "outlined";
   };
 
