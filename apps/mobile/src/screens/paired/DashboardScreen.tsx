@@ -3,7 +3,7 @@ import { View, StyleSheet, Pressable, Dimensions, ScrollView } from "react-nativ
 import { FontAwesome6 } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import { useNavigation, NavigationProp } from "@react-navigation/native";
-import { CONTENT, DashboardResponse, Note, NoteType, NotesResponse } from "@withyou/shared";
+import { CONTENT, DashboardResponse, Note, NotesResponse } from "@withyou/shared";
 import { Screen } from "../../ui/components/Screen";
 import { Text } from "../../ui/components/Text";
 import { clearSession } from "../../state/session";
@@ -88,9 +88,6 @@ export function DashboardScreen() {
   const [dashboard, setDashboard] = useState<DashboardResponse | null>(null);
   const [userMood, setUserMood] = useState<number | null>(null);
   const [notes, setNotes] = useState<Note[]>([]);
-  const [_noteType, setNoteType] = useState<NoteType>("TEXT");
-  const [_noteContent, _setNoteContent] = useState("");
-  const [_noteMediaUrl, setNoteMediaUrl] = useState("");
   const [loading, setLoading] = useState(true);
   const [_errorText, setErrorText] = useState("");
 
@@ -268,10 +265,7 @@ export function DashboardScreen() {
 
         <Pressable 
           style={[styles.actionButton, { backgroundColor: theme.colors.secondary + "20" }]}
-          onPress={() => {
-            setNoteType("TEXT");
-            setNoteMediaUrl("");
-          }}
+          onPress={() => navigation.navigate("NoteCompose")}
         >
           <FontAwesome6 name="message" size={20} color={theme.colors.secondary} weight="solid" />
           <Text style={[styles.actionText, { color: theme.colors.secondary }]}>Send Note</Text>
@@ -282,7 +276,7 @@ export function DashboardScreen() {
       <View style={styles.section}>
         <View style={styles.sectionHeader}>
           <Text variant="sectionLabel" style={{ color: theme.colors.textSecondary, textTransform: "uppercase", letterSpacing: 0.5 }}>Private Notes</Text>
-          <Pressable>
+          <Pressable onPress={() => navigation.navigate("NotesList")}>
             <Text variant="helper" style={{ color: theme.colors.primary }}>View all</Text>
           </Pressable>
         </View>
@@ -292,11 +286,7 @@ export function DashboardScreen() {
           {/* Add note card */}
           <Pressable 
             style={[styles.noteCard, styles.addNoteCard, { borderColor: theme.colors.border }]}
-            onPress={() => {
-              // TODO: Open note composer modal
-              setNoteType("TEXT");
-              setNoteMediaUrl("");
-            }}
+            onPress={() => navigation.navigate("NoteCompose")}
           >
             <FontAwesome6 name="plus" size={32} color={theme.colors.primary} weight="light" />
             <Text style={[styles.addNoteText, { color: theme.colors.text }]}>Send a note</Text>

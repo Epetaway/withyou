@@ -1,27 +1,31 @@
 import { useColorScheme } from "react-native";
 import { MD3LightTheme, MD3DarkTheme } from "react-native-paper";
 import type { MD3Theme } from "react-native-paper";
+import { colorTokens } from "../theme/tokens";
+import { ThemeProvider, useTheme, type ThemeMode } from "./theme/ThemeProvider";
 
-// Material Design 3 Custom Theme
+const baseLight = colorTokens.light;
+const baseDark = colorTokens.dark;
+
 export const lightTheme: MD3Theme = {
   ...MD3LightTheme,
   colors: {
     ...MD3LightTheme.colors,
-    primary: "#A78BFA",
-    primaryContainer: "#EDE9FE",
-    secondary: "#8B5CF6",
-    secondaryContainer: "#DDD6FE",
-    tertiary: "#7C3AED",
-    error: "#EF4444",
-    background: "#FFFFFF",
-    surface: "#F8F9FB",
-    surfaceVariant: "#E5E7EB",
+    primary: baseLight.primary,
+    primaryContainer: baseLight.primarySoft,
+    secondary: baseLight.accent,
+    secondaryContainer: baseLight.surfaceAlt,
+    tertiary: baseLight.primary,
+    error: baseLight.danger,
+    background: baseLight.background,
+    surface: baseLight.surface,
+    surfaceVariant: baseLight.surfaceAlt,
     onPrimary: "#FFFFFF",
-    onSecondary: "#FFFFFF",
-    onBackground: "#1F2937",
-    onSurface: "#1F2937",
-    onSurfaceVariant: "#6B7280",
-    outline: "#D1D5DB",
+    onSecondary: "#0F1115",
+    onBackground: baseLight.textPrimary,
+    onSurface: baseLight.textPrimary,
+    onSurfaceVariant: baseLight.textSecondary,
+    outline: baseLight.border,
   },
 };
 
@@ -29,66 +33,34 @@ export const darkTheme: MD3Theme = {
   ...MD3DarkTheme,
   colors: {
     ...MD3DarkTheme.colors,
-    primary: "#A78BFA",
-    primaryContainer: "#4C1D95",
-    secondary: "#8B5CF6",
-    secondaryContainer: "#5B21B6",
-    tertiary: "#7C3AED",
-    error: "#F87171",
-    background: "#0F1115",
-    surface: "#181B22",
-    surfaceVariant: "#2A2F3A",
+    primary: baseDark.primary,
+    primaryContainer: baseDark.primarySoft,
+    secondary: baseDark.accent,
+    secondaryContainer: baseDark.surfaceAlt,
+    tertiary: baseDark.primary,
+    error: baseDark.danger,
+    background: baseDark.background,
+    surface: baseDark.surface,
+    surfaceVariant: baseDark.surfaceAlt,
     onPrimary: "#FFFFFF",
-    onSecondary: "#FFFFFF",
-    onBackground: "#E5E7EB",
-    onSurface: "#E5E7EB",
-    onSurfaceVariant: "#9CA3AF",
-    outline: "#4B5563",
+    onSecondary: baseDark.textPrimary,
+    onBackground: baseDark.textPrimary,
+    onSurface: baseDark.textPrimary,
+    onSurfaceVariant: baseDark.textSecondary,
+    outline: baseDark.border,
   },
 };
 
-// Legacy color export for gradual migration
-export const colors = {
-  light: {
-    bg: "#FFFFFF",
-    surface: "#F8F9FB",
-    card: "#FFFFFF",
-    text: "#1F2937",
-    text2: "#6B7280",
-    border: "#E5E7EB",
-    primary: "#A78BFA",
-    primaryPressed: "#8B5CF6",
-    danger: "#EF4444",
-    success: "#22C55E",
-  },
-  dark: {
-    bg: "#0F1115",
-    surface: "#181B22",
-    card: "#181B22",
-    text: "#E5E7EB",
-    text2: "#9CA3AF",
-    border: "#2A2F3A",
-    primary: "#A78BFA",
-    primaryPressed: "#8B5CF6",
-    danger: "#F87171",
-    success: "#34D399",
-  },
-} as const;
-
-export function useTheme() {
-  const scheme = useColorScheme();
-  return colors[scheme === "dark" ? "dark" : "light"];
-}
+export { ThemeProvider, useTheme };
+export type { ThemeMode };
 
 export function usePaperTheme() {
   const scheme = useColorScheme();
   return scheme === "dark" ? darkTheme : lightTheme;
 }
 
-export function usePaperThemeWithContext() {
-  // This function must be called within ThemeProvider context
-  // Import useTheme from './theme/ThemeProvider' in calling component
-  // This is a placeholder - actual implementation in App.tsx
-  const scheme = useColorScheme();
-  return scheme === "dark" ? darkTheme : lightTheme;
+export function usePaperThemeWithContext(mode?: ThemeMode) {
+  const system = useColorScheme();
+  const chosen = mode ?? (system === "dark" ? "dark" : "light");
+  return chosen === "dark" ? darkTheme : lightTheme;
 }

@@ -3,7 +3,7 @@ import { StatusBar } from 'expo-status-bar';
 import { ActivityIndicator, View } from 'react-native';
 import { PaperProvider } from 'react-native-paper';
 import { RootNavigator } from './navigation/RootNavigator';
-import { ThemeProvider, useTheme } from './ui/theme/ThemeProvider';
+import { ThemeProvider, useTheme } from './theme/ThemeProvider';
 import { lightTheme, darkTheme } from './ui/theme';
 
 function AppInner() {
