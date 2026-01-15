@@ -1,6 +1,6 @@
 import React from "react";
 import { Text as RNText, type TextStyle, type TextProps as RNTextProps } from "react-native";
-import { useTheme } from "../../theme/ThemeProvider";
+import { useTheme } from "../theme/ThemeProvider";
 
 type TextVariant = "title" | "h1" | "h2" | "h3" | "body" | "bodyStrong" | "caption" | "overline";
 

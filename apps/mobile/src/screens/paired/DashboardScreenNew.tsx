@@ -5,7 +5,6 @@ import { Ionicons } from "@expo/vector-icons";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import type { DashboardResponse, Note, NotesResponse, MoodLevel } from "@withyou/shared";
 import { ThemedText } from "../../components/ThemedText";
-import { ThemedCard } from "../../components/ThemedCard";
 import { HeroHeader } from "../../components/dashboard/HeroHeader";
 import { MoodBoardCard } from "../../components/dashboard/MoodBoardCard";
 import { DateIdeasCarousel } from "../../components/dashboard/DateIdeasCarousel";

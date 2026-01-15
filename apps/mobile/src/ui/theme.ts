@@ -1,9 +1,8 @@
-import { useMemo } from "react";
 import { useColorScheme } from "react-native";
 import { MD3LightTheme, MD3DarkTheme } from "react-native-paper";
 import type { MD3Theme } from "react-native-paper";
 import { colorTokens } from "../theme/tokens";
-import { ThemeProvider, useTheme, type ThemeMode } from "./ThemeProvider";
+import { ThemeProvider, useTheme, type ThemeMode } from "./theme/ThemeProvider";
 
 const baseLight = colorTokens.light;
 const baseDark = colorTokens.dark;

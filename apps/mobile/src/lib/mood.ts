@@ -47,8 +47,7 @@ export function getMoodColorValue(color: MoodColor | null | undefined): string {
  */
 export function blendMoodColors(
   color1: string,
-  color2: string,
-  opacity: number = 0.25
+  color2: string
 ): { start: string; end: string } {
   return {
     start: color1,

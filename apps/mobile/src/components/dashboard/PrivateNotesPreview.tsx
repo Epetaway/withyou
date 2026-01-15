@@ -87,6 +87,8 @@ export function PrivateNotesPreview({
     </Pressable>
   );
 
+  type NoteOrPlaceholder = Note | { id: "__create__" };
+
   return (
     <View style={styles.container}>
       <View style={styles.header}>
@@ -99,8 +101,13 @@ export function PrivateNotesPreview({
       </View>
 
       <FlatList
-        data={[{ id: "__create__" } as any, ...notes.slice(0, 5)]}
-        renderItem={({ item }) => (item.id === "__create__" ? renderCreateCard() : renderNote({ item }))}
+        data={[{ id: "__create__" } as NoteOrPlaceholder, ...notes.slice(0, 5)]}
+        renderItem={({ item }) => {
+          if (item.id === "__create__") {
+            return renderCreateCard();
+          }
+          return renderNote({ item: item as Note });
+        }}
         keyExtractor={(item) => item.id}
         horizontal
         showsHorizontalScrollIndicator={false}
