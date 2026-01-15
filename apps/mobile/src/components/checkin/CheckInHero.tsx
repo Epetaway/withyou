@@ -5,7 +5,6 @@ import { LinearGradient } from "expo-linear-gradient";
 import { Ionicons } from "@expo/vector-icons";
 import { ThemedText } from "../ThemedText";
 import { useTheme } from "../../theme/ThemeProvider";
-import placeholderImage from "../../../assets/placeholder.png";
 
 type CheckInHeroProps = {
   heroImageUrl?: string;
@@ -29,7 +28,6 @@ export function CheckInHero({ heroImageUrl, onBackPress, onInfoPress }: CheckInH
       <Image
         source={{ uri: heroImageUrl || defaultImage }}
         style={styles.image}
-        defaultSource={placeholderImage}
       />
 
       <LinearGradient
