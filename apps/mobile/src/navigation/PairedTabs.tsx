@@ -3,7 +3,7 @@ import { View, StyleSheet, Pressable } from "react-native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { useNavigation, useRoute, NavigationProp } from "@react-navigation/native";
 import { FontAwesome6 } from "@expo/vector-icons";
-import { DashboardScreen } from "../screens/paired/DashboardScreen";
+import { DashboardScreen } from "../screens/paired/DashboardScreenNew";
 import { CheckInV2Screen } from "../screens/paired/CheckInV2Screen";
 import { PreferencesScreen } from "../screens/paired/PreferencesScreen";
 import { LocalMapScreen } from "../screens/paired/LocalMapScreen";
@@ -11,7 +11,7 @@ import { IdeasScreen } from "../screens/paired/IdeasScreen";
 import { SettingsScreen } from "../screens/shared/SettingsScreen";
 import { NoteComposeScreen } from "../screens/paired/NoteComposeScreen";
 import { NotesListScreen } from "../screens/paired/NotesListScreen";
-import { useTheme } from "../ui/theme/ThemeProvider";
+import { useTheme } from "../theme/ThemeProvider";
 
 const Stack = createNativeStackNavigator();
 
