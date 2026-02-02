@@ -1,5 +1,6 @@
 import React, { useMemo, useState } from "react";
 import { StyleSheet, View, SafeAreaView, ScrollView } from "react-native";
+import { useNavigation, NavigationProp } from "@react-navigation/native";
 import { ThemedText } from "../../components/ThemedText";
 import { ThemedCard } from "../../components/ThemedCard";
 import { ScreenHeader } from "../../components/ScreenHeader";
@@ -9,8 +10,12 @@ import { FilterChips } from "../../ui/components/FilterChips";
 import { useTheme } from "../../theme/ThemeProvider";
 import { spacing } from "../../theme/tokens";
 
-type Navigation = {
-  navigate: (screen: string, params?: unknown) => void;
+type PairedStackParamList = {
+  Dashboard: undefined;
+  CheckIn: undefined;
+  Ideas: undefined;
+  Preferences: undefined;
+  Settings: undefined;
 };
 
 const localFilterOptions = [
@@ -20,7 +25,8 @@ const localFilterOptions = [
   { id: "lowcost", label: "Low-cost" },
 ];
 
-export function IdeasScreen({ navigation }: { navigation: Navigation }) {
+export function IdeasScreen() {
+  const navigation = useNavigation<NavigationProp<PairedStackParamList>>();
   const theme = useTheme();
   const [radius, setRadius] = useState<number>(10);
   const [selectedFilters, setSelectedFilters] = useState<Set<string>>(new Set());

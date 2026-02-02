@@ -12,7 +12,7 @@ import { useTheme } from "../../theme/ThemeProvider";
 import { spacing } from "../../theme/tokens";
 import type { CheckInOption } from "../../lib/checkinOptions";
 
-export function PreferencesScreen(_navigation: unknown) {
+export function PreferencesScreen() {
   const theme = useTheme();
   const c = CONTENT.preferences;
 
