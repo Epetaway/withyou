@@ -4,7 +4,7 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { useNavigation, useRoute, NavigationProp } from "@react-navigation/native";
 import { FontAwesome6 } from "@expo/vector-icons";
 import { DashboardScreen } from "../screens/paired/DashboardScreenNew";
-import { CheckInV2Screen } from "../screens/paired/CheckInV2Screen";
+import { CheckInScreen } from "../screens/paired/CheckInScreen";
 import { PreferencesScreen } from "../screens/paired/PreferencesScreen";
 import { LocalMapScreen } from "../screens/paired/LocalMapScreen";
 import { IdeasScreen } from "../screens/paired/IdeasScreen";
@@ -102,7 +102,7 @@ export function PairedTabs() {
       <Stack.Screen name="CheckIn">
         {() => (
           <ScreenWithNav>
-            <CheckInV2Screen />
+            <CheckInScreen />
           </ScreenWithNav>
         )}
       </Stack.Screen>
