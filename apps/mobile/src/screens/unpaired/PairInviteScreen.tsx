@@ -1,29 +1,26 @@
 import React, { useState } from "react";
-import { View, ScrollView, StyleSheet, Pressable, Share } from "react-native";
-import { FontAwesome6 } from "@expo/vector-icons";
+import { View, StyleSheet, SafeAreaView, ScrollView, Pressable, Share } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
 import { CONTENT, InviteResponse } from "@withyou/shared";
-import { Screen } from "../../ui/components/Screen";
-import { Text } from "../../ui/components/Text";
+import { ThemedText } from "../../components/ThemedText";
+import { ThemedCard } from "../../components/ThemedCard";
+import { ScreenHeader } from "../../components/ScreenHeader";
 import { Button } from "../../ui/components/Button";
-import { Card } from "../../ui/components/Card";
-import { Section } from "../../ui/components/Section";
 import { api } from "../../state/appState";
 import { useAsyncAction } from "../../api/hooks";
-import { Spacing } from "../../ui/tokens";
-import { useTheme } from "../../ui/theme/ThemeProvider";
+import { useTheme } from "../../theme/ThemeProvider";
+import { spacing } from "../../theme/tokens";
 import * as Clipboard from "expo-clipboard";
 
-type PairInviteScreenProps = {
-  navigation: unknown;
-};
-
-export function PairInviteScreen({ navigation }: PairInviteScreenProps) {
+export function PairInviteScreen() {
   const theme = useTheme();
   const c = CONTENT.pairing.invite;
 
   const [inviteCode, setInviteCode] = useState<string | null>(null);
   const [expiresAt, setExpiresAt] = useState<string | null>(null);
   const [deepLink, setDeepLink] = useState<string | null>(null);
+  const [copiedCode, setCopiedCode] = useState(false);
+  const [copiedLink, setCopiedLink] = useState(false);
 
   const { run, loading, errorText } = useAsyncAction(async () => {
     const res = await api.request<InviteResponse>("/relationship/invite", {
@@ -39,6 +36,8 @@ export function PairInviteScreen({ navigation }: PairInviteScreenProps) {
     if (!deepLink) return;
     try {
       await Clipboard.setStringAsync(deepLink);
+      setCopiedLink(true);
+      setTimeout(() => setCopiedLink(false), 2000);
     } catch (error) {
       console.error("Clipboard error:", error);
     }
@@ -48,6 +47,8 @@ export function PairInviteScreen({ navigation }: PairInviteScreenProps) {
     if (!inviteCode) return;
     try {
       await Clipboard.setStringAsync(inviteCode);
+      setCopiedCode(true);
+      setTimeout(() => setCopiedCode(false), 2000);
     } catch (error) {
       console.error("Clipboard error:", error);
     }
@@ -67,23 +68,24 @@ export function PairInviteScreen({ navigation }: PairInviteScreenProps) {
   };
 
   return (
-    <Screen style={{ paddingHorizontal: Spacing.md, paddingTop: Spacing.lg }}>
-      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: Spacing.xl }}>
-        {/* Page Header */}
-        <View style={{ marginBottom: Spacing.xl }}>
-          <Text style={[styles.h1, { color: theme.text }]}>{c.title}</Text>
-          <Text style={[styles.h2, { color: theme.text2 }]}>{c.body}</Text>
-        </View>
+    <SafeAreaView style={[styles.container, { backgroundColor: theme.colors.background }]}>
+      <ScrollView 
+        style={styles.scrollView}
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}
+      >
+        <ScreenHeader 
+          title={c.title}
+          subtitle={c.body}
+        />
 
-        {errorText ? (
-          <Section>
-            <Card>
-              <Text variant="body" style={{ color: theme.danger }}>
-                {errorText}
-              </Text>
-            </Card>
-          </Section>
-        ) : null}
+        {errorText && (
+          <ThemedCard elevation="xs" padding="md" radius="lg" style={styles.errorCard}>
+            <ThemedText variant="body" color="danger">
+              {errorText}
+            </ThemedText>
+          </ThemedCard>
+        )}
 
         {!inviteCode ? (
           <Button
@@ -93,87 +95,138 @@ export function PairInviteScreen({ navigation }: PairInviteScreenProps) {
             variant="primary"
           />
         ) : (
-          <Section title="Your invite code">
-            <Card>
-              <View style={{ gap: Spacing.md }}>
-                <View style={[styles.codeBox, { backgroundColor: theme.surface, borderColor: theme.border }]}>
-                  <Text style={[styles.codeText, { color: theme.primary }]}>{inviteCode}</Text>
-                </View>
-                
-                <View style={{ gap: Spacing.sm }}>
-                  <Pressable
+          <View style={styles.inviteContent}>
+            {/* Invite Code Section */}
+            <View>
+              <ThemedText variant="overline" color="muted" style={styles.sectionLabel}>
+                YOUR INVITE CODE
+              </ThemedText>
+              <ThemedCard elevation="sm" padding="lg" radius="lg">
+                <View style={styles.codeContainer}>
+                  <ThemedText variant="h1" color="primary" style={styles.codeText}>
+                    {inviteCode}
+                  </ThemedText>
+                  <Pressable 
                     onPress={copyCode}
-                    style={({ pressed }) => [
-                      styles.actionButton,
-                      { backgroundColor: pressed ? theme.surface : "transparent" }
-                    ]}
+                    style={[styles.iconButton, { backgroundColor: theme.colors.surface }]}
                   >
-                    <FontAwesome6 name="copy" size={18} color={theme.primary} weight="bold" />
-                    <Text style={{ color: theme.primary, fontWeight: "600" }}>Copy Code</Text>
-                  </Pressable>
-                  
-                  <Pressable
-                    onPress={copyLink}
-                    style={({ pressed }) => [
-                      styles.actionButton,
-                      { backgroundColor: pressed ? theme.surface : "transparent" }
-                    ]}
-                  >
-                    <FontAwesome6 name="link" size={18} color={theme.primary} weight="bold" />
-                    <Text style={{ color: theme.primary, fontWeight: "600" }}>Copy Link</Text>
-                  </Pressable>
-                  
-                  <Pressable
-                    onPress={shareLink}
-                    style={({ pressed }) => [
-                      styles.actionButton,
-                      { backgroundColor: pressed ? theme.surface : "transparent" }
-                    ]}
-                  >
-                    <FontAwesome6 name="share-nodes" size={18} color={theme.primary} weight="bold" />
-                    <Text style={{ color: theme.primary, fontWeight: "600" }}>Share</Text>
+                    <Ionicons 
+                      name={copiedCode ? "checkmark" : "copy-outline"} 
+                      size={20} 
+                      color={copiedCode ? theme.colors.success : theme.colors.primary} 
+                    />
                   </Pressable>
                 </View>
-
-                {expiresAt ? (
-                  <Text style={{ fontSize: 12, color: theme.text2, marginTop: Spacing.sm }}>
+                {expiresAt && (
+                  <ThemedText variant="caption" color="muted" style={styles.expiryText}>
                     Expires: {new Date(expiresAt).toLocaleDateString()}
-                  </Text>
-                ) : null}
-              </View>
-            </Card>
-          </Section>
-        )}
+                  </ThemedText>
+                )}
+              </ThemedCard>
+            </View>
 
-        <Button
-          label={c.actions.back}
-          onPress={() => {
-            const nav = navigation as { goBack?: () => void };
-            nav.goBack?.();
-          }}
-          variant="secondary"
-          style={{ marginTop: Spacing.lg }}
-        />
+            {/* Share Link Section */}
+            {deepLink && (
+              <View>
+                <ThemedText variant="overline" color="muted" style={styles.sectionLabel}>
+                  OR SHARE LINK
+                </ThemedText>
+                <ThemedCard elevation="sm" padding="md" radius="lg">
+                  <View style={styles.linkActions}>
+                    <Pressable 
+                      onPress={copyLink}
+                      style={[styles.linkButton, { borderColor: theme.colors.border }]}
+                    >
+                      <Ionicons 
+                        name={copiedLink ? "checkmark" : "link-outline"} 
+                        size={20} 
+                        color={copiedLink ? theme.colors.success : theme.colors.primary} 
+                      />
+                      <ThemedText variant="body" color="primary">
+                        {copiedLink ? "Copied!" : "Copy Link"}
+                      </ThemedText>
+                    </Pressable>
+                    <Pressable 
+                      onPress={shareLink}
+                      style={[styles.linkButton, { borderColor: theme.colors.border }]}
+                    >
+                      <Ionicons name="share-outline" size={20} color={theme.colors.primary} />
+                      <ThemedText variant="body" color="primary">
+                        Share Link
+                      </ThemedText>
+                    </Pressable>
+                  </View>
+                </ThemedCard>
+              </View>
+            )}
+
+            {/* Instructions */}
+            <ThemedCard elevation="xs" padding="md" radius="lg" style={[styles.instructionsCard, { backgroundColor: theme.colors.surface }]}>
+              <ThemedText variant="body" color="secondary" style={styles.instructionsText}>
+                Send this code to your partner. They can enter it in the &quot;Accept Invite&quot; screen to pair with you.
+              </ThemedText>
+            </ThemedCard>
+          </View>
+        )}
       </ScrollView>
-    </Screen>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  h1: { fontSize: 28, fontWeight: "700" },
-  h2: { fontSize: 16, marginTop: Spacing.sm },
-  codeBox: {
-    padding: Spacing.lg,
-    borderRadius: 12,
-    borderWidth: 1,
-    alignItems: "center",
+  container: {
+    flex: 1,
   },
-  codeText: { fontSize: 18, fontWeight: "700", fontFamily: "Menlo" },
-  actionButton: { 
+  scrollView: {
+    flex: 1,
+  },
+  scrollContent: {
+    padding: spacing.lg,
+    paddingBottom: 100,
+  },
+  errorCard: {
+    marginBottom: spacing.md,
+  },
+  inviteContent: {
+    gap: spacing.xl,
+  },
+  sectionLabel: {
+    marginBottom: spacing.sm,
+  },
+  codeContainer: {
     flexDirection: "row",
     alignItems: "center",
-    gap: Spacing.sm,
-    padding: Spacing.sm,
+    justifyContent: "space-between",
+    marginBottom: spacing.xs,
+  },
+  codeText: {
+    letterSpacing: 4,
+  },
+  iconButton: {
+    padding: spacing.sm,
     borderRadius: 8,
+  },
+  expiryText: {
+    marginTop: spacing.xs,
+  },
+  linkActions: {
+    flexDirection: "row",
+    gap: spacing.sm,
+  },
+  linkButton: {
+    flex: 1,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: spacing.xs,
+    padding: spacing.md,
+    borderWidth: 1,
+    borderRadius: 8,
+  },
+  instructionsCard: {
+    marginTop: spacing.sm,
+  },
+  instructionsText: {
+    lineHeight: 20,
   },
 });

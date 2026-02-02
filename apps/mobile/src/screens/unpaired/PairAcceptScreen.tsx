@@ -1,27 +1,27 @@
 import React, { useState } from "react";
-import { View, ScrollView, StyleSheet } from "react-native";
+import { View, StyleSheet, SafeAreaView, ScrollView, TextInput } from "react-native";
+import { useNavigation, NavigationProp } from "@react-navigation/native";
 import {
   CONTENT,
   inviteAcceptSchema,
   RelationshipAcceptResponse,
 } from "@withyou/shared";
-import { Screen } from "../../ui/components/Screen";
-import { Text } from "../../ui/components/Text";
-import { TextField } from "../../ui/components/TextField";
+import { ThemedText } from "../../components/ThemedText";
+import { ThemedCard } from "../../components/ThemedCard";
+import { ScreenHeader } from "../../components/ScreenHeader";
 import { Button } from "../../ui/components/Button";
-import { Card } from "../../ui/components/Card";
-import { Section } from "../../ui/components/Section";
 import { api } from "../../state/appState";
 import { useAsyncAction } from "../../api/hooks";
-import { Spacing } from "../../ui/tokens";
-import { useTheme } from "../../ui/theme/ThemeProvider";
+import { useTheme } from "../../theme/ThemeProvider";
+import { spacing } from "../../theme/tokens";
 
-type PairAcceptScreenProps = {
-  navigation: unknown;
+type PairedStackParamList = {
+  Dashboard: undefined;
 };
 
-export function PairAcceptScreen({ navigation }: PairAcceptScreenProps) {
+export function PairAcceptScreen() {
   const theme = useTheme();
+  const navigation = useNavigation<NavigationProp<PairedStackParamList>>();
   const c = CONTENT.pairing.accept;
 
   const [inviteCode, setInviteCode] = useState("");
@@ -47,9 +47,7 @@ export function PairAcceptScreen({ navigation }: PairAcceptScreenProps) {
       }
     );
 
-    // Success - navigate to dashboard
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    (navigation as any)?.navigate?.("Dashboard");
+    navigation.navigate("Dashboard");
     return res;
   });
 
@@ -62,65 +60,110 @@ export function PairAcceptScreen({ navigation }: PairAcceptScreenProps) {
   };
 
   return (
-    <Screen style={{ paddingHorizontal: Spacing.md, paddingTop: Spacing.lg }}>
-      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: Spacing.xl }}>
-        {/* Page Header */}
-        <View style={{ marginBottom: Spacing.xl }}>
-          <Text style={[styles.h1, { color: theme.text }]}>{c.title}</Text>
-          <Text style={[styles.h2, { color: theme.text2 }]}>{c.helper}</Text>
-        </View>
+    <SafeAreaView style={[styles.container, { backgroundColor: theme.colors.background }]}>
+      <ScrollView 
+        style={styles.scrollView}
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}
+      >
+        <ScreenHeader 
+          title={c.title}
+          subtitle={c.helper}
+        />
 
         {/* Input Section */}
-        <Section title={c.fields.inviteCodeLabel}>
-          <Card>
-            <TextField
+        <View style={styles.formSection}>
+          <ThemedText variant="overline" color="muted" style={styles.label}>
+            {c.fields.inviteCodeLabel.toUpperCase()}
+          </ThemedText>
+          <ThemedCard elevation="sm" padding="md" radius="lg">
+            <TextInput
               value={inviteCode}
               onChangeText={setInviteCode}
               placeholder="ABC123"
+              placeholderTextColor={theme.colors.textMuted}
               autoCapitalize="characters"
+              style={[
+                styles.input,
+                {
+                  color: theme.colors.text,
+                  backgroundColor: theme.colors.background,
+                  borderColor: inviteCodeError ? theme.colors.danger : theme.colors.border,
+                },
+              ]}
             />
-            {inviteCodeError ? (
-              <Text style={{ color: theme.danger, fontSize: 12, marginTop: Spacing.xs }}>
+            {inviteCodeError && (
+              <ThemedText variant="caption" color="danger" style={styles.errorText}>
                 {inviteCodeError}
-              </Text>
-            ) : null}
-          </Card>
-        </Section>
+              </ThemedText>
+            )}
+          </ThemedCard>
+        </View>
 
         {/* Error State */}
-        {errorText ? (
-          <Section>
-            <Card>
-              <Text variant="body" style={{ color: theme.danger }}>
-                {errorText}
-              </Text>
-            </Card>
-          </Section>
-        ) : null}
+        {errorText && (
+          <ThemedCard elevation="xs" padding="md" radius="lg" style={styles.errorCard}>
+            <ThemedText variant="body" color="danger">
+              {errorText}
+            </ThemedText>
+          </ThemedCard>
+        )}
 
         {/* Submit Button */}
-        <View style={{ gap: Spacing.sm, marginTop: Spacing.lg }}>
-          <Button
-            label={loading ? CONTENT.app.common.loading : c.actions.primary}
-            onPress={onSubmit}
-            disabled={loading || !inviteCode}
-            variant="primary"
-          />
-          <Button
-            label={c.actions.back}
-            onPress={() => {
-              const nav = navigation as { goBack?: () => void };
-              nav.goBack?.();
-            }}
-            variant="secondary"
-          />
-        </View>
+        <Button
+          label={loading ? CONTENT.app.common.loading : c.actions.primary}
+          onPress={onSubmit}
+          disabled={loading}
+          variant="primary"
+        />
+
+        {/* Info Card */}
+        <ThemedCard elevation="xs" padding="md" radius="lg" style={[styles.infoCard, { backgroundColor: theme.colors.surface }]}>
+          <ThemedText variant="body" color="secondary" style={styles.infoText}>
+            Enter the invite code your partner shared with you to connect your accounts.
+          </ThemedText>
+        </ThemedCard>
       </ScrollView>
-    </Screen>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  h1: { fontSize: 28, fontWeight: "700" },
-  h2: { fontSize: 16, marginTop: Spacing.sm },
+  container: {
+    flex: 1,
+  },
+  scrollView: {
+    flex: 1,
+  },
+  scrollContent: {
+    padding: spacing.lg,
+    paddingBottom: 100,
+    gap: spacing.lg,
+  },
+  formSection: {
+    gap: spacing.sm,
+  },
+  label: {
+    marginBottom: spacing.xs,
+  },
+  input: {
+    fontSize: 16,
+    fontWeight: "600",
+    letterSpacing: 2,
+    padding: spacing.md,
+    borderRadius: 8,
+    borderWidth: 1,
+  },
+  errorText: {
+    marginTop: spacing.xs,
+  },
+  errorCard: {
+    marginTop: spacing.sm,
+  },
+  infoCard: {
+    marginTop: spacing.sm,
+  },
+  infoText: {
+    lineHeight: 20,
+  },
 });
