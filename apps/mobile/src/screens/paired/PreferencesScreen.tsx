@@ -1,67 +1,25 @@
 import React, { useState } from "react";
-import { View, Pressable } from "react-native";
+import { View, StyleSheet, SafeAreaView, ScrollView } from "react-native";
 import { CONTENT, preferencesSchema } from "@withyou/shared";
-import { Screen } from "../../ui/components/Screen";
-import { Text } from "../../ui/components/Text";
+import { ThemedText } from "../../components/ThemedText";
+import { ThemedCard } from "../../components/ThemedCard";
+import { ScreenHeader } from "../../components/ScreenHeader";
+import { ChipGroup } from "../../components/checkin/ChipGroup";
 import { Button } from "../../ui/components/Button";
 import { api } from "../../state/appState";
 import { useAsyncAction } from "../../api/hooks";
-import { Spacing, BorderRadius } from "../../ui/tokens";
-import { useTheme } from "../../ui/theme/ThemeProvider";
-
-function Chip({
-  label,
-  selected,
-  onPress,
-}: {
-  label: string;
-  selected: boolean;
-  onPress: () => void;
-}) {
-  const theme = useTheme();
-  return (
-    <Pressable
-      onPress={onPress}
-      style={{
-        paddingHorizontal: Spacing.md,
-        paddingVertical: Spacing.sm,
-        borderRadius: BorderRadius.pill,
-        borderWidth: 1,
-        borderColor: selected ? theme.colors.primary : theme.colors.border,
-        backgroundColor: selected ? theme.colors.primary : "transparent",
-        minHeight: 36,
-      }}
-    >
-      <Text
-        variant="body"
-        style={{
-          fontSize: 14,
-          fontWeight: "600",
-          color: selected ? theme.colors.background : theme.colors.text,
-        }}
-      >
-        {label}
-      </Text>
-    </Pressable>
-  );
-}
+import { useTheme } from "../../theme/ThemeProvider";
+import { spacing } from "../../theme/tokens";
+import type { CheckInOption } from "../../lib/checkinOptions";
 
 export function PreferencesScreen(_navigation: unknown) {
   const theme = useTheme();
   const c = CONTENT.preferences;
 
-  const [activityStyle, setActivityStyle] = useState<
-    "chill" | "active" | "surprise" | null
-  >(null);
+  const [activityStyle, setActivityStyle] = useState<"chill" | "active" | "surprise" | null>(null);
   const [foodTypes, setFoodTypes] = useState<string[]>([]);
   const [budget, setBudget] = useState<"low" | "medium" | "high" | null>(null);
   const [energyLevel, setEnergyLevel] = useState<1 | 2 | 3 | 4 | 5 | null>(null);
-
-  const toggleFoodType = (food: string) => {
-    setFoodTypes((prev) =>
-      prev.includes(food) ? prev.filter((f) => f !== food) : [...prev, food]
-    );
-  };
 
   const { run, loading, errorText } = useAsyncAction(async () => {
     if (!activityStyle || foodTypes.length === 0 || !budget || !energyLevel) {
@@ -95,90 +53,118 @@ export function PreferencesScreen(_navigation: unknown) {
     }
   };
 
+  // Convert to CheckInOption format for ChipGroup
+  const activityOptions: CheckInOption[] = [
+    { id: "chill", label: c.options.activityStyle.chill, iconName: "leaf-outline", section: "needs" },
+    { id: "active", label: c.options.activityStyle.active, iconName: "flash-outline", section: "needs" },
+    { id: "surprise", label: c.options.activityStyle.surprise, iconName: "sparkles-outline", section: "needs" },
+  ];
+
+  const budgetOptions: CheckInOption[] = [
+    { id: "low", label: c.options.budget.low, iconName: "cash-outline", section: "needs" },
+    { id: "medium", label: c.options.budget.medium, iconName: "wallet-outline", section: "needs" },
+    { id: "high", label: c.options.budget.high, iconName: "diamond-outline", section: "needs" },
+  ];
+
+  const foodOptions: CheckInOption[] = CONTENT.lists.foodTypes.map(food => ({
+    id: food,
+    label: food,
+    iconName: "restaurant-outline",
+    section: "needs",
+  }));
+
+  const energyOptions: CheckInOption[] = [1, 2, 3, 4, 5].map(level => ({
+    id: String(level),
+    label: String(level),
+    iconName: "battery-charging-outline",
+    section: "needs",
+  }));
+
   return (
-    <Screen scrollable>
-      {/* Page Header */}
-      <View style={{ marginBottom: 24, gap: 4 }}>
-        <Text variant="screenTitle">Preferences</Text>
-        <Text variant="screenSubtitle" style={{ color: theme.colors.textSecondary }}>These are private and help tailor suggestions.</Text>
-      </View>
+    <SafeAreaView style={[styles.container, { backgroundColor: theme.colors.background }]}>
+      <ScrollView 
+        style={styles.scrollView}
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}
+      >
+        <ScreenHeader
+          title="Preferences"
+          subtitle="These are private and help tailor suggestions for both of you."
+        />
 
-      {/* Activity Style */}
-      <View style={{ marginBottom: 24, gap: 12 }}>
-        <Text variant="sectionLabel" style={{ color: theme.colors.textSecondary, textTransform: "uppercase", letterSpacing: 0.5 }}>ACTIVITY</Text>
-        <View style={{ flexDirection: "row", gap: Spacing.sm, flexWrap: "wrap" }}>
-          {(["chill", "active", "surprise"] as const).map((style) => (
-            <Chip
-              key={style}
-              label={c.options.activityStyle[style]}
-              selected={activityStyle === style}
-              onPress={() => setActivityStyle(style)}
-            />
-          ))}
-        </View>
-      </View>
+        <ThemedCard elevation="sm" padding="lg" radius="lg" style={styles.section}>
+          <ChipGroup
+            label="Activity Style"
+            options={activityOptions}
+            selectedIds={activityStyle ? [activityStyle] : []}
+            onSelectionChange={(ids) => setActivityStyle((ids[0] as "chill" | "active" | "surprise") || null)}
+            style={styles.chipSection}
+          />
 
-      {/* Food Types */}
-      <View style={{ marginBottom: 24, gap: 12 }}>
-        <Text variant="sectionLabel" style={{ color: theme.colors.textSecondary, textTransform: "uppercase", letterSpacing: 0.5 }}>FOOD</Text>
-        <View style={{ flexDirection: "row", flexWrap: "wrap", gap: Spacing.sm }}>
-          {CONTENT.lists.foodTypes.map((food) => (
-            <Chip
-              key={food}
-              label={food}
-              selected={foodTypes.includes(food)}
-              onPress={() => toggleFoodType(food)}
-            />
-          ))}
-        </View>
-      </View>
+          <ChipGroup
+            label="Food Preferences"
+            options={foodOptions}
+            selectedIds={foodTypes}
+            onSelectionChange={(ids) => setFoodTypes(ids)}
+            style={styles.chipSection}
+          />
 
-      {/* Budget */}
-      <View style={{ marginBottom: 24, gap: 12 }}>
-        <Text variant="sectionLabel" style={{ color: theme.colors.textSecondary, textTransform: "uppercase", letterSpacing: 0.5 }}>BUDGET</Text>
-        <View style={{ flexDirection: "row", gap: Spacing.sm, flexWrap: "wrap" }}>
-          {(["low", "medium", "high"] as const).map((level) => (
-            <Chip
-              key={level}
-              label={c.options.budget[level]}
-              selected={budget === level}
-              onPress={() => setBudget(level)}
-            />
-          ))}
-        </View>
-      </View>
+          <ChipGroup
+            label="Budget Level"
+            options={budgetOptions}
+            selectedIds={budget ? [budget] : []}
+            onSelectionChange={(ids) => setBudget((ids[0] as "low" | "medium" | "high") || null)}
+            style={styles.chipSection}
+          />
 
-      {/* Energy Level */}
-      <View style={{ marginBottom: 24, gap: 12 }}>
-        <Text variant="sectionLabel" style={{ color: theme.colors.textSecondary, textTransform: "uppercase", letterSpacing: 0.5 }}>ENERGY</Text>
-        <View style={{ flexDirection: "row", gap: Spacing.sm, flexWrap: "wrap" }}>
-          {[1, 2, 3, 4, 5].map((level) => (
-            <Chip
-              key={level}
-              label={String(level)}
-              selected={energyLevel === level}
-              onPress={() => setEnergyLevel(level as 1 | 2 | 3 | 4 | 5)}
-            />
-          ))}
-        </View>
-      </View>
+          <ChipGroup
+            label="Energy Level"
+            options={energyOptions}
+            selectedIds={energyLevel ? [String(energyLevel)] : []}
+            onSelectionChange={(ids) => setEnergyLevel(ids[0] ? (parseInt(ids[0]) as 1 | 2 | 3 | 4 | 5) : null)}
+            style={styles.chipSection}
+          />
 
-      {/* Error State */}
-      {errorText ? (
-        <View style={{ marginBottom: Spacing.lg }}>
-          <Text variant="body" style={{ color: theme.colors.error }}>
-            {errorText}
-          </Text>
-        </View>
-      ) : null}
+          {errorText && (
+            <View style={[styles.errorContainer, { backgroundColor: theme.colors.danger + "15" }]}>
+              <ThemedText variant="body" color="danger">
+                {errorText}
+              </ThemedText>
+            </View>
+          )}
 
-      {/* Submit Button */}
-      <Button
-        label={loading ? CONTENT.app.common.loading : c.actions.primary}
-        onPress={onSubmit}
-        disabled={loading}
-        variant="primary"
-      />
-    </Screen>
+          <Button
+            label={loading ? CONTENT.app.common.loading : c.actions.primary}
+            onPress={onSubmit}
+            disabled={loading}
+            variant="primary"
+          />
+        </ThemedCard>
+      </ScrollView>
+    </SafeAreaView>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+  scrollView: {
+    flex: 1,
+  },
+  scrollContent: {
+    padding: spacing.lg,
+    paddingBottom: 100, // Space for floating nav
+  },
+  section: {
+    marginBottom: spacing.lg,
+  },
+  chipSection: {
+    marginBottom: spacing.lg,
+  },
+  errorContainer: {
+    padding: spacing.md,
+    borderRadius: 8,
+    marginBottom: spacing.md,
+  },
+});

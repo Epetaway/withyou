@@ -1,11 +1,13 @@
 import React, { useMemo, useState } from "react";
-import { StyleSheet, View } from "react-native";
-import { Screen } from "../../ui/components/Screen";
-import { Text } from "../../ui/components/Text";
+import { StyleSheet, View, SafeAreaView, ScrollView } from "react-native";
+import { ThemedText } from "../../components/ThemedText";
+import { ThemedCard } from "../../components/ThemedCard";
+import { ScreenHeader } from "../../components/ScreenHeader";
 import { Button } from "../../ui/components/Button";
 import { RadiusSelector } from "../../ui/components/RadiusSelector";
 import { FilterChips } from "../../ui/components/FilterChips";
-import { Spacing } from "../../ui/tokens";
+import { useTheme } from "../../theme/ThemeProvider";
+import { spacing } from "../../theme/tokens";
 
 type Navigation = {
   navigate: (screen: string, params?: unknown) => void;
@@ -19,6 +21,7 @@ const localFilterOptions = [
 ];
 
 export function IdeasScreen({ navigation }: { navigation: Navigation }) {
+  const theme = useTheme();
   const [radius, setRadius] = useState<number>(10);
   const [selectedFilters, setSelectedFilters] = useState<Set<string>>(new Set());
 
@@ -34,65 +37,101 @@ export function IdeasScreen({ navigation }: { navigation: Navigation }) {
   };
 
   return (
-    <Screen style={styles.screen} scrollable>
-        <View style={styles.header}>
-          <Text variant="title" style={styles.h1}>Ideas</Text>
-          <Text variant="body" style={styles.h2}>
-            Pick a mode and we’ll suggest gentle, low-pressure activities.
-          </Text>
-        </View>
+    <SafeAreaView style={[styles.container, { backgroundColor: theme.colors.background }]}>
+      <ScrollView 
+        style={styles.scrollView}
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}
+      >
+        <ScreenHeader
+          title="Ideas"
+          subtitle="Discover gentle, low-pressure activities for you and your partner."
+        />
 
-        <View style={styles.section}>
-          <Text variant="subtitle" style={styles.sectionTitle}>Local activities</Text>
-          <Text variant="body" style={styles.sectionBody}>
+        {/* Local Activities Section */}
+        <ThemedCard elevation="sm" padding="lg" radius="lg" style={styles.section}>
+          <ThemedText variant="h3" color="primary" style={styles.sectionTitle}>
+            Local activities
+          </ThemedText>
+          <ThemedText variant="body" color="muted" style={styles.sectionBody}>
             Choose a nearby radius and optional filters to see curated ideas.
-          </Text>
+          </ThemedText>
 
-          <Text variant="body" style={styles.label}>Radius</Text>
+          <ThemedText variant="overline" color="muted" style={styles.label}>
+            RADIUS
+          </ThemedText>
           <RadiusSelector value={radius} onChange={setRadius} />
 
-          <Text variant="body" style={[styles.label, { marginTop: Spacing.md }]}>Filters</Text>
+          <ThemedText variant="overline" color="muted" style={[styles.label, { marginTop: spacing.md }]}>
+            FILTERS
+          </ThemedText>
           <FilterChips
             options={localFilterOptions}
             selected={selectedFilters}
             onToggle={toggleFilter}
           />
 
-          <View style={styles.actionsRow}>
+          <View style={styles.actionRow}>
             <Button
               label="Find near me"
               onPress={() => navigation.navigate("LocalMap", { radiusMiles: radius, filters: filtersArray })}
               variant="primary"
             />
           </View>
-        </View>
+        </ThemedCard>
 
-        <View style={styles.section}>
-          <Text variant="subtitle" style={styles.sectionTitle}>Try a mode</Text>
-          <Text variant="body" style={styles.sectionBody}>
+        {/* Quick Modes Section */}
+        <ThemedCard elevation="sm" padding="lg" radius="lg" style={styles.section}>
+          <ThemedText variant="h3" color="primary" style={styles.sectionTitle}>
+            Try a mode
+          </ThemedText>
+          <ThemedText variant="body" color="muted" style={styles.sectionBody}>
             Quick-start ideas for cooking at home or a cozy movie night. Saved ideas live here too.
-          </Text>
+          </ThemedText>
 
           <View style={styles.modeButtons}>
             <Button label="Food mode" onPress={() => navigation.navigate("FoodMode")} variant="primary" />
             <Button label="Movie mode" onPress={() => navigation.navigate("MovieMode")} variant="secondary" />
             <Button label="Saved ideas" onPress={() => navigation.navigate("SavedIdeas")} variant="secondary" />
           </View>
-        </View>
-    </Screen>
+        </ThemedCard>
+      </ScrollView>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  screen: { paddingHorizontal: Spacing.md, paddingTop: Spacing.lg },
-  scrollContent: { paddingBottom: Spacing.xl, gap: Spacing.lg },
-  header: { gap: Spacing.xs },
-  h1: { fontSize: 28, fontWeight: "700" },
-  h2: { color: "rgba(34,23,42,0.70)" },
-  section: { gap: Spacing.sm },
-  sectionTitle: { fontWeight: "700" },
-  sectionBody: { color: "rgba(34,23,42,0.70)" },
-  label: { marginTop: Spacing.xs, color: "rgba(34,23,42,0.70)" },
-  actionsRow: { flexDirection: "row", gap: Spacing.sm, marginTop: Spacing.md },
-  modeButtons: { flexDirection: "row", gap: Spacing.sm, flexWrap: "wrap" },
+  container: {
+    flex: 1,
+  },
+  scrollView: {
+    flex: 1,
+  },
+  scrollContent: {
+    padding: spacing.lg,
+    paddingBottom: 100, // Space for floating nav
+  },
+  section: {
+    marginBottom: spacing.lg,
+  },
+  sectionTitle: {
+    marginBottom: spacing.xs,
+  },
+  sectionBody: {
+    marginBottom: spacing.md,
+    lineHeight: 22,
+  },
+  label: {
+    marginTop: spacing.md,
+    marginBottom: spacing.xs,
+  },
+  actionRow: {
+    marginTop: spacing.md,
+  },
+  modeButtons: {
+    flexDirection: "row",
+    gap: spacing.sm,
+    flexWrap: "wrap",
+    marginTop: spacing.md,
+  },
 });
