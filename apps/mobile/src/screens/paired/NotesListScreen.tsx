@@ -1,10 +1,12 @@
 import React, { useState, useCallback } from "react";
-import { View, StyleSheet, Pressable, FlatList, RefreshControl } from "react-native";
-import { FontAwesome6 } from "@expo/vector-icons";
+import { View, StyleSheet, Pressable, FlatList, RefreshControl, SafeAreaView } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
 import { useNavigation, useFocusEffect, NavigationProp } from "@react-navigation/native";
-import { Screen } from "../../ui/components/Screen";
-import { Text } from "../../ui/components/Text";
-import { useTheme } from "../../ui/theme/ThemeProvider";
+import { ThemedText } from "../../components/ThemedText";
+import { ThemedCard } from "../../components/ThemedCard";
+import { ScreenHeader } from "../../components/ScreenHeader";
+import { useTheme } from "../../theme/ThemeProvider";
+import { spacing } from "../../theme/tokens";
 import { api } from "../../state/appState";
 import { Note, NotesResponse } from "@withyou/shared";
 
@@ -42,25 +44,14 @@ export function NotesListScreen() {
     fetchNotes();
   };
 
-  const getNoteIcon = (type: string) => {
+  const getNoteIcon = (type: string): "chatbubbles" | "film" | "mic" => {
     switch (type) {
       case "VIDEO":
-        return "video";
+        return "film";
       case "VOICE":
-        return "microphone";
+        return "mic";
       default:
-        return "message";
-    }
-  };
-
-  const getNoteBackgroundColor = (type: string) => {
-    switch (type) {
-      case "VIDEO":
-        return "#F5D4FF"; // light purple
-      case "VOICE":
-        return "#DBEAFE"; // light blue
-      default:
-        return "#FEF3C7"; // light yellow
+        return "chatbubbles";
     }
   };
 
@@ -81,59 +72,58 @@ export function NotesListScreen() {
   };
 
   const renderNote = ({ item }: { item: Note }) => (
-    <Pressable
-      style={[styles.noteCard, { backgroundColor: getNoteBackgroundColor(item.type) }]}
-    >
+    <ThemedCard elevation="xs" padding="md" radius="lg">
       <View style={styles.noteHeader}>
-        <FontAwesome6
+        <Ionicons
           name={getNoteIcon(item.type)}
-          size={18}
-          color="#374151"
+          size={20}
+          color={theme.colors.primary}
         />
-        <Text variant="helper" style={{ color: "#6B7280", marginLeft: 8 }}>
+        <ThemedText variant="caption" color="muted" style={styles.noteTime}>
           {formatDate(item.createdAt)}
-        </Text>
+        </ThemedText>
       </View>
-      <Text
+      <ThemedText
         variant="body"
-        style={{ color: "#1F2937", marginTop: 8 }}
-        numberOfLines={4}
+        color="primary"
+        style={styles.noteContent}
+        numberOfLines={3}
       >
-        {item.content || (item.type === "VIDEO" ? "Video note" : item.type === "VOICE" ? "Voice note" : "Note")}
-      </Text>
-    </Pressable>
+        {item.content || (item.type === "VIDEO" ? "📹 Video note" : item.type === "VOICE" ? "🎙️ Voice note" : "📝 Note")}
+      </ThemedText>
+    </ThemedCard>
   );
 
   return (
-    <Screen>
-      <View style={styles.header}>
-        <Pressable onPress={() => navigation.goBack()}>
-          <FontAwesome6 name="arrow-left" size={24} color={theme.colors.text} />
-        </Pressable>
-        <Text variant="screenTitle">Notes</Text>
-        <Pressable onPress={() => navigation.navigate("NoteCompose")}>
-          <FontAwesome6 name="plus" size={24} color={theme.colors.primary} />
+    <SafeAreaView style={[styles.container, { backgroundColor: theme.colors.background }]}>
+      <View style={styles.headerContainer}>
+        <ScreenHeader title="Notes" subtitle="Your private messages" />
+        <Pressable 
+          onPress={() => navigation.navigate("NoteCompose")}
+          style={[styles.addButton, { backgroundColor: theme.colors.primary }]}
+        >
+          <Ionicons name="add" size={24} color="#FFFFFF" />
         </Pressable>
       </View>
 
       {loading ? (
         <View style={styles.centerContent}>
-          <Text variant="body">Loading notes...</Text>
+          <ThemedText variant="body" color="secondary">Loading notes...</ThemedText>
         </View>
       ) : notes.length === 0 ? (
         <View style={styles.centerContent}>
-          <FontAwesome6 name="message" size={48} color={theme.colors.textSecondary} style={{ marginBottom: 16 }} />
-          <Text variant="subtitle" style={{ color: theme.colors.text, marginBottom: 8 }}>
+          <Ionicons name="chatbubbles-outline" size={64} color={theme.colors.textMuted} style={styles.emptyIcon} />
+          <ThemedText variant="h2" color="primary" style={styles.emptyTitle}>
             No notes yet
-          </Text>
-          <Text variant="body" style={{ color: theme.colors.textSecondary, textAlign: "center", paddingHorizontal: 40 }}>
+          </ThemedText>
+          <ThemedText variant="body" color="secondary" style={styles.emptyText}>
             Send a sweet message, photo, or video to your partner
-          </Text>
+          </ThemedText>
           <Pressable
             style={[styles.emptyButton, { backgroundColor: theme.colors.primary }]}
             onPress={() => navigation.navigate("NoteCompose")}
           >
-            <Text style={{ color: "#FFFFFF", fontWeight: "600" }}>Send your first note</Text>
+            <ThemedText style={styles.emptyButtonText}>Send your first note</ThemedText>
           </Pressable>
         </View>
       ) : (
@@ -142,6 +132,7 @@ export function NotesListScreen() {
           renderItem={renderNote}
           keyExtractor={(item) => item.id}
           contentContainerStyle={styles.listContent}
+          scrollEnabled={true}
           refreshControl={
             <RefreshControl
               refreshing={refreshing}
@@ -151,44 +142,74 @@ export function NotesListScreen() {
           }
         />
       )}
-    </Screen>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  header: {
+  container: {
+    flex: 1,
+  },
+  headerContainer: {
+    paddingHorizontal: spacing.lg,
+    paddingTop: spacing.md,
+    paddingBottom: spacing.md,
     flexDirection: "row",
     justifyContent: "space-between",
+    alignItems: "flex-start",
+  },
+  addButton: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    justifyContent: "center",
     alignItems: "center",
-    paddingHorizontal: 20,
-    paddingVertical: 16,
+    marginTop: spacing.sm,
   },
   centerContent: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
+    paddingHorizontal: spacing.xl,
   },
   listContent: {
-    padding: 20,
-    gap: 12,
-  },
-  noteCard: {
-    borderRadius: 12,
-    padding: 16,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
-    shadowRadius: 2,
-    elevation: 1,
+    padding: spacing.lg,
+    gap: spacing.md,
+    paddingBottom: 100,
   },
   noteHeader: {
     flexDirection: "row",
     alignItems: "center",
+    marginBottom: spacing.sm,
+    gap: spacing.sm,
+  },
+  noteTime: {
+    flex: 1,
+  },
+  noteContent: {
+    lineHeight: 22,
+  },
+  emptyIcon: {
+    marginBottom: spacing.lg,
+    opacity: 0.5,
+  },
+  emptyTitle: {
+    marginBottom: spacing.sm,
+  },
+  emptyText: {
+    textAlign: "center",
+    marginBottom: spacing.lg,
+    lineHeight: 20,
   },
   emptyButton: {
-    marginTop: 24,
-    paddingVertical: 14,
-    paddingHorizontal: 24,
+    marginTop: spacing.lg,
+    paddingVertical: spacing.md,
+    paddingHorizontal: spacing.xl,
     borderRadius: 12,
+  },
+  emptyButtonText: {
+    color: "#FFFFFF",
+    fontWeight: "600",
+    textAlign: "center",
   },
 });

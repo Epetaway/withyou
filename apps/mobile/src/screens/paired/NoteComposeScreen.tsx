@@ -1,12 +1,14 @@
 import React, { useState } from "react";
-import { View, StyleSheet, TextInput, Pressable, Image, Alert, ActivityIndicator, ScrollView } from "react-native";
-import { FontAwesome6 } from "@expo/vector-icons";
+import { View, StyleSheet, TextInput, Pressable, Image, Alert, ActivityIndicator, SafeAreaView, ScrollView } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
 import * as ImagePicker from "expo-image-picker";
 import { useNavigation } from "@react-navigation/native";
-import { Screen } from "../../ui/components/Screen";
-import { Text } from "../../ui/components/Text";
+import { ThemedText } from "../../components/ThemedText";
+import { ThemedCard } from "../../components/ThemedCard";
+import { ScreenHeader } from "../../components/ScreenHeader";
 import { Button } from "../../ui/components/Button";
-import { useTheme } from "../../ui/theme/ThemeProvider";
+import { useTheme } from "../../theme/ThemeProvider";
+import { spacing } from "../../theme/tokens";
 import { api } from "../../state/appState";
 import { NoteType } from "@withyou/shared";
 
@@ -35,7 +37,7 @@ export function NoteComposeScreen() {
 
     if (!result.canceled && result.assets[0]) {
       setMediaUri(result.assets[0].uri);
-      setNoteType("TEXT"); // For now, treating image as attachment to text
+      setNoteType("TEXT");
     }
   };
 
@@ -51,7 +53,7 @@ export function NoteComposeScreen() {
       mediaTypes: ImagePicker.MediaTypeOptions.Videos,
       allowsEditing: true,
       quality: 0.5,
-      videoMaxDuration: 60, // 60 seconds max
+      videoMaxDuration: 60,
     });
 
     if (!result.canceled && result.assets[0]) {
@@ -75,17 +77,11 @@ export function NoteComposeScreen() {
 
     if (!result.canceled && result.assets[0]) {
       setMediaUri(result.assets[0].uri);
-      setNoteType("TEXT"); // Treating photo as attachment to text
+      setNoteType("TEXT");
     }
   };
 
   const uploadMedia = async (uri: string): Promise<string> => {
-    // TODO: Implement secure media upload to S3 or similar storage
-    // For now, this is a placeholder that returns the local URI
-    // In production, this should:
-    // 1. Upload the media file to S3 using pre-signed URL
-    // 2. Return the public/secure URL for the uploaded file
-    // 3. Handle upload failures with retry logic
     console.warn("Media upload not implemented - using local URI as placeholder");
     return uri;
   };
@@ -150,83 +146,91 @@ export function NoteComposeScreen() {
   };
 
   return (
-    <Screen>
-      <View style={styles.header}>
-        <Pressable onPress={() => navigation.goBack()}>
-          <FontAwesome6 name="arrow-left" size={24} color={theme.colors.text} />
-        </Pressable>
-        <Text variant="screenTitle">Send a Note</Text>
-        <View style={{ width: 24 }} />
-      </View>
+    <SafeAreaView style={[styles.container, { backgroundColor: theme.colors.background }]}>
+      <ScreenHeader title="Send a Note" subtitle="Keep it private and meaningful" />
 
-      <ScrollView style={styles.content} contentContainerStyle={styles.scrollContent}>
-        <Text variant="body" style={[styles.hint, { color: theme.colors.textSecondary }]}>
-          Send a sweet message, photo, or short video to your partner. Keep it private and meaningful.
-        </Text>
+      <ScrollView 
+        style={styles.content}
+        contentContainerStyle={styles.scrollContent}
+        keyboardShouldPersistTaps="handled"
+      >
+        <ThemedText variant="body" color="secondary" style={styles.hint}>
+          Send a sweet message, photo, or short video to your partner.
+        </ThemedText>
 
-        <TextInput
-          style={[
-            styles.textInput,
-            {
-              backgroundColor: theme.colors.surface,
-              color: theme.colors.text,
-              borderColor: theme.colors.border,
-            },
-          ]}
-          placeholder="Write your note here..."
-          placeholderTextColor={theme.colors.textSecondary}
-          multiline
-          value={content}
-          onChangeText={setContent}
-          maxLength={300}
-          textAlignVertical="top"
-        />
-
-        <Text variant="helper" style={[styles.charCount, { color: theme.colors.textSecondary }]}>
-          {content.length}/300
-        </Text>
+        <ThemedCard elevation="sm" padding="md" radius="lg">
+          <TextInput
+            style={[
+              styles.textInput,
+              {
+                backgroundColor: theme.colors.background,
+                color: theme.colors.text,
+                borderColor: theme.colors.border,
+              },
+            ]}
+            placeholder="Write your note here..."
+            placeholderTextColor={theme.colors.textMuted}
+            multiline
+            value={content}
+            onChangeText={setContent}
+            maxLength={300}
+            textAlignVertical="top"
+          />
+          <ThemedText variant="caption" color="muted" style={styles.charCount}>
+            {content.length}/300
+          </ThemedText>
+        </ThemedCard>
 
         {mediaUri && (
-          <View style={styles.mediaPreview}>
-            {noteType === "VIDEO" ? (
-              <View style={[styles.videoPlaceholder, { backgroundColor: theme.colors.surface }]}>
-                <FontAwesome6 name="video" size={48} color={theme.colors.primary} />
-                <Text variant="body" style={{ marginTop: 8 }}>Video attached</Text>
-              </View>
-            ) : (
-              <Image source={{ uri: mediaUri }} style={styles.imagePreview} resizeMode="cover" />
-            )}
-            <Pressable style={styles.removeMediaButton} onPress={clearMedia}>
-              <FontAwesome6 name="xmark" size={16} color="#FFFFFF" />
-            </Pressable>
+          <View style={styles.mediaSection}>
+            <ThemedText variant="overline" color="muted" style={styles.sectionLabel}>
+              ATTACHMENT
+            </ThemedText>
+            <ThemedCard elevation="sm" padding="0" radius="lg" style={styles.mediaPreview}>
+              {noteType === "VIDEO" ? (
+                <View style={[styles.videoPlaceholder, { backgroundColor: theme.colors.surface }]}>
+                  <Ionicons name="film" size={48} color={theme.colors.primary} />
+                  <ThemedText variant="body" color="primary" style={styles.videoText}>
+                    Video attached
+                  </ThemedText>
+                </View>
+              ) : (
+                <Image source={{ uri: mediaUri }} style={styles.imagePreview} resizeMode="cover" />
+              )}
+              <Pressable style={styles.removeMediaButton} onPress={clearMedia}>
+                <Ionicons name="close" size={18} color="#FFFFFF" />
+              </Pressable>
+            </ThemedCard>
           </View>
         )}
 
-        <View style={styles.attachmentRow}>
-          <Text variant="subtitle" style={{ marginBottom: 8 }}>Add attachment</Text>
+        <View style={styles.attachmentSection}>
+          <ThemedText variant="overline" color="muted" style={styles.sectionLabel}>
+            ADD ATTACHMENT
+          </ThemedText>
           <View style={styles.attachmentButtons}>
             <Pressable
-              style={[styles.attachmentButton, { backgroundColor: theme.colors.primary + "20" }]}
+              style={[styles.attachmentButton, { backgroundColor: theme.colors.primary + "15", borderColor: theme.colors.primary }]}
               onPress={takePhoto}
             >
-              <FontAwesome6 name="camera" size={24} color={theme.colors.primary} />
-              <Text variant="helper" style={{ color: theme.colors.primary }}>Camera</Text>
+              <Ionicons name="camera" size={28} color={theme.colors.primary} />
+              <ThemedText variant="caption" color="primary">Camera</ThemedText>
             </Pressable>
 
             <Pressable
-              style={[styles.attachmentButton, { backgroundColor: theme.colors.primary + "20" }]}
+              style={[styles.attachmentButton, { backgroundColor: theme.colors.primary + "15", borderColor: theme.colors.primary }]}
               onPress={pickImage}
             >
-              <FontAwesome6 name="image" size={24} color={theme.colors.primary} />
-              <Text variant="helper" style={{ color: theme.colors.primary }}>Photo</Text>
+              <Ionicons name="image" size={28} color={theme.colors.primary} />
+              <ThemedText variant="caption" color="primary">Photo</ThemedText>
             </Pressable>
 
             <Pressable
-              style={[styles.attachmentButton, { backgroundColor: theme.colors.primary + "20" }]}
+              style={[styles.attachmentButton, { backgroundColor: theme.colors.primary + "15", borderColor: theme.colors.primary }]}
               onPress={pickVideo}
             >
-              <FontAwesome6 name="video" size={24} color={theme.colors.primary} />
-              <Text variant="helper" style={{ color: theme.colors.primary }}>Video</Text>
+              <Ionicons name="film" size={28} color={theme.colors.primary} />
+              <ThemedText variant="caption" color="primary">Video</ThemedText>
             </Pressable>
           </View>
         </View>
@@ -236,9 +240,9 @@ export function NoteComposeScreen() {
         {uploading && (
           <View style={styles.uploadingContainer}>
             <ActivityIndicator size="small" color={theme.colors.primary} />
-            <Text variant="helper" style={{ color: theme.colors.textSecondary, marginLeft: 8 }}>
+            <ThemedText variant="caption" color="secondary" style={styles.uploadingText}>
               Uploading media...
-            </Text>
+            </ThemedText>
           </View>
         )}
         <Button
@@ -248,46 +252,46 @@ export function NoteComposeScreen() {
           disabled={sending || uploading}
         />
       </View>
-    </Screen>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  header: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    paddingHorizontal: 20,
-    paddingVertical: 16,
+  container: {
+    flex: 1,
   },
   content: {
     flex: 1,
-    paddingHorizontal: 20,
   },
   scrollContent: {
-    paddingBottom: 20,
+    padding: spacing.lg,
+    gap: spacing.lg,
+    paddingBottom: 120,
   },
   hint: {
-    marginBottom: 16,
+    lineHeight: 20,
   },
   textInput: {
     minHeight: 120,
     borderWidth: 1,
-    borderRadius: 12,
-    padding: 16,
+    borderRadius: 8,
+    padding: spacing.md,
     fontSize: 16,
-    marginBottom: 8,
   },
   charCount: {
     textAlign: "right",
-    marginBottom: 16,
+    marginTop: spacing.xs,
+  },
+  mediaSection: {
+    gap: spacing.sm,
+  },
+  sectionLabel: {
+    marginBottom: spacing.xs,
   },
   mediaPreview: {
     width: "100%",
     height: 200,
-    borderRadius: 12,
     overflow: "hidden",
-    marginBottom: 16,
     position: "relative",
   },
   imagePreview: {
@@ -299,40 +303,49 @@ const styles = StyleSheet.create({
     height: "100%",
     justifyContent: "center",
     alignItems: "center",
+    gap: spacing.sm,
+  },
+  videoText: {
+    marginTop: spacing.sm,
   },
   removeMediaButton: {
     position: "absolute",
-    top: 8,
-    right: 8,
-    width: 32,
-    height: 32,
-    borderRadius: 16,
+    top: spacing.sm,
+    right: spacing.sm,
+    width: 36,
+    height: 36,
+    borderRadius: 18,
     backgroundColor: "rgba(0, 0, 0, 0.6)",
     justifyContent: "center",
     alignItems: "center",
   },
-  attachmentRow: {
-    marginTop: 8,
+  attachmentSection: {
+    gap: spacing.sm,
   },
   attachmentButtons: {
     flexDirection: "row",
-    gap: 12,
+    gap: spacing.sm,
   },
   attachmentButton: {
     flex: 1,
     alignItems: "center",
-    padding: 16,
+    padding: spacing.lg,
     borderRadius: 12,
-    gap: 8,
+    borderWidth: 1,
+    gap: spacing.xs,
   },
   footer: {
-    padding: 20,
+    padding: spacing.lg,
     borderTopWidth: 1,
   },
   uploadingContainer: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    marginBottom: 12,
+    marginBottom: spacing.md,
+    gap: spacing.sm,
+  },
+  uploadingText: {
+    marginLeft: spacing.sm,
   },
 });
