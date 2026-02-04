@@ -1,8 +1,10 @@
 import React, { useState } from "react";
-import { View, StyleSheet, Pressable } from "react-native";
-import { Screen } from "../../ui/components/Screen";
-import { Text } from "../../ui/components/Text";
+import { View, StyleSheet, Pressable, SafeAreaView, ScrollView } from "react-native";
 import { TextFieldNew } from "../../ui/components/TextFieldNew";
+import { ThemedCard } from "../../ui/components/ThemedCard";
+import { ThemedText } from "../../ui/components/ThemedText";
+import { ScreenHeader } from "../../ui/components/ScreenHeader";
+import { spacing } from "../../ui/tokens";
 import { api } from "../../state/appState";
 import { useAsyncAction } from "../../api/hooks";
 import { useTheme } from "../../ui/theme/ThemeProvider";
@@ -55,10 +57,10 @@ export function ProfileSetupScreen({ navigation }: ProfileSetupScreenProps) {
     switch (currentStep) {
       case 1:
         return (
-          <View style={{ gap: 16 }}>
-            <Text variant="body" style={{ color: theme.colors.textSecondary }}>
+          <View style={{ gap: spacing.md }}>
+            <ThemedText variant="body" color="secondary">
               What would you like to be called?
-            </Text>
+            </ThemedText>
             <TextFieldNew
               label="Nickname (optional)"
               value={nickname}
@@ -70,35 +72,35 @@ export function ProfileSetupScreen({ navigation }: ProfileSetupScreenProps) {
         );
       case 2:
         return (
-          <View style={{ gap: 16 }}>
-            <Text variant="body" style={{ color: theme.colors.textSecondary }}>
+          <View style={{ gap: spacing.md }}>
+            <ThemedText variant="body" color="secondary">
               What are your relationship goals? (You can select multiple or skip)
-            </Text>
-            <Text variant="helper" style={{ color: theme.colors.textSecondary, fontStyle: "italic" }}>
+            </ThemedText>
+            <ThemedText variant="caption" color="secondary" style={{ fontStyle: "italic" }}>
               Goal selection would go here
-            </Text>
+            </ThemedText>
           </View>
         );
       case 3:
         return (
-          <View style={{ gap: 16 }}>
-            <Text variant="body" style={{ color: theme.colors.textSecondary }}>
+          <View style={{ gap: spacing.md }}>
+            <ThemedText variant="body" color="secondary">
               Choose your privacy settings
-            </Text>
-            <Text variant="helper" style={{ color: theme.colors.textSecondary, fontStyle: "italic" }}>
+            </ThemedText>
+            <ThemedText variant="caption" color="secondary" style={{ fontStyle: "italic" }}>
               Privacy toggles would go here
-            </Text>
+            </ThemedText>
           </View>
         );
       case 4:
         return (
-          <View style={{ gap: 16 }}>
-            <Text variant="body" style={{ color: theme.colors.textSecondary }}>
+          <View style={{ gap: spacing.md }}>
+            <ThemedText variant="body" color="secondary">
               When would you like to receive notifications?
-            </Text>
-            <Text variant="helper" style={{ color: theme.colors.textSecondary, fontStyle: "italic" }}>
+            </ThemedText>
+            <ThemedText variant="caption" color="secondary" style={{ fontStyle: "italic" }}>
               Notification time pickers would go here
-            </Text>
+            </ThemedText>
           </View>
         );
       default:
@@ -107,76 +109,81 @@ export function ProfileSetupScreen({ navigation }: ProfileSetupScreenProps) {
   };
 
   return (
-    <Screen scrollable>
-      <View style={{ marginBottom: 32, marginTop: 40 }}>
-        <Text variant="screenTitle">Set Up Your Profile</Text>
-        <Text variant="screenSubtitle" style={{ color: theme.colors.textSecondary, marginTop: 4 }}>
-          Step {currentStep} of {totalSteps}
-        </Text>
-      </View>
+    <SafeAreaView style={[styles.container, { backgroundColor: theme.colors.background }]}>
+      <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContent}>
+        <ScreenHeader title="Set Up Your Profile" subtitle={`Step ${currentStep} of ${totalSteps}`} />
 
-      {/* Progress indicator */}
-      <View style={styles.progressContainer}>
-        {[1, 2, 3, 4].map((step) => (
-          <View
-            key={step}
-            style={[
-              styles.progressDot,
-              {
-                backgroundColor:
-                  step <= currentStep ? theme.colors.primary : theme.colors.textSecondary,
-                opacity: step <= currentStep ? 1 : 0.3,
-              },
-            ]}
-          />
-        ))}
-      </View>
+        {/* Progress indicator */}
+        <View style={styles.progressContainer}>
+          {[1, 2, 3, 4].map((step) => (
+            <View
+              key={step}
+              style={[
+                styles.progressDot,
+                {
+                  backgroundColor:
+                    step <= currentStep ? theme.colors.primary : theme.colors.textSecondary,
+                  opacity: step <= currentStep ? 1 : 0.3,
+                },
+              ]}
+            />
+          ))}
+        </View>
 
-      {/* Step content */}
-      <View style={{ marginBottom: 32 }}>{renderStep()}</View>
+        {/* Step content */}
+        <ThemedCard style={styles.stepContent} color="surface" elevation="sm">
+          {renderStep()}
+        </ThemedCard>
 
-      {/* Buttons */}
-      <View style={{ gap: 12 }}>
-        <Pressable
-          style={[styles.primaryButton, { backgroundColor: theme.colors.primary }]}
-          onPress={handleNext}
-          disabled={loading}
-        >
-          <Text style={{ color: theme.colors.background, fontSize: 16, fontWeight: "600" }}>
-            {loading ? "Saving..." : currentStep === totalSteps ? "Finish" : "Next"}
-          </Text>
-        </Pressable>
+        {/* Buttons */}
+        <View style={{ gap: spacing.sm }}>
+          <Pressable
+            style={[styles.primaryButton, { backgroundColor: theme.colors.primary }]}
+            onPress={handleNext}
+            disabled={loading}
+          >
+            <ThemedText variant="body" style={{ fontWeight: "600" }} color="secondary">
+              {loading ? "Saving..." : currentStep === totalSteps ? "Finish" : "Next"}
+            </ThemedText>
+          </Pressable>
 
-        <Pressable style={styles.secondaryButton} onPress={handleSkip}>
-          <Text style={{ color: theme.colors.textSecondary, fontSize: 16, fontWeight: "600" }}>
-            Skip
-          </Text>
-        </Pressable>
-      </View>
-    </Screen>
+          <Pressable style={[styles.secondaryButton, { borderColor: theme.colors.primary }]} onPress={handleSkip}>
+            <ThemedText variant="body" color="primary" style={{ fontWeight: "600" }}>
+              Skip
+            </ThemedText>
+          </Pressable>
+        </View>
+      </ScrollView>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
+  container: { flex: 1 },
+  scrollView: { flex: 1 },
+  scrollContent: { padding: spacing.lg, paddingBottom: 100, gap: spacing.lg },
   progressContainer: {
     flexDirection: "row",
-    gap: 8,
-    marginBottom: 32,
+    gap: spacing.sm,
   },
   progressDot: {
     flex: 1,
     height: 4,
     borderRadius: 2,
   },
+  stepContent: { padding: spacing.lg, gap: spacing.md },
   primaryButton: {
-    paddingVertical: 16,
-    paddingHorizontal: 24,
+    paddingVertical: spacing.md,
+    paddingHorizontal: spacing.lg,
     borderRadius: 12,
     alignItems: "center",
+    minHeight: 48,
   },
   secondaryButton: {
-    paddingVertical: 16,
-    paddingHorizontal: 24,
+    paddingVertical: spacing.md,
+    paddingHorizontal: spacing.lg,
+    borderRadius: 12,
     alignItems: "center",
+    borderWidth: 1.5,
   },
 });

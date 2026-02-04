@@ -1,8 +1,10 @@
 import React, { useState, useEffect, useCallback } from "react";
-import { View, StyleSheet, Pressable } from "react-native";
-import { Screen } from "../../ui/components/Screen";
-import { Text } from "../../ui/components/Text";
+import { View, StyleSheet, Pressable, SafeAreaView, ScrollView, ActivityIndicator } from "react-native";
 import { TextFieldNew } from "../../ui/components/TextFieldNew";
+import { ThemedCard } from "../../ui/components/ThemedCard";
+import { ThemedText } from "../../ui/components/ThemedText";
+import { ScreenHeader } from "../../ui/components/ScreenHeader";
+import { spacing } from "../../ui/tokens";
 import { api } from "../../state/appState";
 import { useAsyncAction } from "../../api/hooks";
 import { useTheme } from "../../ui/theme/ThemeProvider";
@@ -89,78 +91,90 @@ export function EmailVerificationScreen({ navigation, route }: EmailVerification
   }, [code, verifying, handleVerify]);
 
   return (
-    <Screen scrollable>
-      <View style={{ marginBottom: 32, marginTop: 40 }}>
-        <Text variant="screenTitle">Verify Your Email</Text>
-        <Text variant="screenSubtitle" style={{ color: theme.colors.textSecondary, marginTop: 4 }}>
-          We sent a 6-digit code to {email || "your email"}
-        </Text>
-      </View>
+    <SafeAreaView style={[styles.container, { backgroundColor: theme.colors.background }]}>
+      <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContent}>
+        <ScreenHeader title="Verify Your Email" subtitle={`We sent a 6-digit code to ${email || "your email"}`} />
 
-      <View style={{ gap: 16, marginBottom: 24 }}>
-        <TextFieldNew
-          label="Verification Code"
-          value={code}
-          onChangeText={(text) => setCode(text.replace(/[^0-9]/g, "").slice(0, 6))}
-          keyboardType="number-pad"
-          autoCapitalize="none"
-          placeholder="000000"
-          maxLength={6}
-          error={error || undefined}
-        />
+        <ThemedCard style={styles.formSection} color="surface" elevation="sm">
+          <TextFieldNew
+            label="Verification Code"
+            value={code}
+            onChangeText={(text) => setCode(text.replace(/[^0-9]/g, "").slice(0, 6))}
+            keyboardType="number-pad"
+            autoCapitalize="none"
+            placeholder="000000"
+            maxLength={6}
+            error={error || undefined}
+          />
 
-        {error ? (
-          <Text variant="helper" style={{ color: theme.colors.error }}>
-            {error}
-          </Text>
-        ) : null}
+          {error ? (
+            <ThemedText variant="caption" color="danger" style={{ marginTop: spacing.sm }}>
+              {error}
+            </ThemedText>
+          ) : null}
 
-        <Pressable
-          style={[
-            styles.primaryButton,
-            { backgroundColor: theme.colors.primary },
-            (verifying || code.length !== 6) && { opacity: 0.6 }
-          ]}
-          onPress={handleVerify}
-          disabled={verifying || code.length !== 6}
-        >
-          <Text style={{ color: theme.colors.background, fontSize: 16, fontWeight: "600" }}>
-            {verifying ? "Verifying..." : "Verify Email"}
-          </Text>
+          <Pressable
+            style={[
+              styles.primaryButton,
+              { backgroundColor: theme.colors.primary },
+              (verifying || code.length !== 6) && { opacity: 0.6 }
+            ]}
+            onPress={handleVerify}
+            disabled={verifying || code.length !== 6}
+          >
+            {verifying ? (
+              <ActivityIndicator color={theme.colors.background} />
+            ) : (
+              <ThemedText variant="body" color="secondary" style={{ fontWeight: "600" }}>
+                Verify Email
+              </ThemedText>
+            )}
+          </Pressable>
+
+          <View style={styles.resendContainer}>
+            {countdown > 0 ? (
+              <ThemedText variant="caption" color="secondary">
+                Resend code in {countdown}s
+              </ThemedText>
+            ) : (
+              <Pressable onPress={handleResend} disabled={sending}>
+                {sending ? (
+                  <ActivityIndicator size="small" color={theme.colors.primary} />
+                ) : (
+                  <ThemedText variant="caption" color="primary" style={{ fontWeight: "600" }}>
+                    Resend Code
+                  </ThemedText>
+                )}
+              </Pressable>
+            )}
+          </View>
+        </ThemedCard>
+
+        <Pressable style={styles.backButton} onPress={() => navigation.navigate("Login")}>
+          <ThemedText variant="caption" color="secondary" style={{ textAlign: "center" }}>
+            Back to Login
+          </ThemedText>
         </Pressable>
-
-        <View style={{ alignItems: "center", marginTop: 16 }}>
-          {countdown > 0 ? (
-            <Text variant="helper" style={{ color: theme.colors.textSecondary }}>
-              Resend code in {countdown}s
-            </Text>
-          ) : (
-            <Pressable onPress={handleResend} disabled={sending}>
-              <Text variant="helper" style={{ color: theme.colors.primary, fontWeight: "600" }}>
-                {sending ? "Sending..." : "Resend Code"}
-              </Text>
-            </Pressable>
-          )}
-        </View>
-      </View>
-
-      <Pressable onPress={() => navigation.navigate("Login")}>
-        <Text variant="helper" style={{ color: theme.colors.textSecondary, textAlign: "center" }}>
-          Back to Login
-        </Text>
-      </Pressable>
-    </Screen>
+      </ScrollView>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
+  container: { flex: 1 },
+  scrollView: { flex: 1 },
+  scrollContent: { padding: spacing.lg, paddingBottom: 100, gap: spacing.lg },
+  formSection: { gap: spacing.md, padding: spacing.lg },
   primaryButton: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    paddingVertical: 16,
-    paddingHorizontal: 24,
+    paddingVertical: spacing.md,
+    paddingHorizontal: spacing.lg,
     borderRadius: 12,
-    marginTop: 8,
+    marginTop: spacing.md,
+    minHeight: 48,
   },
+  resendContainer: { alignItems: "center", marginTop: spacing.md },
+  backButton: { alignItems: "center", marginTop: spacing.lg },
 });

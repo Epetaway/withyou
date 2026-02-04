@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from "react";
-import { View, StyleSheet, Pressable, Dimensions, ScrollView } from "react-native";
-import { FontAwesome6 } from "@expo/vector-icons";
+import { View, StyleSheet, Pressable, Dimensions, ScrollView, SafeAreaView, ActivityIndicator } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import { useNavigation, NavigationProp } from "@react-navigation/native";
 import { CONTENT, DashboardResponse, Note, NotesResponse } from "@withyou/shared";
-import { Screen } from "../../ui/components/Screen";
-import { Text } from "../../ui/components/Text";
+import { ThemedCard } from "../../ui/components/ThemedCard";
+import { ThemedText } from "../../ui/components/ThemedText";
+import { ScreenHeader } from "../../ui/components/ScreenHeader";
+import { spacing } from "../../ui/tokens";
 import { clearSession } from "../../state/session";
 import { api } from "../../state/appState";
 import { useTheme } from "../../ui/theme/ThemeProvider";
@@ -126,429 +128,270 @@ export function DashboardScreen() {
 
   if (loading) {
     return (
-      <Screen>
-        <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-          <Text variant="body">{CONTENT.app.common.loading}</Text>
+      <SafeAreaView style={[styles.container, { backgroundColor: theme.colors.background }]}>
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color={theme.colors.primary} />
+          <ThemedText variant="body" color="secondary" style={{ marginTop: spacing.md }}>
+            {CONTENT.app.common.loading}
+          </ThemedText>
         </View>
-      </Screen>
+      </SafeAreaView>
     );
   }
 
   return (
-    <Screen scrollable>
-      {/* Header */}
-      <View style={styles.headerRow}>
-        <Text variant="screenTitle">Home</Text>
-        <Pressable onPress={clearSession}>
-          <FontAwesome6 name="right-from-bracket" size={24} color={theme.colors.text} weight="bold" />
-        </Pressable>
-      </View>
+    <SafeAreaView style={[styles.container, { backgroundColor: theme.colors.background }]}>
+      <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContent}>
+        {/* Header with logout */}
+        <View style={styles.headerRow}>
+          <ScreenHeader title="Home" subtitle="You & your partner" />
+          <Pressable onPress={clearSession} style={styles.logoutButton}>
+            <Ionicons name="log-out" size={24} color={theme.colors.primary} />
+          </Pressable>
+        </View>
 
-      {/* Connection Card */}
-      <View style={styles.section}>
+        {/* Connection Card */}
         <View style={styles.coupleCards}>
           {/* User Card */}
-          <Pressable style={[styles.largeProfileCard, { backgroundColor: theme.colors.primary }]}>
+          <ThemedCard style={styles.profileCard} color="primary" elevation="md">
             <View style={styles.cardContent}>
-              <View style={styles.cardBottom}>
-                <View>
-                  <Text style={styles.cardName}>You</Text>
-                  <Text style={styles.cardLocation}>
-                    {userMood ? CONTENT.checkIn.create.moodLabels[userMood as 1 | 2 | 3 | 4 | 5] : "No check-in yet"}
-                  </Text>
-                </View>
-                <View style={styles.moodRing} />
+              <View>
+                <ThemedText variant="h2" color="secondary">You</ThemedText>
+                <ThemedText variant="body" color="secondary" style={{ marginTop: spacing.sm }}>
+                  {userMood ? CONTENT.checkIn.create.moodLabels[userMood as 1 | 2 | 3 | 4 | 5] : "No check-in yet"}
+                </ThemedText>
               </View>
+              <View style={[styles.moodRing, { borderColor: theme.colors.background }]} />
             </View>
-          </Pressable>
+          </ThemedCard>
 
-          {/* Partner Card - with Mood Ring */}
-          <Pressable 
+          {/* Partner Card */}
+          <ThemedCard 
             style={[
-              styles.largeProfileCard, 
-              { 
-                backgroundColor: theme.colors.error || '#D946EF',
-                borderWidth: dashboard?.partnerLastCheckIn ? 3 : 0,
-                borderColor: dashboard?.partnerLastCheckIn ? getMoodColor(dashboard.partnerLastCheckIn.mood_level) : 'transparent'
-              }
-            ]}
+              styles.profileCard, 
+              { borderWidth: dashboard?.partnerLastCheckIn ? 2 : 0, borderColor: getMoodColor(dashboard?.partnerLastCheckIn?.mood_level ?? 3) }
+            ]} 
+            color="surface" 
+            elevation="md"
           >
             <View style={styles.cardContent}>
-              <View style={styles.cardBottom}>
-                <View>
-                  <Text style={styles.cardName}>Partner</Text>
-                  <Text style={styles.cardLocation}>
-                    {dashboard?.partnerLastCheckIn
-                      ? CONTENT.checkIn.create.moodLabels[dashboard.partnerLastCheckIn.mood_level]
-                      : dashboard?.relationshipStage
-                        ? "Waiting for check-in"
-                        : "Not paired"}
-                  </Text>
-                </View>
-                <View style={styles.moodRing} />
+              <View>
+                <ThemedText variant="h2">Partner</ThemedText>
+                <ThemedText variant="body" color="secondary" style={{ marginTop: spacing.sm }}>
+                  {dashboard?.partnerLastCheckIn
+                    ? CONTENT.checkIn.create.moodLabels[dashboard.partnerLastCheckIn.mood_level]
+                    : dashboard?.relationshipStage
+                      ? "Waiting for check-in"
+                      : "Not paired"}
+                </ThemedText>
               </View>
+              <View style={[styles.moodRing, { borderColor: theme.colors.primary }]} />
             </View>
-          </Pressable>
+          </ThemedCard>
         </View>
 
         {/* Relationship Stage */}
         {dashboard?.relationshipStage && (
-          <View style={[styles.stageBadge, { backgroundColor: theme.colors.primary + "20" }]}>
-            <FontAwesome6 name="heart" size={16} color={theme.colors.primary} weight="solid" />
-            <Text style={[styles.stageText, { color: theme.colors.primary }]}>
-              {CONTENT.preferences.options.stage[dashboard.relationshipStage]}
-            </Text>
-          </View>
+          <ThemedCard style={[styles.stageBadge, { paddingHorizontal: spacing.lg, paddingVertical: spacing.md }]} color="surface">
+            <Ionicons name="heart" size={16} color={theme.colors.primary} />
+            <ThemedText variant="caption" color="primary" style={{ marginLeft: spacing.sm }}>
+              {CONTENT.preferences.options.stage[dashboard.relationshipStage].toUpperCase()}
+            </ThemedText>
+          </ThemedCard>
         )}
-      </View>
 
-      {/* Mood board */}
-      <View style={[styles.section, styles.moodBoard]}>
-        <Text variant="sectionLabel" style={{ color: theme.colors.textSecondary, textTransform: "uppercase", letterSpacing: 0.5, marginBottom: 12 }}>MOOD BOARD</Text>
+        {/* Mood board */}
+        <ThemedCard style={styles.section} color="surface" elevation="sm">
+          <ThemedText variant="overline" color="secondary" style={{ marginBottom: spacing.md }}>
+            MOOD BOARD
+          </ThemedText>
 
-        <View style={styles.moodPairRow}>
-          <View style={styles.moodPill}>
-            <View style={[styles.moodDot, { backgroundColor: userMood ? getMoodColor(userMood) : theme.colors.border }]} />
-            <View>
-              <Text variant="helper" style={{ color: theme.colors.textSecondary }}>You</Text>
-              <Text variant="body" style={{ color: theme.colors.text }}>
-                {userMood ? CONTENT.checkIn.create.moodLabels[userMood as 1 | 2 | 3 | 4 | 5] : "No check-in"}
-              </Text>
-            </View>
-          </View>
-
-          <View style={styles.moodPill}>
-            <View style={[styles.moodDot, { backgroundColor: partnerMood ? getMoodColor(partnerMood) : theme.colors.border }]} />
-            <View>
-              <Text variant="helper" style={{ color: theme.colors.textSecondary }}>Partner</Text>
-              <Text variant="body" style={{ color: theme.colors.text }}>
-                {partnerMood
-                  ? CONTENT.checkIn.create.moodLabels[partnerMood as 1 | 2 | 3 | 4 | 5]
-                  : dashboard?.relationshipStage
-                    ? "Waiting for check-in"
-                    : "Not paired"}
-              </Text>
-            </View>
-          </View>
-        </View>
-
-        <LinearGradient
-          colors={blendedColors}
-          start={{ x: 0, y: 0.5 }}
-          end={{ x: 1, y: 0.5 }}
-          style={styles.blendBar}
-        />
-
-        {partnerMood && userMood ? (
-          <View style={[styles.tipCard, { backgroundColor: theme.colors.primary + "10" }]}> 
-            <FontAwesome6 name="lightbulb" size={16} color={theme.colors.primary} weight="solid" style={{ marginRight: 8 }} />
-            <Text variant="body" style={{ color: theme.colors.text, flex: 1 }}>
-              {moodTip}
-            </Text>
-          </View>
-        ) : (
-          <Text variant="helper" style={{ color: theme.colors.textSecondary }}>
-            Waiting for both check-ins to blend moods.
-          </Text>
-        )}
-      </View>
-
-      {/* Quick Actions */}
-      <View style={styles.actionRow}>
-        <Pressable 
-          style={[styles.actionButton, { backgroundColor: theme.colors.primary + "20" }]}
-          onPress={() => navigation.navigate("CheckIn")}
-        >
-          <FontAwesome6 name="heart" size={20} color={theme.colors.primary} weight="solid" />
-          <Text style={[styles.actionText, { color: theme.colors.primary }]}>Check In</Text>
-        </Pressable>
-
-        <Pressable 
-          style={[styles.actionButton, { backgroundColor: theme.colors.secondary + "20" }]}
-          onPress={() => navigation.navigate("NoteCompose")}
-        >
-          <FontAwesome6 name="message" size={20} color={theme.colors.secondary} weight="solid" />
-          <Text style={[styles.actionText, { color: theme.colors.secondary }]}>Send Note</Text>
-        </Pressable>
-      </View>
-
-      {/* Notes Section */}
-      <View style={styles.section}>
-        <View style={styles.sectionHeader}>
-          <Text variant="sectionLabel" style={{ color: theme.colors.textSecondary, textTransform: "uppercase", letterSpacing: 0.5 }}>Private Notes</Text>
-          <Pressable onPress={() => navigation.navigate("NotesList")}>
-            <Text variant="helper" style={{ color: theme.colors.primary }}>View all</Text>
-          </Pressable>
-        </View>
-
-        {/* Notes feed - Card Grid */}
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 12 }}>
-          {/* Add note card */}
-          <Pressable 
-            style={[styles.noteCard, styles.addNoteCard, { borderColor: theme.colors.border }]}
-            onPress={() => navigation.navigate("NoteCompose")}
-          >
-            <FontAwesome6 name="plus" size={32} color={theme.colors.primary} weight="light" />
-            <Text style={[styles.addNoteText, { color: theme.colors.text }]}>Send a note</Text>
-          </Pressable>
-
-          {/* Note cards */}
-          {notes.map((note) => {
-            let bgColor = "#FEF3C7"; // yellow for TEXT
-            if (note.type === "VOICE") bgColor = "#DBEAFE"; // light blue
-            if (note.type === "VIDEO") bgColor = "#F5D4FF"; // light purple
-            
-            return (
-              <View key={note.id} style={[styles.noteCard, { backgroundColor: bgColor }]}>
-                <View style={{ flex: 1 }}>
-                  <Text 
-                    variant="body" 
-                    style={{ color: "#1F2937", fontWeight: "600", marginBottom: 8 }}
-                    numberOfLines={3}
-                  >
-                    {note.content || (note.type === "VOICE" ? "🎤 Voice note" : "🎥 Video note")}
-                  </Text>
-                </View>
-                <Text variant="helper" style={{ color: "#6B7280" }}>
-                  {new Date(note.createdAt).toLocaleString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
-                </Text>
+          <View style={styles.moodPairRow}>
+            <View style={[styles.moodPill, { borderColor: theme.colors.border }]}>
+              <View style={[styles.moodDot, { backgroundColor: userMood ? getMoodColor(userMood) : theme.colors.border }]} />
+              <View>
+                <ThemedText variant="caption" color="secondary">You</ThemedText>
+                <ThemedText variant="body">
+                  {userMood ? CONTENT.checkIn.create.moodLabels[userMood as 1 | 2 | 3 | 4 | 5] : "No check-in"}
+                </ThemedText>
               </View>
-            );
-          })}
-        </ScrollView>
-      </View>
+            </View>
 
-      {/* Ideas Section */}
-      <View style={styles.section}>
-        <View style={styles.sectionHeader}>
-          <Text variant="sectionLabel" style={{ color: theme.colors.textSecondary, textTransform: "uppercase", letterSpacing: 0.5 }}>Things to do</Text>
-          <Pressable onPress={() => navigation.navigate("Ideas")}>
-            <Text variant="helper" style={{ color: theme.colors.primary }}>View all</Text>
+            <View style={[styles.moodPill, { borderColor: theme.colors.border }]}>
+              <View style={[styles.moodDot, { backgroundColor: partnerMood ? getMoodColor(partnerMood) : theme.colors.border }]} />
+              <View>
+                <ThemedText variant="caption" color="secondary">Partner</ThemedText>
+                <ThemedText variant="body">
+                  {partnerMood
+                    ? CONTENT.checkIn.create.moodLabels[partnerMood as 1 | 2 | 3 | 4 | 5]
+                    : dashboard?.relationshipStage
+                      ? "Waiting for check-in"
+                      : "Not paired"}
+                </ThemedText>
+              </View>
+            </View>
+          </View>
+
+          <LinearGradient
+            colors={blendedColors}
+            start={{ x: 0, y: 0.5 }}
+            end={{ x: 1, y: 0.5 }}
+            style={styles.blendBar}
+          />
+
+          {partnerMood && userMood ? (
+            <View style={styles.tipCard}>
+              <Ionicons name="bulb" size={16} color={theme.colors.primary} style={{ marginRight: spacing.sm }} />
+              <ThemedText variant="body" style={{ flex: 1 }}>
+                {moodTip}
+              </ThemedText>
+            </View>
+          ) : (
+            <ThemedText variant="caption" color="secondary">
+              Waiting for both check-ins to blend moods.
+            </ThemedText>
+          )}
+        </ThemedCard>
+
+        {/* Quick Actions */}
+        <View style={styles.actionRow}>
+          <Pressable 
+            style={[styles.actionButton, { backgroundColor: theme.colors.primary + "20" }]}
+            onPress={() => navigation.navigate("CheckIn")}
+          >
+            <Ionicons name="heart" size={20} color={theme.colors.primary} />
+            <ThemedText variant="body" color="primary" style={{ fontWeight: "600" }}>Check In</ThemedText>
+          </Pressable>
+
+          <Pressable 
+            style={[styles.actionButton, { borderColor: theme.colors.primary, borderWidth: 1.5 }]}
+            onPress={() => navigation.navigate("CheckIn")}
+          >
+            <Ionicons name="chatbubble" size={20} color={theme.colors.primary} />
+            <ThemedText variant="body" color="primary" style={{ fontWeight: "600" }}>Send Note</ThemedText>
           </Pressable>
         </View>
 
-        <View style={styles.ideasPills}>
-          {dateIdeas.slice(0, 6).map((idea) => (
-            <Pressable 
-              key={idea.id}
-              style={[styles.ideaPill, { backgroundColor: theme.colors.primary + "20" }]}
-            >
-              <FontAwesome6 
-                name={idea.icon as "utensils" | "film" | "tree" | "fire" | "gamepad" | "spa"}
-                size={16}
-                color={theme.colors.primary}
-                weight="bold"
-              />
-              <Text style={[styles.ideaPillText, { color: theme.colors.text }]}>{idea.title}</Text>
+        {/* Notes Section */}
+        <View>
+          <View style={styles.sectionHeader}>
+            <ThemedText variant="overline" color="secondary">Private Notes</ThemedText>
+            <Pressable onPress={() => navigation.navigate("NotesList")}>
+              <ThemedText variant="caption" color="primary">View all</ThemedText>
             </Pressable>
-          ))}
+          </View>
+
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: spacing.md }}>
+            {/* Add note card */}
+            <ThemedCard 
+              style={styles.noteCard}
+              color="surface"
+              elevation="sm"
+            >
+              <Pressable 
+                style={[StyleSheet.absoluteFill, styles.noteCardContent]}
+                onPress={() => navigation.navigate("NoteCompose")}
+              >
+                <Ionicons name="add-circle" size={32} color={theme.colors.primary} />
+                <ThemedText variant="caption" color="primary" style={{ marginTop: spacing.sm }}>Send a note</ThemedText>
+              </Pressable>
+            </ThemedCard>
+
+            {/* Note cards */}
+            {notes.map((note) => {
+              let bgGradient: [string, string] = [theme.colors.surface, theme.colors.background];
+              if (note.type === "VOICE") bgGradient = ["#DBEAFE", "#E0F2FE"];
+              if (note.type === "VIDEO") bgGradient = ["#F5D4FF", "#FAE8FF"];
+              
+              return (
+                <View key={note.id} style={styles.noteCard}>
+                  <LinearGradient colors={bgGradient} style={[StyleSheet.absoluteFill, { borderRadius: 12 }]} />
+                  <View style={styles.noteCardContent}>
+                    <ThemedText 
+                      variant="body" 
+                      style={{ fontWeight: "600", marginBottom: spacing.sm }}
+                      numberOfLines={3}
+                    >
+                      {note.content || (note.type === "VOICE" ? "🎤 Voice note" : "🎥 Video note")}
+                    </ThemedText>
+                    <ThemedText variant="caption" color="secondary">
+                      {new Date(note.createdAt).toLocaleString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
+                    </ThemedText>
+                  </View>
+                </View>
+              );
+            })}
+          </ScrollView>
         </View>
 
-        {/* Find Near Me Button */}
-        <Pressable 
-          style={[styles.findNearMeButton, { backgroundColor: theme.colors.primary }]}
-          onPress={() => navigation.navigate("LocalMap")}
-        >
-          <FontAwesome6 name="map" size={18} color="#FFFFFF" weight="bold" />
-          <Text style={styles.findNearMeText}>Find near me</Text>
-          <FontAwesome6 name="arrow-right" size={14} color="#FFFFFF" weight="bold" />
-        </Pressable>
-      </View>
-    </Screen>
+        {/* Ideas Section */}
+        <View>
+          <View style={styles.sectionHeader}>
+            <ThemedText variant="overline" color="secondary">Things to do</ThemedText>
+            <Pressable onPress={() => navigation.navigate("Ideas")}>
+              <ThemedText variant="caption" color="primary">View all</ThemedText>
+            </Pressable>
+          </View>
+
+          <View style={styles.ideasPills}>
+            {dateIdeas.slice(0, 6).map((idea) => (
+              <ThemedCard 
+                key={idea.id}
+                style={styles.ideaPill}
+                color="surface"
+                elevation="xs"
+              >
+                <Ionicons 
+                  name={idea.icon as keyof typeof Ionicons.glyphMap}
+                  size={16}
+                  color={theme.colors.primary}
+                />
+                <ThemedText variant="caption">
+                  {idea.title}
+                </ThemedText>
+              </ThemedCard>
+            ))}
+          </View>
+
+          {/* Find Near Me Button */}
+          <Pressable 
+            style={[styles.findNearMeButton, { backgroundColor: theme.colors.primary }]}
+            onPress={() => navigation.navigate("LocalMap")}
+          >
+            <Ionicons name="map" size={18} color={theme.colors.background} />
+            <ThemedText variant="body" color="secondary" style={{ fontWeight: "700" }}>Find near me</ThemedText>
+            <Ionicons name="arrow-forward" size={14} color={theme.colors.background} />
+          </Pressable>
+        </View>
+      </ScrollView>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  headerRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 24,
-  },
-  section: {
-    marginBottom: 32,
-  },
-  sectionHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 16,
-  },
-  viewAll: {
-    fontSize: 14,
-    fontWeight: '600',
-  },
-  coupleCards: {
-    flexDirection: 'row',
-    gap: 12,
-  },
-  largeProfileCard: {
-    flex: 1,
-    height: 200,
-    borderRadius: 24,
-    padding: 20,
-    justifyContent: 'space-between',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.15,
-    shadowRadius: 12,
-    elevation: 4,
-  },
-  cardContent: {
-    flex: 1,
-    justifyContent: 'space-between',
-  },
-  cardBottom: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'flex-end',
-  },
-  cardName: {
-    fontSize: 24,
-    fontWeight: '700',
-    color: '#FFFFFF',
-    marginBottom: 4,
-  },
-  cardLocation: {
-    fontSize: 14,
-    color: 'rgba(255, 255, 255, 0.8)',
-    fontWeight: '500',
-  },
-  moodRing: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    backgroundColor: 'rgba(255, 255, 255, 0.3)',
-    borderWidth: 3,
-    borderColor: '#FFFFFF',
-  },
-  moodBoard: {
-    marginBottom: 32,
-  },
-  moodPairRow: {
-    flexDirection: 'row',
-    gap: 12,
-    marginBottom: 12,
-  },
-  moodPill: {
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 10,
-    padding: 12,
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: '#E5E7EB',
-    backgroundColor: '#F9FAFB',
-  },
-  moodDot: {
-    width: 14,
-    height: 14,
-    borderRadius: 7,
-  },
-  blendBar: {
-    height: 12,
-    borderRadius: 999,
-    marginBottom: 12,
-  },
-  tipCard: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    gap: 8,
-    padding: 12,
-    borderRadius: 12,
-  },
-  stageBadge: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-    paddingHorizontal: 16,
-    paddingVertical: 10,
-    borderRadius: 20,
-    alignSelf: 'center',
-  },
-  stageText: {
-    fontSize: 14,
-    fontWeight: '600',
-  },
-  actionRow: {
-    flexDirection: 'row',
-    gap: 12,
-    marginBottom: 32,
-  },
-  actionButton: {
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 8,
-    paddingVertical: 14,
-    borderRadius: 16,
-  },
-  actionText: {
-    fontSize: 14,
-    fontWeight: '600',
-  },
-  noteCard: {
-    width: 160,
-    height: 140,
-    borderRadius: 16,
-    padding: 14,
-    justifyContent: 'space-between',
-    minWidth: 160,
-  },
-  addNoteCard: {
-    backgroundColor: 'transparent',
-    borderWidth: 2,
-    borderStyle: 'dashed',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  addNoteText: {
-    fontSize: 13,
-    marginTop: 8,
-    fontWeight: '600',
-  },
-  notePreview: {
-    fontSize: 13,
-    fontWeight: '600',
-    color: '#1F2937',
-  },
-  noteTime: {
-    fontSize: 11,
-    color: '#6B7280',
-    marginTop: 4,
-  },
-  ideasPills: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 8,
-  },
-  ideaPill: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-    paddingHorizontal: 14,
-    paddingVertical: 10,
-    borderRadius: 18,
-    minHeight: 36,
-  },
-  ideaPillText: {
-    fontSize: 13,
-    fontWeight: '600',
-  },
-  findNearMeButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 10,
-    paddingVertical: 16,
-    borderRadius: 16,
-    marginTop: 12,
-  },
-  findNearMeText: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: '#FFFFFF',
-  },
+  container: { flex: 1 },
+  scrollView: { flex: 1 },
+  scrollContent: { padding: spacing.lg, paddingBottom: 100, gap: spacing.lg },
+  loadingContainer: { flex: 1, justifyContent: "center", alignItems: "center" },
+  headerRow: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: spacing.lg },
+  logoutButton: { padding: spacing.sm },
+  coupleCards: { flexDirection: "row", gap: spacing.md },
+  profileCard: { flex: 1, padding: spacing.lg, minHeight: 160 },
+  cardContent: { flexDirection: "row", justifyContent: "space-between", alignItems: "flex-start" },
+  moodRing: { width: 48, height: 48, borderRadius: 24, borderWidth: 2 },
+  section: { padding: spacing.lg, gap: spacing.md },
+  stageBadge: { flexDirection: "row", alignItems: "center", alignSelf: "center" },
+  moodPairRow: { flexDirection: "row", gap: spacing.md, marginBottom: spacing.md },
+  moodPill: { flex: 1, flexDirection: "row", alignItems: "center", gap: spacing.sm, padding: spacing.md, borderRadius: 12, borderWidth: 1 },
+  moodDot: { width: 14, height: 14, borderRadius: 7 },
+  blendBar: { height: 12, borderRadius: 999, marginBottom: spacing.md },
+  tipCard: { flexDirection: "row", alignItems: "flex-start", gap: spacing.sm, marginTop: spacing.md },
+  actionRow: { flexDirection: "row", gap: spacing.md },
+  actionButton: { flex: 1, flexDirection: "row", alignItems: "center", justifyContent: "center", gap: spacing.sm, paddingVertical: spacing.md, borderRadius: 12, minHeight: 48 },
+  sectionHeader: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: spacing.md },
+  noteCard: { width: 140, height: 120, borderRadius: 12, overflow: "hidden", minWidth: 140 },
+  noteCardContent: { flex: 1, padding: spacing.md, justifyContent: "space-between" },
+  ideasPills: { flexDirection: "row", flexWrap: "wrap", gap: spacing.sm, marginBottom: spacing.md },
+  ideaPill: { flexDirection: "row", alignItems: "center", gap: spacing.sm, paddingHorizontal: spacing.md, paddingVertical: spacing.sm, borderRadius: 999 },
+  findNearMeButton: { flexDirection: "row", alignItems: "center", justifyContent: "center", gap: spacing.md, paddingVertical: spacing.md, borderRadius: 12, minHeight: 48 },
 });
