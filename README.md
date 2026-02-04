@@ -35,11 +35,105 @@ See **[BETA_CHECKLIST.md](./BETA_CHECKLIST.md)** for complete implementation det
 
 ## Quick Start
 
+### Prerequisites
+
+- Node.js 18+ and npm
+- PostgreSQL 14+ (running locally or remotely)
+- Git
+
+### Environment Setup
+
+The project supports three environments: **development**, **test**, and **production**.
+
+#### 1. Clone and Install Dependencies
+
+```bash
+git clone https://github.com/Epetaway/withyou.git
+cd withyou
+npm install
+```
+
+#### 2. Database Setup
+
+Create separate databases for each environment:
+
+```bash
+# Development database
+createdb withyou_dev
+
+# Test database (for E2E testing)
+createdb withyou_test
+
+# Production uses separate hosted database
+```
+
+#### 3. Environment Configuration
+
+Copy the example environment file and configure for your environment:
+
+```bash
+cd apps/api
+cp .env.example .env.development
+```
+
+Edit `.env.development` with your local database credentials:
+
+```env
+NODE_ENV=development
+APP_ENV=development
+DATABASE_URL="postgresql://username:password@localhost:5432/withyou_dev"
+JWT_SECRET="your-dev-secret-key"
+QA_ADMIN_TOKEN="your-qa-admin-token"
+ALLOWED_ORIGINS="http://localhost:3000,http://localhost:19006"
+```
+
+For **test** environment, create `.env.test`:
+
+```bash
+cp .env.example .env.test
+```
+
+And update the DATABASE_URL to use `withyou_test`.
+
+For **production**, create `.env.production` (not committed to git) with production credentials.
+
+#### 4. Apply Database Migrations
+
+```bash
+# Development
+cd apps/api
+NODE_ENV=development npx dotenv -e .env.development -- npx prisma migrate deploy
+
+# Test
+NODE_ENV=test npx dotenv -e .env.test -- npx prisma migrate deploy
+```
+
+#### 5. Seed Database
+
+**Development** (minimal data):
+```bash
+npm run seed:dev
+```
+
+**E2E Testing** (QA test couples):
+```bash
+npm run seed:e2e
+```
+
+**Legacy seed** (comprehensive test data):
+```bash
+npm run prisma:seed
+```
+
 ### API Server
 
 ```bash
-npm install
+# Development mode (with hot reload)
 npm run dev:api  # Starts on http://localhost:3000
+
+# Production mode
+npm run build:api
+npm run start --workspace apps/api
 ```
 
 ### Mobile App
@@ -48,11 +142,65 @@ npm run dev:api  # Starts on http://localhost:3000
 npm run dev:mobile -- --ios  # or --android
 ```
 
-### Database Setup
+## QA and E2E Testing
+
+### QA Test Accounts
+
+After running `npm run seed:e2e`, the following test accounts are available:
+
+**Couple A (Dating)**:
+- `qa_alex@example.com` / `password123`
+- `qa_jordan@example.com` / `password123`
+
+**Couple B (Committed)**:
+- `qa_taylor@example.com` / `password123`
+- `qa_casey@example.com` / `password123`
+
+**Unpaired**:
+- `qa_unpaired@example.com` / `password123`
+
+All QA accounts are tagged with `testTag: "e2e-test"` and `isTestUser: true`.
+
+### QA Endpoints (Dev/Test Only)
+
+The API provides special QA endpoints for E2E testing automation. **These endpoints are only available in development and test environments.**
+
+#### POST /qa/reset
+
+Wipes all test-tagged data (users with `testTag: "e2e-test"`).
 
 ```bash
-npx prisma migrate deploy  # Apply migrations
-npm run prisma:seed        # Seed test data
+curl -X POST http://localhost:3000/qa/reset \
+  -H "Content-Type: application/json" \
+  -H "QA-Admin-Token: your-qa-admin-token"
+```
+
+#### POST /qa/seed
+
+Runs the E2E seed script to populate test data.
+
+```bash
+curl -X POST http://localhost:3000/qa/seed \
+  -H "Content-Type: application/json" \
+  -H "QA-Admin-Token: your-qa-admin-token"
+```
+
+**Rate Limiting**: QA endpoints have strict rate limiting (5 requests/hour).
+
+### E2E Testing Workflow
+
+```bash
+# 1. Reset test data
+curl -X POST http://localhost:3000/qa/reset -H "QA-Admin-Token: your-token"
+
+# 2. Seed fresh test data
+curl -X POST http://localhost:3000/qa/seed -H "QA-Admin-Token: your-token"
+
+# 3. Run E2E tests
+./test-e2e.sh
+
+# 4. Clean up (optional)
+curl -X POST http://localhost:3000/qa/reset -H "QA-Admin-Token: your-token"
 ```
 
 ## Documentation
@@ -91,6 +239,54 @@ withyou/
 **Storage**: AWS S3 + CloudFront for avatar images
 
 **Validation**: Zod schemas for runtime type safety
+
+**Security**: Helmet.js, CORS, rate limiting, relationship-scoped access control
+
+## Security
+
+### Environment Separation
+
+The application enforces strict environment separation:
+
+- **Development** (`.env.development`): Local development with relaxed security
+- **Test** (`.env.test`): Isolated test database with QA endpoints enabled
+- **Production** (`.env.production`): Hardened security, QA endpoints disabled
+
+### Security Features
+
+1. **Helmet.js**: Sets secure HTTP headers (CSP, XSS protection, etc.)
+2. **CORS**: Strict origin validation (configurable via `ALLOWED_ORIGINS`)
+3. **Rate Limiting**:
+   - General API: 100 requests/15 min
+   - Auth endpoints: 5 requests/15 min
+   - Invite endpoints: 10 requests/hour
+   - QA endpoints: 5 requests/hour (dev/test only)
+   - Places endpoints: 30 requests/15 min
+4. **Relationship Verification**: Middleware ensures users can only access their own relationship data
+5. **JWT Validation**: All protected routes require valid JWT tokens
+6. **Password Hashing**: bcrypt with 10 rounds
+7. **Input Validation**: Zod schemas validate all API inputs
+
+### QA Endpoint Security
+
+QA endpoints (`/qa/reset`, `/qa/seed`) are:
+- **Disabled in production** (environment check)
+- **Token-protected** (`QA_ADMIN_TOKEN` header required)
+- **Rate-limited** (5 requests/hour)
+- **Scoped to test data** (only affects records with `isTestUser: true`)
+
+### Production Deployment Checklist
+
+Before deploying to production:
+
+- [ ] Set `NODE_ENV=production` and `APP_ENV=production`
+- [ ] Use a strong random `JWT_SECRET` (32+ characters)
+- [ ] Configure `ALLOWED_ORIGINS` with actual production domains
+- [ ] Never commit `.env.production` to version control
+- [ ] Verify QA endpoints return 404 in production
+- [ ] Enable database SSL in production `DATABASE_URL`
+- [ ] Set up monitoring and alerting for security events
+- [ ] Review all rate limiting thresholds for production traffic
 
 ## Core Features
 
