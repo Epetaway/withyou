@@ -190,7 +190,7 @@ router.get("/activities", jwtMiddleware, async (req: AuthedRequest, res, next) =
       take: 10,
     });
 
-    const activities = ideas.map((idea) => ({
+    const activities = ideas.map((idea: { id: string; title: string; description: string | null; category: string | null }) => ({
       id: idea.id,
       title: idea.title,
       description: idea.description || "",

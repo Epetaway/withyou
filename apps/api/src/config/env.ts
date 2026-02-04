@@ -1,6 +1,17 @@
 import dotenv from 'dotenv';
+import path from 'path';
+import { fileURLToPath } from 'url';
 
-dotenv.config();
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+
+// Load environment-specific .env file
+const nodeEnv = process.env.NODE_ENV || 'development';
+const envFile = `.env.${nodeEnv}`;
+const envPath = path.resolve(__dirname, '../../', envFile);
+
+// Try to load environment-specific file first, fallback to .env
+dotenv.config({ path: envPath });
+dotenv.config(); // Fallback to .env if exists
 
 const parsePort = (value: string | undefined): number | undefined => {
   if (!value) return undefined;
@@ -8,9 +19,30 @@ const parsePort = (value: string | undefined): number | undefined => {
   return Number.isFinite(parsed) ? parsed : undefined;
 };
 
+const parseAllowedOrigins = (value: string | undefined): string[] => {
+  if (!value) return [];
+  return value.split(',').map(origin => origin.trim()).filter(Boolean);
+};
+
+// Helper methods for environment checking
+const isDevelopment = (nodeEnv: string, appEnv: string) => 
+  nodeEnv === 'development' || appEnv === 'development';
+const isTest = (nodeEnv: string, appEnv: string) => 
+  nodeEnv === 'test' || appEnv === 'test';
+const isProduction = (nodeEnv: string, appEnv: string) => 
+  nodeEnv === 'production' || appEnv === 'production';
+
 export const env = {
+  nodeEnv: process.env.NODE_ENV ?? 'development',
+  appEnv: process.env.APP_ENV ?? 'development',
   port: parsePort(process.env.PORT) ?? 3000,
   jwtSecret: process.env.JWT_SECRET ?? 'replace-me-in-prod',
+  
+  // QA Admin
+  qaAdminToken: process.env.QA_ADMIN_TOKEN,
+  
+  // CORS
+  allowedOrigins: parseAllowedOrigins(process.env.ALLOWED_ORIGINS),
   
   // OAuth
   googleClientId: process.env.GOOGLE_CLIENT_ID,
@@ -32,4 +64,9 @@ export const env = {
   
   // Deep linking
   appDeepLinkDomain: process.env.APP_DEEP_LINK_DOMAIN ?? 'withyou.app',
+  
+  // Helper methods
+  isDevelopment: () => isDevelopment(process.env.NODE_ENV ?? 'development', process.env.APP_ENV ?? 'development'),
+  isTest: () => isTest(process.env.NODE_ENV ?? 'development', process.env.APP_ENV ?? 'development'),
+  isProduction: () => isProduction(process.env.NODE_ENV ?? 'development', process.env.APP_ENV ?? 'development'),
 };

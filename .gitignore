@@ -3,7 +3,14 @@ node_modules/
 dist/
 **/dist/
 .env
-.env.*
+.env.local
+.env.production
+.env.production.local
+
+# Allow committed environment templates
+!.env.development
+!.env.test
+!.env.example
 
 # Logs
 logs
