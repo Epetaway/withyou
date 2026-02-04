@@ -96,6 +96,8 @@ model User {
   emailVerified Boolean     @default(false)
   avatarUrl    String?
   setupCompleted Boolean    @default(false)
+  isTestUser   Boolean     @default(false)
+  testTag      String?
   createdAt    DateTime    @default(now())
   updatedAt    DateTime    @updatedAt
   relationshipsA Relationship[] @relation("UserARelationships")
@@ -113,6 +115,7 @@ model User {
   plans        Plan[]
   
   @@index([oauthProvider, oauthId])
+  @@index([isTestUser, testTag])
 }
 
 model Relationship {
@@ -121,6 +124,7 @@ model Relationship {
   userBId    String
   status     RelationshipStatus  @default(active)
   stage      RelationshipStage   @default(dating)
+  isTest     Boolean             @default(false)
   createdAt  DateTime            @default(now())
   updatedAt  DateTime            @updatedAt
   endedAt    DateTime?
@@ -135,6 +139,7 @@ model Relationship {
   userB User @relation("UserBRelationships", fields: [userBId], references: [id])
 
   @@unique([userAId, userBId])
+  @@index([isTest])
 }
 
 model RelationshipInvite {
