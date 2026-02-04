@@ -1,6 +1,6 @@
 import { Router } from "express";
 import type { Request } from "express";
-import type { Prisma } from "@prisma/client";
+import type { InputJsonValue } from "@prisma/client/runtime/library";
 import {
   ideasQuerySchema,
   recipesQuerySchema,
@@ -198,7 +198,7 @@ router.post("/query", jwtMiddleware, async (req: AuthedRequest, res, next) => {
           userId,
           relationshipId: relationship.id,
           type: params.type,
-          params: params as unknown as Prisma.InputJsonValue,
+          params: params as unknown as InputJsonValue,
         },
       });
     }
@@ -281,7 +281,7 @@ router.post("/recipes", jwtMiddleware, async (req: AuthedRequest, res, next) => 
           userId,
           relationshipId: relationship.id,
           type: "FOOD",
-          params: params as unknown as Prisma.InputJsonValue,
+          params: params as unknown as InputJsonValue,
         },
       });
     }
@@ -499,7 +499,22 @@ router.get("/saved", jwtMiddleware, async (req: AuthedRequest, res, next) => {
     });
 
     res.json({
-      items: savedIdeas.map((si) => ({
+      items: savedIdeas.map((si: { 
+        id: string; 
+        ideaId: string; 
+        notes: string | null; 
+        createdAt: Date;
+        idea: {
+          id: string;
+          type: string;
+          title: string;
+          description: string | null;
+          category: string | null;
+          source: string;
+          metadata: unknown;
+          createdAt: Date;
+        }
+      }) => ({
         id: si.id,
         ideaId: si.ideaId,
         idea: {

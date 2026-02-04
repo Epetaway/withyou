@@ -97,7 +97,25 @@ router.get("/", jwtMiddleware, async (req: AuthedRequest, res, next) => {
     });
 
     res.json({
-      plans: plans.map((plan) => ({
+      plans: plans.map((plan: {
+        id: string;
+        userId: string;
+        relationshipId: string | null;
+        ideaId: string | null;
+        title: string;
+        description: string | null;
+        placeId: string | null;
+        address: string | null;
+        lat: number | null;
+        lng: number | null;
+        websiteUrl: string | null;
+        phoneNumber: string | null;
+        priceLevel: number | null;
+        scheduledDate: Date | null;
+        notes: string | null;
+        createdAt: Date;
+        updatedAt: Date;
+      }) => ({
         id: plan.id,
         userId: plan.userId,
         relationshipId: plan.relationshipId,

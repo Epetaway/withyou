@@ -54,7 +54,7 @@ router.get("/dashboard", jwtMiddleware, async (req: AuthedRequest, res, next) =>
             take: 5,
           })
         )
-          .map((c) => `Check-in on ${new Date(c.createdAt).toLocaleDateString()}`)
+          .map((c: { createdAt: Date }) => `Check-in on ${new Date(c.createdAt).toLocaleDateString()}`)
       : [];
 
     res.json({
@@ -178,7 +178,7 @@ router.get("/notes", jwtMiddleware, async (req: AuthedRequest, res, next) => {
     });
 
     res.json({
-      notes: notes.map((n) => ({
+      notes: notes.map((n: { id: string; userId: string; type: string; content: string | null; mediaUrl: string | null; createdAt: Date }) => ({
         id: n.id,
         authorId: n.userId,
         type: n.type,
