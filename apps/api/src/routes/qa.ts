@@ -3,10 +3,12 @@ import type { Request, Response, NextFunction } from "express";
 import { prisma } from "../utils/prisma.js";
 import { AppError } from "../errors/app-error.js";
 import { env } from "../config/env.js";
+import { QA_TEST_TAG } from "../config/qa-constants.js";
 import { exec } from "child_process";
 import { promisify } from "util";
 import path from "path";
 import { fileURLToPath } from "url";
+import fs from "fs";
 
 const execAsync = promisify(exec);
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -31,14 +33,12 @@ const qaAdminAuth = (req: Request, res: Response, next: NextFunction) => {
 // POST /qa/reset - Wipe only test-tagged data
 router.post("/qa/reset", qaAdminAuth, async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const QA_TAG = "e2e-test";
-    
     // Delete in correct order to avoid foreign key constraints
     await prisma.savedIdea.deleteMany({
       where: {
         user: {
           isTestUser: true,
-          testTag: QA_TAG,
+          testTag: QA_TEST_TAG,
         },
       },
     });
@@ -47,7 +47,7 @@ router.post("/qa/reset", qaAdminAuth, async (req: Request, res: Response, next: 
       where: {
         user: {
           isTestUser: true,
-          testTag: QA_TAG,
+          testTag: QA_TEST_TAG,
         },
       },
     });
@@ -56,7 +56,7 @@ router.post("/qa/reset", qaAdminAuth, async (req: Request, res: Response, next: 
       where: {
         user: {
           isTestUser: true,
-          testTag: QA_TAG,
+          testTag: QA_TEST_TAG,
         },
       },
     });
@@ -65,7 +65,7 @@ router.post("/qa/reset", qaAdminAuth, async (req: Request, res: Response, next: 
       where: {
         user: {
           isTestUser: true,
-          testTag: QA_TAG,
+          testTag: QA_TEST_TAG,
         },
       },
     });
@@ -74,7 +74,7 @@ router.post("/qa/reset", qaAdminAuth, async (req: Request, res: Response, next: 
       where: {
         user: {
           isTestUser: true,
-          testTag: QA_TAG,
+          testTag: QA_TEST_TAG,
         },
       },
     });
@@ -83,7 +83,7 @@ router.post("/qa/reset", qaAdminAuth, async (req: Request, res: Response, next: 
       where: {
         user: {
           isTestUser: true,
-          testTag: QA_TAG,
+          testTag: QA_TEST_TAG,
         },
       },
     });
@@ -92,7 +92,7 @@ router.post("/qa/reset", qaAdminAuth, async (req: Request, res: Response, next: 
       where: {
         user: {
           isTestUser: true,
-          testTag: QA_TAG,
+          testTag: QA_TEST_TAG,
         },
       },
     });
@@ -101,7 +101,7 @@ router.post("/qa/reset", qaAdminAuth, async (req: Request, res: Response, next: 
       where: {
         user: {
           isTestUser: true,
-          testTag: QA_TAG,
+          testTag: QA_TEST_TAG,
         },
       },
     });
@@ -110,7 +110,7 @@ router.post("/qa/reset", qaAdminAuth, async (req: Request, res: Response, next: 
       where: {
         user: {
           isTestUser: true,
-          testTag: QA_TAG,
+          testTag: QA_TEST_TAG,
         },
       },
     });
@@ -119,7 +119,7 @@ router.post("/qa/reset", qaAdminAuth, async (req: Request, res: Response, next: 
       where: {
         inviter: {
           isTestUser: true,
-          testTag: QA_TAG,
+          testTag: QA_TEST_TAG,
         },
       },
     });
@@ -133,7 +133,7 @@ router.post("/qa/reset", qaAdminAuth, async (req: Request, res: Response, next: 
     await prisma.user.deleteMany({
       where: {
         isTestUser: true,
-        testTag: QA_TAG,
+        testTag: QA_TEST_TAG,
       },
     });
 
@@ -141,7 +141,7 @@ router.post("/qa/reset", qaAdminAuth, async (req: Request, res: Response, next: 
 
     res.status(200).json({
       message: "Test data reset successfully",
-      tag: QA_TAG,
+      tag: QA_TEST_TAG,
     });
   } catch (error) {
     console.error("QA reset error:", error);
@@ -152,11 +152,22 @@ router.post("/qa/reset", qaAdminAuth, async (req: Request, res: Response, next: 
 // POST /qa/seed - Run E2E seed script
 router.post("/qa/seed", qaAdminAuth, async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const seedScriptPath = path.join(__dirname, "../../prisma/seed-e2e.ts");
+    const seedScriptPath = path.resolve(__dirname, "../../prisma/seed-e2e.ts");
+    
+    // Validate that the seed script exists and is in the expected location
+    if (!fs.existsSync(seedScriptPath)) {
+      return next(new AppError("Seed script not found", 500, "SEED_SCRIPT_NOT_FOUND"));
+    }
+    
+    // Ensure the path is within our project directory
+    const projectRoot = path.resolve(__dirname, "../..");
+    if (!seedScriptPath.startsWith(projectRoot)) {
+      return next(new AppError("Invalid seed script path", 500, "INVALID_PATH"));
+    }
     
     console.log("Running E2E seed script...");
     const { stdout, stderr } = await execAsync(`npx tsx ${seedScriptPath}`, {
-      cwd: path.join(__dirname, "../.."),
+      cwd: projectRoot,
     });
 
     if (stderr && !stderr.includes("ExperimentalWarning")) {

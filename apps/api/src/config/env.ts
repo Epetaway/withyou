@@ -24,6 +24,14 @@ const parseAllowedOrigins = (value: string | undefined): string[] => {
   return value.split(',').map(origin => origin.trim()).filter(Boolean);
 };
 
+// Helper methods for environment checking
+const isDevelopment = (nodeEnv: string, appEnv: string) => 
+  nodeEnv === 'development' || appEnv === 'development';
+const isTest = (nodeEnv: string, appEnv: string) => 
+  nodeEnv === 'test' || appEnv === 'test';
+const isProduction = (nodeEnv: string, appEnv: string) => 
+  nodeEnv === 'production' || appEnv === 'production';
+
 export const env = {
   nodeEnv: process.env.NODE_ENV ?? 'development',
   appEnv: process.env.APP_ENV ?? 'development',
@@ -58,7 +66,7 @@ export const env = {
   appDeepLinkDomain: process.env.APP_DEEP_LINK_DOMAIN ?? 'withyou.app',
   
   // Helper methods
-  isDevelopment: () => env.nodeEnv === 'development' || env.appEnv === 'development',
-  isTest: () => env.nodeEnv === 'test' || env.appEnv === 'test',
-  isProduction: () => env.nodeEnv === 'production' || env.appEnv === 'production',
+  isDevelopment: () => isDevelopment(process.env.NODE_ENV ?? 'development', process.env.APP_ENV ?? 'development'),
+  isTest: () => isTest(process.env.NODE_ENV ?? 'development', process.env.APP_ENV ?? 'development'),
+  isProduction: () => isProduction(process.env.NODE_ENV ?? 'development', process.env.APP_ENV ?? 'development'),
 };

@@ -1,9 +1,8 @@
 import { PrismaClient } from "@prisma/client";
 import { hash } from "bcrypt";
+import { QA_TEST_TAG } from "../src/config/qa-constants.js";
 
 const prisma = new PrismaClient();
-
-const QA_TAG = "e2e-test";
 
 async function main() {
   console.log("Seeding E2E test database...");
@@ -13,7 +12,7 @@ async function main() {
     where: {
       user: {
         isTestUser: true,
-        testTag: QA_TAG,
+        testTag: QA_TEST_TAG,
       },
     },
   });
@@ -21,7 +20,7 @@ async function main() {
     where: {
       user: {
         isTestUser: true,
-        testTag: QA_TAG,
+        testTag: QA_TEST_TAG,
       },
     },
   });
@@ -29,7 +28,7 @@ async function main() {
     where: {
       user: {
         isTestUser: true,
-        testTag: QA_TAG,
+        testTag: QA_TEST_TAG,
       },
     },
   });
@@ -37,7 +36,7 @@ async function main() {
     where: {
       user: {
         isTestUser: true,
-        testTag: QA_TAG,
+        testTag: QA_TEST_TAG,
       },
     },
   });
@@ -45,7 +44,7 @@ async function main() {
     where: {
       user: {
         isTestUser: true,
-        testTag: QA_TAG,
+        testTag: QA_TEST_TAG,
       },
     },
   });
@@ -53,7 +52,7 @@ async function main() {
     where: {
       user: {
         isTestUser: true,
-        testTag: QA_TAG,
+        testTag: QA_TEST_TAG,
       },
     },
   });
@@ -61,7 +60,7 @@ async function main() {
     where: {
       inviter: {
         isTestUser: true,
-        testTag: QA_TAG,
+        testTag: QA_TEST_TAG,
       },
     },
   });
@@ -73,7 +72,7 @@ async function main() {
   await prisma.user.deleteMany({
     where: {
       isTestUser: true,
-      testTag: QA_TAG,
+      testTag: QA_TEST_TAG,
     },
   });
 
@@ -86,7 +85,7 @@ async function main() {
       passwordHash: hashedPassword,
       emailVerified: true,
       isTestUser: true,
-      testTag: QA_TAG,
+      testTag: QA_TEST_TAG,
     },
   });
 
@@ -96,7 +95,7 @@ async function main() {
       passwordHash: hashedPassword,
       emailVerified: true,
       isTestUser: true,
-      testTag: QA_TAG,
+      testTag: QA_TEST_TAG,
     },
   });
 
@@ -107,7 +106,7 @@ async function main() {
       passwordHash: hashedPassword,
       emailVerified: true,
       isTestUser: true,
-      testTag: QA_TAG,
+      testTag: QA_TEST_TAG,
     },
   });
 
@@ -117,7 +116,7 @@ async function main() {
       passwordHash: hashedPassword,
       emailVerified: true,
       isTestUser: true,
-      testTag: QA_TAG,
+      testTag: QA_TEST_TAG,
     },
   });
 
@@ -128,7 +127,7 @@ async function main() {
       passwordHash: hashedPassword,
       emailVerified: true,
       isTestUser: true,
-      testTag: QA_TAG,
+      testTag: QA_TEST_TAG,
     },
   });
 
@@ -420,7 +419,7 @@ async function main() {
   console.log("  qa_casey@example.com / password123");
   console.log("\nUnpaired:");
   console.log("  qa_unpaired@example.com / password123");
-  console.log("\nAll accounts have testTag: '" + QA_TAG + "'");
+  console.log("\nAll accounts have testTag: '" + QA_TEST_TAG + "'");
   console.log("\nE2E seeding complete!");
 }
 

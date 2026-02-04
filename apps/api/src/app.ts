@@ -15,7 +15,7 @@ import userRouter from './routes/user.js';
 import plansRouter from './routes/plans.js';
 import qaRouter from './routes/qa.js';
 import { errorHandler } from './middleware/error-handler.js';
-import { generalLimiter, authLimiter, inviteLimiter, qaLimiter, placesLimiter } from './middleware/rate-limit.js';
+import { generalLimiter, authLimiter, inviteLimiter, qaLimiter } from './middleware/rate-limit.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -47,14 +47,15 @@ const corsOptions = {
       if (env.allowedOrigins.includes(origin)) {
         callback(null, true);
       } else {
-        callback(new Error('Not allowed by CORS'));
+        // Generic error message to avoid leaking information
+        callback(new Error('CORS policy violation'));
       }
     } else {
       // In dev/test, allow configured origins or all if none configured
       if (env.allowedOrigins.length === 0 || env.allowedOrigins.includes(origin)) {
         callback(null, true);
       } else {
-        callback(new Error('Not allowed by CORS'));
+        callback(new Error('CORS policy violation'));
       }
     }
   },

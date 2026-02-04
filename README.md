@@ -100,12 +100,15 @@ For **production**, create `.env.production` (not committed to git) with product
 #### 4. Apply Database Migrations
 
 ```bash
-# Development
+# Development (use migrate dev for interactive migration)
 cd apps/api
-NODE_ENV=development npx dotenv -e .env.development -- npx prisma migrate deploy
+NODE_ENV=development npx dotenv -e .env.development -- npx prisma migrate dev
 
 # Test
-NODE_ENV=test npx dotenv -e .env.test -- npx prisma migrate deploy
+NODE_ENV=test npx dotenv -e .env.test -- npx prisma migrate dev
+
+# Production (use migrate deploy for non-interactive deployment)
+NODE_ENV=production npx dotenv -e .env.production -- npx prisma migrate deploy
 ```
 
 #### 5. Seed Database

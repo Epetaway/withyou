@@ -39,8 +39,8 @@ async function main() {
 
   console.log(`Created dev users: ${dev1.email}, ${dev2.email}`);
 
-  // Create a basic relationship
-  const relationship = await prisma.relationship.create({
+  // Create a basic relationship for testing
+  const devRelationship = await prisma.relationship.create({
     data: {
       userAId: dev1.id,
       userBId: dev2.id,
@@ -49,7 +49,7 @@ async function main() {
     },
   });
 
-  console.log("Created active relationship");
+  console.log(`Created active relationship: ${devRelationship.id}`);
 
   // Create minimal curated ideas
   const ideas = [
