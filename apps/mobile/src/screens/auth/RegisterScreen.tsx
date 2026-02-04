@@ -1,30 +1,32 @@
 import React, { useState } from "react";
-import { View, StyleSheet, Pressable } from "react-native";
-import { FontAwesome6 } from "@expo/vector-icons";
+import { View, StyleSheet, Pressable, SafeAreaView, ScrollView, TextInput } from "react-native";
+import { useNavigation, NavigationProp } from "@react-navigation/native";
+import { Ionicons } from "@expo/vector-icons";
 import { CONTENT, registerSchema, AuthResponse } from "@withyou/shared";
-import { Screen } from "../../ui/components/Screen";
-import { Text } from "../../ui/components/Text";
-import { TextFieldNew } from "../../ui/components/TextFieldNew";
+import { ThemedText } from "../../components/ThemedText";
+import { ThemedCard } from "../../components/ThemedCard";
+import { ScreenHeader } from "../../components/ScreenHeader";
+import { Button } from "../../ui/components/Button";
 import { api } from "../../state/appState";
 import { setSession } from "../../state/session";
 import { setToken } from "../../state/appState";
 import { useAsyncAction } from "../../api/hooks";
-import { useTheme } from "../../ui/theme/ThemeProvider";
+import { useTheme } from "../../theme/ThemeProvider";
+import { spacing } from "../../theme/tokens";
 
-type RegisterScreenProps = {
-  navigation: {
-    navigate: (screen: string) => void;
-  };
+type AuthStackParamList = {
+  Login: undefined;
+  Register: undefined;
 };
 
-export function RegisterScreen({ navigation }: RegisterScreenProps) {
+export function RegisterScreen() {
   const c = CONTENT.auth.register;
   const theme = useTheme();
+  const navigation = useNavigation<NavigationProp<AuthStackParamList>>();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
 
   const { run, loading, errorText, setErrorText } = useAsyncAction(async () => {
@@ -72,106 +74,179 @@ export function RegisterScreen({ navigation }: RegisterScreenProps) {
   };
 
   return (
-    <Screen scrollable>
-      {/* Header with back button */}
-      <View style={styles.header}>
+    <SafeAreaView style={[styles.container, { backgroundColor: theme.colors.background }]}>
+      <ScrollView 
+        style={styles.scrollView}
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}
+        keyboardShouldPersistTaps="handled"
+      >
+        {/* Back Button */}
         <Pressable 
           style={styles.backButton}
           onPress={() => navigation.navigate("Login")}
         >
-          <FontAwesome6 name="arrow-left" size={24} color={theme.colors.text} weight="bold" />
+          <Ionicons name="arrow-back" size={24} color={theme.colors.text} />
         </Pressable>
-      </View>
 
-      {/* Title Section */}
-      <View style={{ marginBottom: 32, marginTop: 8 }}>
-        <Text variant="screenTitle">Create Account</Text>
-        <Text variant="screenSubtitle" style={{ color: theme.colors.textSecondary, marginTop: 4 }}>
-          Sign up to get started
-        </Text>
-      </View>
-
-      {/* Form */}
-      <View style={{ gap: 16, marginBottom: 24 }}>
-        <TextFieldNew
-          label={c.fields.emailLabel}
-          value={email}
-          onChangeText={setEmail}
-          keyboardType="email-address"
-          autoCapitalize="none"
-          error={fieldErrors.email}
-        />
-        
-        <TextFieldNew
-          label={c.fields.passwordLabel}
-          value={password}
-          onChangeText={setPassword}
-          secureTextEntry
-          autoCapitalize="none"
-          error={fieldErrors.password}
-        />
-        
-        <TextFieldNew
-          label={c.fields.confirmPasswordLabel}
-          value={confirmPassword}
-          onChangeText={setConfirmPassword}
-          secureTextEntry
-          autoCapitalize="none"
-          error={fieldErrors.confirmPassword}
+        <ScreenHeader 
+          title="Create Account"
+          subtitle="Sign up to get started"
         />
 
-        {errorText ? (
-          <Text variant="helper" style={{ color: theme.colors.error, marginTop: 8 }}>
-            {errorText}
-          </Text>
-        ) : null}
+        {/* Form */}
+        <ThemedCard elevation="sm" padding="lg" radius="lg" style={styles.formCard}>
+          <View style={styles.formFields}>
+            <View>
+              <ThemedText variant="caption" color="secondary" style={styles.fieldLabel}>
+                {c.fields.emailLabel}
+              </ThemedText>
+              <TextInput
+                value={email}
+                onChangeText={setEmail}
+                keyboardType="email-address"
+                autoCapitalize="none"
+                placeholder="you@example.com"
+                placeholderTextColor={theme.colors.textMuted}
+                style={[
+                  styles.input,
+                  {
+                    color: theme.colors.text,
+                    backgroundColor: theme.colors.background,
+                    borderColor: fieldErrors.email ? theme.colors.danger : theme.colors.border,
+                  },
+                ]}
+              />
+              {fieldErrors.email && (
+                <ThemedText variant="caption" color="danger" style={styles.errorText}>
+                  {fieldErrors.email}
+                </ThemedText>
+              )}
+            </View>
 
-        <Pressable
-          style={[
-            styles.primaryButton,
-            { backgroundColor: theme.colors.primary },
-            loading && { opacity: 0.6 }
-          ]}
-          onPress={onSubmit}
-          disabled={loading}
-        >
-          <Text style={{ color: theme.colors.background, fontSize: 16, fontWeight: "600" }}>
-            {loading ? CONTENT.app.common.loading : c.actions.primary}
-          </Text>
-        </Pressable>
-      </View>
+            <View>
+              <ThemedText variant="caption" color="secondary" style={styles.fieldLabel}>
+                {c.fields.passwordLabel}
+              </ThemedText>
+              <TextInput
+                value={password}
+                onChangeText={setPassword}
+                secureTextEntry
+                autoCapitalize="none"
+                placeholder="••••••••"
+                placeholderTextColor={theme.colors.textMuted}
+                style={[
+                  styles.input,
+                  {
+                    color: theme.colors.text,
+                    backgroundColor: theme.colors.background,
+                    borderColor: fieldErrors.password ? theme.colors.danger : theme.colors.border,
+                  },
+                ]}
+              />
+              {fieldErrors.password && (
+                <ThemedText variant="caption" color="danger" style={styles.errorText}>
+                  {fieldErrors.password}
+                </ThemedText>
+              )}
+            </View>
 
-      {/* Login Link */}
-      <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "center" }}>
-        <Text variant="helper" style={{ color: theme.colors.textSecondary }}>
-          Already have an account?{" "}
-        </Text>
-        <Pressable onPress={() => navigation.navigate("Login")}>
-          <Text variant="helper" style={{ color: theme.colors.primary, fontWeight: "600" }}>
-            Login
-          </Text>
-        </Pressable>
-      </View>
-    </Screen>
+            <View>
+              <ThemedText variant="caption" color="secondary" style={styles.fieldLabel}>
+                {c.fields.confirmPasswordLabel}
+              </ThemedText>
+              <TextInput
+                value={confirmPassword}
+                onChangeText={setConfirmPassword}
+                secureTextEntry
+                autoCapitalize="none"
+                placeholder="••••••••"
+                placeholderTextColor={theme.colors.textMuted}
+                style={[
+                  styles.input,
+                  {
+                    color: theme.colors.text,
+                    backgroundColor: theme.colors.background,
+                    borderColor: fieldErrors.confirmPassword ? theme.colors.danger : theme.colors.border,
+                  },
+                ]}
+              />
+              {fieldErrors.confirmPassword && (
+                <ThemedText variant="caption" color="danger" style={styles.errorText}>
+                  {fieldErrors.confirmPassword}
+                </ThemedText>
+              )}
+            </View>
+
+            {errorText && (
+              <ThemedText variant="body" color="danger">
+                {errorText}
+              </ThemedText>
+            )}
+
+            <Button
+              label={loading ? CONTENT.app.common.loading : c.actions.primary}
+              onPress={onSubmit}
+              disabled={loading}
+              variant="primary"
+            />
+          </View>
+        </ThemedCard>
+
+        {/* Login Link */}
+        <View style={styles.linkContainer}>
+          <ThemedText variant="body" color="secondary">
+            Already have an account?{" "}
+          </ThemedText>
+          <Pressable onPress={() => navigation.navigate("Login")}>
+            <ThemedText variant="body" color="primary" style={styles.link}>
+              Sign In
+            </ThemedText>
+          </Pressable>
+        </View>
+      </ScrollView>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  header: {
-    marginBottom: 24,
+  container: {
+    flex: 1,
+  },
+  scrollView: {
+    flex: 1,
+  },
+  scrollContent: {
+    padding: spacing.lg,
+    paddingBottom: 100,
   },
   backButton: {
-    width: 40,
-    height: 40,
+    marginBottom: spacing.md,
+  },
+  formCard: {
+    marginBottom: spacing.lg,
+  },
+  formFields: {
+    gap: spacing.md,
+  },
+  fieldLabel: {
+    marginBottom: spacing.xs,
+  },
+  input: {
+    fontSize: 16,
+    padding: spacing.md,
+    borderRadius: 8,
+    borderWidth: 1,
+  },
+  errorText: {
+    marginTop: spacing.xs,
+  },
+  linkContainer: {
+    flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
   },
-  primaryButton: {
-    paddingVertical: 16,
-    paddingHorizontal: 24,
-    borderRadius: 50,
-    alignItems: "center",
-    justifyContent: "center",
-    marginTop: 8,
+  link: {
+    fontWeight: "600",
   },
 });

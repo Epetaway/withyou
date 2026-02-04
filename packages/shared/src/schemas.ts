@@ -360,3 +360,12 @@ export const calendarEventPayloadSchema = z.object({
   endDate: z.string().datetime().optional(),
   allDay: z.boolean().optional(),
 });
+
+// Check-in schemas
+export const checkInPayloadSchema = z.object({
+  date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Date must be in YYYY-MM-DD format"),
+  needs: z.array(z.string()).optional().default([]),
+  intentions: z.array(z.string()).optional().default([]),
+  support: z.array(z.string()).optional().default([]),
+  note: z.string().max(250).optional(),
+});

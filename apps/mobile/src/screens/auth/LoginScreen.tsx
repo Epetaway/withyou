@@ -1,25 +1,29 @@
 import React, { useState } from "react";
-import { View, StyleSheet, Pressable, Platform } from "react-native";
+import { View, StyleSheet, Pressable, Platform, SafeAreaView, ScrollView, TextInput } from "react-native";
+import { useNavigation, NavigationProp } from "@react-navigation/native";
 import { CONTENT, loginSchema, AuthResponse, OAuthLoginResponse } from "@withyou/shared";
-import { Screen } from "../../ui/components/Screen";
-import { Text } from "../../ui/components/Text";
-import { TextFieldNew } from "../../ui/components/TextFieldNew";
+import { ThemedText } from "../../components/ThemedText";
+import { ThemedCard } from "../../components/ThemedCard";
+import { ScreenHeader } from "../../components/ScreenHeader";
+import { Button } from "../../ui/components/Button";
 import { api } from "../../state/appState";
 import { setSession } from "../../state/session";
 import { setToken } from "../../state/appState";
 import { useAsyncAction } from "../../api/hooks";
-import { useTheme } from "../../ui/theme/ThemeProvider";
+import { useTheme } from "../../theme/ThemeProvider";
+import { spacing } from "../../theme/tokens";
 import * as AppleAuthentication from "expo-apple-authentication";
 
-type LoginScreenProps = {
-  navigation: {
-    navigate: (screen: string, params?: Record<string, unknown>) => void;
-  };
+type AuthStackParamList = {
+  Login: undefined;
+  Register: undefined;
+  EmailVerification: { email: string };
 };
 
-export function LoginScreen({ navigation }: LoginScreenProps) {
+export function LoginScreen() {
   const c = CONTENT.auth.login;
   const theme = useTheme();
+  const navigation = useNavigation<NavigationProp<AuthStackParamList>>();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -73,7 +77,6 @@ export function LoginScreen({ navigation }: LoginScreenProps) {
         ],
       });
 
-      // Send ID token to backend
       const res = await api.request<OAuthLoginResponse>("/auth/apple", {
         method: "POST",
         body: JSON.stringify({
@@ -85,13 +88,11 @@ export function LoginScreen({ navigation }: LoginScreenProps) {
       await setSession(res.token, res.userId);
       setToken(res.token);
 
-      // If email not verified, navigate to verification
       if (!res.emailVerified && res.isNewUser) {
         navigation.navigate("EmailVerification", { email: credential.email || "" });
       }
     } catch (err: unknown) {
       if (err && typeof err === 'object' && 'code' in err && err.code === "ERR_CANCELED") {
-        // User canceled
         return;
       }
       console.error("Apple sign in error:", err);
@@ -99,110 +100,183 @@ export function LoginScreen({ navigation }: LoginScreenProps) {
   };
 
   return (
-    <Screen scrollable>
-      {/* Title Section */}
-      <View style={{ marginBottom: 32, marginTop: 40 }}>
-        <Text variant="screenTitle">Welcome Back</Text>
-        <Text variant="screenSubtitle" style={{ color: theme.colors.textSecondary, marginTop: 4 }}>
-          Sign in to continue
-        </Text>
-      </View>
+    <SafeAreaView style={[styles.container, { backgroundColor: theme.colors.background }]}>
+      <ScrollView 
+        style={styles.scrollView}
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}
+        keyboardShouldPersistTaps="handled"
+      >
+        <ScreenHeader 
+          title="Welcome Back"
+          subtitle="Sign in to continue"
+        />
 
-      {/* OAuth Buttons */}
-      {Platform.OS === "ios" && (
-        <View style={{ gap: 12, marginBottom: 24 }}>
-          <AppleAuthentication.AppleAuthenticationButton
-            buttonType={AppleAuthentication.AppleAuthenticationButtonType.SIGN_IN}
-            buttonStyle={AppleAuthentication.AppleAuthenticationButtonStyle.BLACK}
-            cornerRadius={12}
-            style={{ width: "100%", height: 50 }}
-            onPress={handleAppleSignIn}
-          />
+        {/* OAuth Buttons */}
+        {Platform.OS === "ios" && (
+          <View style={styles.oauthSection}>
+            <AppleAuthentication.AppleAuthenticationButton
+              buttonType={AppleAuthentication.AppleAuthenticationButtonType.SIGN_IN}
+              buttonStyle={AppleAuthentication.AppleAuthenticationButtonStyle.BLACK}
+              cornerRadius={12}
+              style={styles.appleButton}
+              onPress={handleAppleSignIn}
+            />
+          </View>
+        )}
+
+        {/* Divider */}
+        <View style={styles.divider}>
+          <View style={[styles.dividerLine, { backgroundColor: theme.colors.border }]} />
+          <ThemedText variant="caption" color="muted" style={styles.dividerText}>
+            or
+          </ThemedText>
+          <View style={[styles.dividerLine, { backgroundColor: theme.colors.border }]} />
         </View>
-      )}
 
-      {/* Divider */}
-      <View style={styles.divider}>
-        <View style={[styles.dividerLine, { backgroundColor: theme.colors.textSecondary }]} />
-        <Text variant="helper" style={{ color: theme.colors.textSecondary, paddingHorizontal: 16 }}>
-          or
-        </Text>
-        <View style={[styles.dividerLine, { backgroundColor: theme.colors.textSecondary }]} />
-      </View>
+        {/* Form */}
+        <ThemedCard elevation="sm" padding="lg" radius="lg" style={styles.formCard}>
+          <View style={styles.formFields}>
+            <View>
+              <ThemedText variant="caption" color="secondary" style={styles.fieldLabel}>
+                {c.fields.emailLabel}
+              </ThemedText>
+              <TextInput
+                value={email}
+                onChangeText={setEmail}
+                keyboardType="email-address"
+                autoCapitalize="none"
+                placeholder="you@example.com"
+                placeholderTextColor={theme.colors.textMuted}
+                style={[
+                  styles.input,
+                  {
+                    color: theme.colors.text,
+                    backgroundColor: theme.colors.background,
+                    borderColor: fieldErrors.email ? theme.colors.danger : theme.colors.border,
+                  },
+                ]}
+              />
+              {fieldErrors.email && (
+                <ThemedText variant="caption" color="danger" style={styles.errorText}>
+                  {fieldErrors.email}
+                </ThemedText>
+              )}
+            </View>
 
-      {/* Form */}
-      <View style={{ gap: 16, marginBottom: 24 }}>
-        <TextFieldNew
-          label={c.fields.emailLabel}
-          value={email}
-          onChangeText={setEmail}
-          keyboardType="email-address"
-          autoCapitalize="none"
-          error={fieldErrors.email}
-        />
-        
-        <TextFieldNew
-          label={c.fields.passwordLabel}
-          value={password}
-          onChangeText={setPassword}
-          secureTextEntry
-          autoCapitalize="none"
-          error={fieldErrors.password}
-        />
+            <View>
+              <ThemedText variant="caption" color="secondary" style={styles.fieldLabel}>
+                {c.fields.passwordLabel}
+              </ThemedText>
+              <TextInput
+                value={password}
+                onChangeText={setPassword}
+                secureTextEntry
+                autoCapitalize="none"
+                placeholder="••••••••"
+                placeholderTextColor={theme.colors.textMuted}
+                style={[
+                  styles.input,
+                  {
+                    color: theme.colors.text,
+                    backgroundColor: theme.colors.background,
+                    borderColor: fieldErrors.password ? theme.colors.danger : theme.colors.border,
+                  },
+                ]}
+              />
+              {fieldErrors.password && (
+                <ThemedText variant="caption" color="danger" style={styles.errorText}>
+                  {fieldErrors.password}
+                </ThemedText>
+              )}
+            </View>
 
-        {errorText ? (
-          <Text variant="helper" style={{ color: theme.colors.error, marginTop: 8 }}>
-            {errorText}
-          </Text>
-        ) : null}
+            {errorText && (
+              <ThemedText variant="body" color="danger">
+                {errorText}
+              </ThemedText>
+            )}
 
-        <Pressable
-          style={[
-            styles.primaryButton,
-            { backgroundColor: theme.colors.primary },
-            loading && { opacity: 0.6 }
-          ]}
-          onPress={onSubmit}
-          disabled={loading}
-        >
-          <Text style={{ color: theme.colors.background, fontSize: 16, fontWeight: "600" }}>
-            {loading ? CONTENT.app.common.loading : c.actions.primary}
-          </Text>
-        </Pressable>
-      </View>
+            <Button
+              label={loading ? CONTENT.app.common.loading : c.actions.primary}
+              onPress={onSubmit}
+              disabled={loading}
+              variant="primary"
+            />
+          </View>
+        </ThemedCard>
 
-      {/* Sign Up Link */}
-      <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "center" }}>
-        <Text variant="helper" style={{ color: theme.colors.textSecondary }}>
-          Don&apos;t have an account?{" "}
-        </Text>
-        <Pressable onPress={() => navigation.navigate("Register")}>
-          <Text variant="helper" style={{ color: theme.colors.primary, fontWeight: "600" }}>
-            Sign Up
-          </Text>
-        </Pressable>
-      </View>
-    </Screen>
+        {/* Sign Up Link */}
+        <View style={styles.linkContainer}>
+          <ThemedText variant="body" color="secondary">
+            Don&apos;t have an account?{" "}
+          </ThemedText>
+          <Pressable onPress={() => navigation.navigate("Register")}>
+            <ThemedText variant="body" color="primary" style={styles.link}>
+              Sign Up
+            </ThemedText>
+          </Pressable>
+        </View>
+      </ScrollView>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  primaryButton: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    paddingVertical: 16,
-    paddingHorizontal: 24,
-    borderRadius: 12,
+  container: {
+    flex: 1,
+  },
+  scrollView: {
+    flex: 1,
+  },
+  scrollContent: {
+    padding: spacing.lg,
+    paddingBottom: 100,
+  },
+  oauthSection: {
+    gap: spacing.sm,
+    marginBottom: spacing.lg,
+  },
+  appleButton: {
+    width: "100%",
+    height: 50,
   },
   divider: {
     flexDirection: "row",
     alignItems: "center",
-    marginVertical: 24,
+    marginVertical: spacing.lg,
   },
   dividerLine: {
     flex: 1,
     height: 1,
-    opacity: 0.2,
+  },
+  dividerText: {
+    paddingHorizontal: spacing.md,
+  },
+  formCard: {
+    marginBottom: spacing.lg,
+  },
+  formFields: {
+    gap: spacing.md,
+  },
+  fieldLabel: {
+    marginBottom: spacing.xs,
+  },
+  input: {
+    fontSize: 16,
+    padding: spacing.md,
+    borderRadius: 8,
+    borderWidth: 1,
+  },
+  errorText: {
+    marginTop: spacing.xs,
+  },
+  linkContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  link: {
+    fontWeight: "600",
   },
 });

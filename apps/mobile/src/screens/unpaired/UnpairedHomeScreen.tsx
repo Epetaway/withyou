@@ -1,21 +1,25 @@
 import React from "react";
-import { View, StyleSheet } from "react-native";
-import { FontAwesome6 } from "@expo/vector-icons";
+import { View, StyleSheet, SafeAreaView, ScrollView } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
 import { CONTENT } from "@withyou/shared";
-import { Screen } from "../../ui/components/Screen";
-import { Text } from "../../ui/components/Text";
+import { ThemedText } from "../../components/ThemedText";
+import { ThemedCard } from "../../components/ThemedCard";
+import { ScreenHeader } from "../../components/ScreenHeader";
 import { Button } from "../../ui/components/Button";
 import { clearSession } from "../../state/session";
-import { Card } from "../../ui/components/Card";
-import { Spacing } from "../../ui/tokens";
-import { useTheme } from "../../ui/theme/ThemeProvider";
+import { useTheme } from "../../theme/ThemeProvider";
+import { spacing } from "../../theme/tokens";
+import { useNavigation, NavigationProp } from "@react-navigation/native";
 
-type UnpairedHomeScreenProps = {
-  navigation: unknown;
+type UnpairedStackParamList = {
+  UnpairedHome: undefined;
+  PairInvite: undefined;
+  PairAccept: undefined;
 };
 
-export function UnpairedHomeScreen({ navigation }: UnpairedHomeScreenProps) {
+export function UnpairedHomeScreen() {
   const theme = useTheme();
+  const navigation = useNavigation<NavigationProp<UnpairedStackParamList>>();
   const c = CONTENT.dashboard.unpaired;
 
   const handleLogout = async () => {
@@ -23,42 +27,37 @@ export function UnpairedHomeScreen({ navigation }: UnpairedHomeScreenProps) {
   };
 
   return (
-    <Screen>
-      <View style={{ flex: 1, justifyContent: "center", gap: Spacing.xl }}>
-        {/* Hero Section */}
-        <Card>
-          <View style={{ gap: Spacing.lg, alignItems: "center" }}>
-            <FontAwesome6 name="heart" size={56} color={theme.primary} weight="solid" />
-            <View style={{ gap: Spacing.sm }}>
-              <Text style={[styles.title, { color: theme.text, textAlign: "center" }]}>
-                {c.title}
-              </Text>
-              <Text
-                variant="body"
-                style={{ textAlign: "center", color: theme.text2 }}
-              >
-                {c.body}
-              </Text>
-            </View>
-          </View>
-        </Card>
+    <SafeAreaView style={[styles.container, { backgroundColor: theme.colors.background }]}>
+      <ScrollView 
+        style={styles.scrollView}
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}
+      >
+        <ScreenHeader title="WithYou" />
 
-        {/* CTA Buttons */}
-        <View style={{ gap: Spacing.sm }}>
+        {/* Hero Card */}
+        <ThemedCard elevation="sm" padding="xl" radius="lg" style={styles.heroCard}>
+          <View style={styles.heroContent}>
+            <Ionicons name="heart" size={64} color={theme.colors.primary} />
+            <ThemedText variant="h1" color="primary" style={styles.heroTitle}>
+              {c.title}
+            </ThemedText>
+            <ThemedText variant="body" color="secondary" style={styles.heroBody}>
+              {c.body}
+            </ThemedText>
+          </View>
+        </ThemedCard>
+
+        {/* Action Buttons */}
+        <View style={styles.actionsContainer}>
           <Button
             label={c.actions.primary}
-            onPress={() =>
-              // eslint-disable-next-line @typescript-eslint/no-explicit-any
-              (navigation as any)?.navigate?.("PairInvite")
-            }
+            onPress={() => navigation.navigate("PairInvite")}
             variant="primary"
           />
           <Button
             label={c.actions.secondary}
-            onPress={() =>
-              // eslint-disable-next-line @typescript-eslint/no-explicit-any
-              (navigation as any)?.navigate?.("PairAccept")
-            }
+            onPress={() => navigation.navigate("PairAccept")}
             variant="secondary"
           />
           <Button
@@ -67,11 +66,37 @@ export function UnpairedHomeScreen({ navigation }: UnpairedHomeScreenProps) {
             variant="secondary"
           />
         </View>
-      </View>
-    </Screen>
+      </ScrollView>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  title: { fontSize: 24, fontWeight: "700" },
+  container: {
+    flex: 1,
+  },
+  scrollView: {
+    flex: 1,
+  },
+  scrollContent: {
+    padding: spacing.lg,
+    paddingBottom: 100,
+  },
+  heroCard: {
+    marginBottom: spacing.xl,
+  },
+  heroContent: {
+    alignItems: "center",
+    gap: spacing.md,
+  },
+  heroTitle: {
+    textAlign: "center",
+  },
+  heroBody: {
+    textAlign: "center",
+    lineHeight: 22,
+  },
+  actionsContainer: {
+    gap: spacing.sm,
+  },
 });
