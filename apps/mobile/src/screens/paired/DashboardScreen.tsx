@@ -4,16 +4,17 @@ import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import { useNavigation, NavigationProp } from "@react-navigation/native";
 import { CONTENT, DashboardResponse, Note, NotesResponse } from "@withyou/shared";
-import { ThemedCard } from "../../ui/components/ThemedCard";
-import { ThemedText } from "../../ui/components/ThemedText";
-import { ScreenHeader } from "../../ui/components/ScreenHeader";
-import { spacing } from "../../ui/tokens";
+import { ThemedCard } from "../../components/ThemedCard";
+import { ThemedText } from "../../components/ThemedText";
+import { ScreenHeader } from "../../components/ScreenHeader";
+import { Spacing } from "../../ui/tokens";
 import { clearSession } from "../../state/session";
 import { api } from "../../state/appState";
 import { useTheme } from "../../ui/theme/ThemeProvider";
 
 const { width } = Dimensions.get('window');
 const _CARD_WIDTH = (width - 60) / 2;
+const spacing = Spacing;
 
 type PairedStackParamList = {
   Dashboard: undefined;
@@ -22,6 +23,8 @@ type PairedStackParamList = {
   Preferences: undefined;
   Settings: undefined;
   LocalMap: undefined;
+  NotesList: undefined;
+  NoteCompose: undefined;
 };
 
 const dateIdeas = [

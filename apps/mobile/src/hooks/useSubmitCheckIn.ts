@@ -1,5 +1,5 @@
 import { useState, useCallback } from "react";
-import { api } from "../api/client";
+import { api } from "../state/appState";
 import type { CheckInDraft } from "./useCheckInDraft";
 
 export interface CheckInPayload {
@@ -45,19 +45,21 @@ export function useSubmitCheckIn() {
         };
 
         // POST to /checkins endpoint
-        const response = await api.post("/checkins", payload);
+        const response = await api.request<Record<string, unknown>>("/checkins", {
+          method: "POST",
+          body: JSON.stringify(payload),
+        });
 
         return {
           success: true,
           data: response,
         };
       } catch (err) {
-        const error = err as Record<string, unknown>;
-        const errorMessage = (error?.response as Record<string, unknown>)?.data?.message || (error as Error)?.message || "Failed to save check-in";
-        setError(errorMessage as string);
+        const errorMessage = err instanceof Error ? err.message : "Failed to save check-in";
+        setError(errorMessage);
         return {
           success: false,
-          error: errorMessage as string,
+          error: errorMessage,
         };
       } finally {
         setIsLoading(false);

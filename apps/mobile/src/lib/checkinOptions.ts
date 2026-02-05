@@ -2,15 +2,7 @@
  * Check-in options with labels, descriptions, and icon mappings
  */
 
-export type CheckInOptionId =
-  | "empathy"
-  | "reassurance"
-  | "recharge"
-  | "feel_close"
-  | "encouragement"
-  | "listen"
-  | "advice"
-  | "give_hand";
+export type CheckInOptionId = string;
 
 export type CheckInSection = "needs" | "intentions" | "support";
 

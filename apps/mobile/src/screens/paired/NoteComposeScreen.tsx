@@ -121,7 +121,7 @@ export function NoteComposeScreen() {
 
       await api.request("/notes", {
         method: "POST",
-        body: payload,
+        body: JSON.stringify(payload),
       });
 
       Alert.alert("Note Sent", "Your note has been sent to your partner.", [
@@ -186,7 +186,7 @@ export function NoteComposeScreen() {
             <ThemedText variant="overline" color="muted" style={styles.sectionLabel}>
               ATTACHMENT
             </ThemedText>
-            <ThemedCard elevation="sm" padding="0" radius="lg" style={styles.mediaPreview}>
+            <ThemedCard elevation="sm" padding="none" radius="lg" style={styles.mediaPreview}>
               {noteType === "VIDEO" ? (
                 <View style={[styles.videoPlaceholder, { backgroundColor: theme.colors.surface }]}>
                   <Ionicons name="film" size={48} color={theme.colors.primary} />

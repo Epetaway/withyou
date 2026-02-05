@@ -1,4 +1,4 @@
-import { PrismaClient } from "@prisma/client";
+import { Prisma, PrismaClient } from "@prisma/client";
 import { hash } from "bcrypt";
 
 const prisma = new PrismaClient();
@@ -89,7 +89,7 @@ async function main() {
         description: idea.description,
         category: idea.category,
         source: idea.source,
-        metadata: idea.metadata as unknown,
+        metadata: idea.metadata as Prisma.InputJsonValue,
       },
     });
   }

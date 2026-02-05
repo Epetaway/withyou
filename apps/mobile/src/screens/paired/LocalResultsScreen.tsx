@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { Linking, StyleSheet, View, Alert, SafeAreaView, ScrollView, ActivityIndicator } from "react-native";
-import { NavigationProp, useNavigation, useRoute } from "@react-navigation/native";
+import { NavigationProp, RouteProp, useNavigation, useRoute } from "@react-navigation/native";
 import { Ionicons } from "@expo/vector-icons";
 import { ThemedText } from "../../components/ThemedText";
 import { ThemedCard } from "../../components/ThemedCard";
@@ -17,10 +17,10 @@ type Params = {
 };
 
 type LocalStackParamList = {
-  LocalResults: { radiusMiles?: number; filters?: string[] };
+  LocalResults: Params;
 };
 
-type Route = { params?: Params };
+type LocalResultsRoute = RouteProp<LocalStackParamList, "LocalResults">;
 
 type Idea = {
   id: string;
@@ -51,7 +51,7 @@ function openMaps(lat?: number, lng?: number, label?: string) {
 export function LocalResultsScreen() {
   const theme = useTheme();
   const navigation = useNavigation<NavigationProp<LocalStackParamList>>();
-  const route = useRoute<Route>();
+  const route = useRoute<LocalResultsRoute>();
   const radiusMiles = route.params?.radiusMiles ?? 10;
   const filters = route.params?.filters ?? [];
   const [ideas, setIdeas] = useState<Idea[]>([]);

@@ -62,6 +62,7 @@ export function RootNavigator() {
   return (
     <NavigationContainer>
       <Stack.Navigator
+      id="RootNavigator"
         screenOptions={{ headerShown: false }}
         initialRouteName={
           authStatus === "signedOut"

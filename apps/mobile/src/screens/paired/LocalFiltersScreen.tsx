@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from "react";
 import { SafeAreaView, ScrollView, StyleSheet, View } from "react-native";
-import { NavigationProp, useNavigation, useRoute } from "@react-navigation/native";
+import { NavigationProp, RouteProp, useNavigation, useRoute } from "@react-navigation/native";
 import { ThemedText } from "../../components/ThemedText";
 import { ThemedCard } from "../../components/ThemedCard";
 import { ScreenHeader } from "../../components/ScreenHeader";
@@ -23,17 +23,16 @@ type Params = {
 };
 
 type LocalStackParamList = {
-  LocalResults: { radiusMiles?: number; filters?: string[] };
+  LocalFilters: Params;
+  LocalResults: Params;
 };
-
-type Route = { params?: Params };
 
 export function LocalFiltersScreen() {
   const theme = useTheme();
   const navigation = useNavigation<NavigationProp<LocalStackParamList>>();
-  const route = useRoute<Route>();
+  const route = useRoute<RouteProp<LocalStackParamList, "LocalFilters">>();
   const initialRadius = route.params?.radiusMiles ?? 10;
-  const initialFilters = new Set(route.params?.filters ?? []);
+  const initialFilters = new Set<string>(route.params?.filters ?? []);
   const [radius, setRadius] = useState<number>(initialRadius);
   const [selectedFilters, setSelectedFilters] = useState<Set<string>>(initialFilters);
 
@@ -53,7 +52,7 @@ export function LocalFiltersScreen() {
   };
 
   return (
-    <SafeAreaView style={[styles.container, { backgroundColor: theme.colors.background }]}>
+    <SafeAreaView style={[styles.container, { backgroundColor: theme.colors.background }]}> 
       <ScrollView
         style={styles.scrollView}
         contentContainerStyle={styles.scrollContent}

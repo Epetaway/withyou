@@ -1,10 +1,10 @@
 import React, { useState } from "react";
 import { View, StyleSheet, Pressable, SafeAreaView, ScrollView } from "react-native";
 import { TextFieldNew } from "../../ui/components/TextFieldNew";
-import { ThemedCard } from "../../ui/components/ThemedCard";
-import { ThemedText } from "../../ui/components/ThemedText";
-import { ScreenHeader } from "../../ui/components/ScreenHeader";
-import { spacing } from "../../ui/tokens";
+import { ThemedCard } from "../../components/ThemedCard";
+import { ThemedText } from "../../components/ThemedText";
+import { ScreenHeader } from "../../components/ScreenHeader";
+import { Spacing } from "../../ui/tokens";
 import { api } from "../../state/appState";
 import { useAsyncAction } from "../../api/hooks";
 import { useTheme } from "../../ui/theme/ThemeProvider";
@@ -17,6 +17,7 @@ type ProfileSetupScreenProps = {
 
 export function ProfileSetupScreen({ navigation }: ProfileSetupScreenProps) {
   const theme = useTheme();
+  const spacing = Spacing;
   const [nickname, setNickname] = useState("");
   const [currentStep, setCurrentStep] = useState(1);
   const totalSteps = 4;
@@ -161,27 +162,27 @@ export function ProfileSetupScreen({ navigation }: ProfileSetupScreenProps) {
 const styles = StyleSheet.create({
   container: { flex: 1 },
   scrollView: { flex: 1 },
-  scrollContent: { padding: spacing.lg, paddingBottom: 100, gap: spacing.lg },
+  scrollContent: { padding: Spacing.lg, paddingBottom: 100, gap: Spacing.lg },
   progressContainer: {
     flexDirection: "row",
-    gap: spacing.sm,
+    gap: Spacing.sm,
   },
   progressDot: {
     flex: 1,
     height: 4,
     borderRadius: 2,
   },
-  stepContent: { padding: spacing.lg, gap: spacing.md },
+  stepContent: { padding: Spacing.lg, gap: Spacing.md },
   primaryButton: {
-    paddingVertical: spacing.md,
-    paddingHorizontal: spacing.lg,
+    paddingVertical: Spacing.md,
+    paddingHorizontal: Spacing.lg,
     borderRadius: 12,
     alignItems: "center",
     minHeight: 48,
   },
   secondaryButton: {
-    paddingVertical: spacing.md,
-    paddingHorizontal: spacing.lg,
+    paddingVertical: Spacing.md,
+    paddingHorizontal: Spacing.lg,
     borderRadius: 12,
     alignItems: "center",
     borderWidth: 1.5,

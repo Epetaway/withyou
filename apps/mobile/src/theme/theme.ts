@@ -5,13 +5,16 @@ export type Theme = ThemeTokens & {
 };
 
 export function getTheme(mode: ThemeMode): Theme {
+  const colors = colorTokens[mode];
   return {
     mode,
     isDark: mode === "dark",
-    colors: colorTokens[mode],
+    colors,
     spacing,
     radius,
     elevation,
     typography,
+    text: colors.text,
+    text2: colors.text2,
   };
 }

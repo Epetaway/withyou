@@ -8,6 +8,38 @@ import { generateAvatarUploadUrl } from "../utils/s3.js";
 
 const router = Router();
 
+// Get authenticated user profile
+router.get("/user/profile", jwtMiddleware, async (req: AuthenticatedRequest, res, next) => {
+  try {
+    const userId = req.user?.userId;
+
+    if (!userId) {
+      return next(new AppError("Unauthorized", 401, "UNAUTHORIZED"));
+    }
+
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: {
+        id: true,
+        email: true,
+        emailVerified: true,
+        setupCompleted: true,
+        avatarUrl: true,
+        createdAt: true,
+        updatedAt: true,
+      },
+    });
+
+    if (!user) {
+      return next(new AppError("User not found", 404, "NOT_FOUND"));
+    }
+
+    res.status(200).json({ user });
+  } catch (error) {
+    next(error);
+  }
+});
+
 // Get pre-signed URL for avatar upload
 router.get("/user/avatar/upload-url", jwtMiddleware, async (req: AuthenticatedRequest, res, next) => {
   try {

@@ -89,7 +89,7 @@ export function PairInviteScreen() {
 
         {!inviteCode ? (
           <Button
-            label={loading ? CONTENT.app.common.loading : c.actions.generate}
+            label={loading ? CONTENT.app.common.loading : c.actions.generateCode}
             onPress={run}
             disabled={loading}
             variant="primary"

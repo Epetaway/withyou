@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, TextInput, Text, StyleSheet, ViewStyle, TextInputProps } from 'react-native';
-import { Spacing, BorderRadius, Typography, Animation } from '../tokens';
+import { Spacing, BorderRadius, Typography } from '../tokens';
 import { useTheme } from '../theme/ThemeProvider';
 
 interface TextFieldProps extends TextInputProps {
@@ -73,7 +73,6 @@ const styles = StyleSheet.create({
     borderRadius: BorderRadius.md,
     paddingHorizontal: Spacing.md,
     minHeight: 48,
-    transitionDuration: `${Animation.fast}ms`,
   },
   
   input: {

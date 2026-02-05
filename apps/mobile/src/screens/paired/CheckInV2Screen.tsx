@@ -6,10 +6,10 @@ import { MoodColorPicker } from '../../ui/components/MoodColorPicker';
 import { EmotionSelector } from '../../ui/components/EmotionSelector';
 import { EnergySelector } from '../../ui/components/EnergySelector';
 import { MoodGradient } from '../../ui/components/MoodGradient';
-import { ThemedCard } from '../../ui/components/ThemedCard';
-import { ThemedText } from '../../ui/components/ThemedText';
-import { ScreenHeader } from '../../ui/components/ScreenHeader';
-import { spacing } from '../../ui/tokens';
+import { ThemedCard } from '../../components/ThemedCard';
+import { ThemedText } from '../../components/ThemedText';
+import { ScreenHeader } from '../../components/ScreenHeader';
+import { Spacing } from '../../ui/tokens';
 import { useTheme } from '../../ui/theme/ThemeProvider';
 import { api } from '../../state/appState';
 import { useAsyncAction } from '../../api/hooks';
@@ -31,8 +31,7 @@ export function CheckInV2Screen({ navigation: _navigation }: CheckInV2ScreenProp
 
   // Fetch today's check-ins on mount
   const { run: fetchToday } = useAsyncAction(async () => {
-    const response = await api.request('/checkins/today', { method: 'GET' });
-    const data = await response.json() as CheckinTodayResponse;
+    const data = await api.request<CheckinTodayResponse>('/checkins/today', { method: 'GET' });
     setTodayData(data);
   });
 
@@ -143,7 +142,7 @@ export function CheckInV2Screen({ navigation: _navigation }: CheckInV2ScreenProp
 const styles = StyleSheet.create({
   container: { flex: 1 },
   scrollView: { flex: 1 },
-  scrollContent: { padding: spacing.lg, paddingBottom: 100, gap: spacing.lg },
-  section: { gap: spacing.sm },
-  submitButton: { marginTop: spacing.md, marginBottom: spacing.xl },
+  scrollContent: { padding: Spacing.lg, paddingBottom: 100, gap: Spacing.lg },
+  section: { gap: Spacing.sm },
+  submitButton: { marginTop: Spacing.md, marginBottom: Spacing.xl },
 });

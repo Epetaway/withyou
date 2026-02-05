@@ -56,7 +56,7 @@ export function UnpairedHomeScreen() {
             variant="primary"
           />
           <Button
-            label={c.actions.secondary}
+            label={c.actions.primary}
             onPress={() => navigation.navigate("PairAccept")}
             variant="secondary"
           />

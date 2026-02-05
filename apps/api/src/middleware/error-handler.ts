@@ -1,5 +1,6 @@
 import type { NextFunction, Request, Response } from 'express';
 import { AppError } from '../errors/app-error.js';
+import { env } from '../config/env.js';
 
 export const errorHandler = (
   err: unknown,
@@ -10,6 +11,14 @@ export const errorHandler = (
   const appError = err instanceof AppError
     ? err
     : new AppError('Internal server error', 500, 'INTERNAL_ERROR');
+
+  if (!env.isProduction()) {
+    console.error('Unhandled error:', {
+      path: req.path,
+      method: req.method,
+      error: err,
+    });
+  }
 
   res.status(appError.statusCode).json({
     error: {

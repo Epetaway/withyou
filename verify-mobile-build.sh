@@ -108,10 +108,12 @@ echo "Step 6: Type Checking"
 echo "===================="
 
 echo "Checking TypeScript compilation..."
-npx tsc --noEmit 2>&1 | head -20 || {
+if npx tsc --noEmit -p apps/mobile/tsconfig.json; then
+  echo -e "${GREEN}✓${NC} TypeScript compilation successful"
+else
   echo -e "${RED}✗${NC} TypeScript compilation has errors"
-}
-echo -e "${GREEN}✓${NC} TypeScript compilation successful"
+  exit 1
+fi
 
 echo ""
 echo "Step 7: Linting"
@@ -129,9 +131,9 @@ if [ -f ".env" ]; then
   echo -e "${GREEN}✓${NC} .env file exists"
 else
   echo -e "${YELLOW}!${NC} .env file not found - creating from template..."
-  cat > .env << 'EOF'
+  cat > .env << EOF
 PORT=3000
-DATABASE_URL=postgresql://postgres@localhost:5432/withyou
+DATABASE_URL=postgresql://${USER}@localhost:5432/withyou
 JWT_SECRET=dev-secret-change-in-production
 EOF
   echo -e "${GREEN}✓${NC} Created .env file"
@@ -144,7 +146,7 @@ echo "====================="
 cd apps/api
 echo "Checking Prisma migrations..."
 npx prisma migrate status 2>&1 | grep -q "up to date" && echo -e "${GREEN}✓${NC} Database migrations up to date" || echo -e "${YELLOW}!${NC} Database migrations may need updating"
-npx prisma generate --silent
+npx prisma generate
 echo -e "${GREEN}✓${NC} Prisma client generated"
 
 cd ../..

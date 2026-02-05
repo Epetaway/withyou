@@ -19,12 +19,10 @@ import { CheckInTextArea } from "../../components/checkin/CheckInTextArea";
 import { CheckInActions } from "../../components/checkin/CheckInActions";
 import { ThemedCard } from "../../components/ThemedCard";
 import { ThemedText } from "../../components/ThemedText";
-import type { NativeStackScreenProps } from "@react-navigation/native-stack";
+import { useNavigation, type NavigationProp, type ParamListBase } from "@react-navigation/native";
 
-type RootStackParamList = Record<string, unknown>;
-type CheckInScreenProps = NativeStackScreenProps<RootStackParamList, "CheckIn">;
-
-export function CheckInScreen({ navigation }: CheckInScreenProps) {
+export function CheckInScreen() {
+  const navigation = useNavigation<NavigationProp<ParamListBase>>();
   const theme = useTheme();
   const { draft, setNeeds, setIntentions, setSupport, updateNote, reset } =
     useCheckInDraft();

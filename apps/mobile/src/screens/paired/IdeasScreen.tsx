@@ -16,6 +16,10 @@ type PairedStackParamList = {
   Ideas: undefined;
   Preferences: undefined;
   Settings: undefined;
+  LocalMap: { radiusMiles?: number; filters?: string[] } | undefined;
+  FoodMode: undefined;
+  MovieMode: undefined;
+  SavedIdeas: undefined;
 };
 
 const localFilterOptions = [

@@ -85,6 +85,7 @@ export function PairedTabs() {
 
   return (
     <Stack.Navigator
+      id="PairedTabs"
       initialRouteName="Dashboard"
       screenOptions={{
         headerShown: false,

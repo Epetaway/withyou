@@ -134,6 +134,5 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 10,
     borderRadius: 999,
-    backdropFilter: "blur(10px)",
   },
 });

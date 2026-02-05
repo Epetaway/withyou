@@ -1,5 +1,5 @@
 import React from "react";
-import { TextInput as PaperTextInput } from "react-native-paper";
+import { TextInput as PaperTextInput, HelperText } from "react-native-paper";
 import { View, StyleSheet, TextStyle } from "react-native";
 
 type Props = {
@@ -50,9 +50,9 @@ export function TextField({
         outlineStyle={{ borderRadius: 12 }}
       />
       {errorText && (
-        <PaperTextInput.Helper type="error">
+        <HelperText type="error">
           {errorText}
-        </PaperTextInput.Helper>
+        </HelperText>
       )}
     </View>
   );

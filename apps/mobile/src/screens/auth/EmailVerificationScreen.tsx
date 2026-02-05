@@ -1,10 +1,10 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { View, StyleSheet, Pressable, SafeAreaView, ScrollView, ActivityIndicator } from "react-native";
 import { TextFieldNew } from "../../ui/components/TextFieldNew";
-import { ThemedCard } from "../../ui/components/ThemedCard";
-import { ThemedText } from "../../ui/components/ThemedText";
-import { ScreenHeader } from "../../ui/components/ScreenHeader";
-import { spacing } from "../../ui/tokens";
+import { ThemedCard } from "../../components/ThemedCard";
+import { ThemedText } from "../../components/ThemedText";
+import { ScreenHeader } from "../../components/ScreenHeader";
+import { Spacing } from "../../ui/tokens";
 import { api } from "../../state/appState";
 import { useAsyncAction } from "../../api/hooks";
 import { useTheme } from "../../ui/theme/ThemeProvider";
@@ -22,6 +22,7 @@ type EmailVerificationScreenProps = {
 
 export function EmailVerificationScreen({ navigation, route }: EmailVerificationScreenProps) {
   const theme = useTheme();
+  const spacing = Spacing;
   const [code, setCode] = useState("");
   const [countdown, setCountdown] = useState(0);
   const [error, setError] = useState<string | null>(null);
@@ -163,18 +164,18 @@ export function EmailVerificationScreen({ navigation, route }: EmailVerification
 const styles = StyleSheet.create({
   container: { flex: 1 },
   scrollView: { flex: 1 },
-  scrollContent: { padding: spacing.lg, paddingBottom: 100, gap: spacing.lg },
-  formSection: { gap: spacing.md, padding: spacing.lg },
+  scrollContent: { padding: Spacing.lg, paddingBottom: 100, gap: Spacing.lg },
+  formSection: { gap: Spacing.md, padding: Spacing.lg },
   primaryButton: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    paddingVertical: spacing.md,
-    paddingHorizontal: spacing.lg,
+    paddingVertical: Spacing.md,
+    paddingHorizontal: Spacing.lg,
     borderRadius: 12,
-    marginTop: spacing.md,
+    marginTop: Spacing.md,
     minHeight: 48,
   },
-  resendContainer: { alignItems: "center", marginTop: spacing.md },
-  backButton: { alignItems: "center", marginTop: spacing.lg },
+  resendContainer: { alignItems: "center", marginTop: Spacing.md },
+  backButton: { alignItems: "center", marginTop: Spacing.lg },
 });

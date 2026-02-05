@@ -1,13 +1,16 @@
 import React, { useState, useEffect } from "react";
 import { View, StyleSheet, Pressable, ScrollView, ActivityIndicator, Linking, Alert, SafeAreaView } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { NavigationProp, useNavigation, useRoute } from "@react-navigation/native";
+import { NavigationProp, RouteProp, useNavigation, useRoute } from "@react-navigation/native";
 import { ThemedText } from "../../components/ThemedText";
 import { ThemedCard } from "../../components/ThemedCard";
 import { ScreenHeader } from "../../components/ScreenHeader";
 import { useTheme } from "../../theme/ThemeProvider";
 import { spacing } from "../../theme/tokens";
 import { api } from "../../state/appState";
+
+type LocalMapParams = { radiusMiles?: number; filters?: string[] };
+type LocalMapRoute = RouteProp<{ LocalMap: LocalMapParams }, "LocalMap">;
 
 type LocalIdea = {
   id: string;
@@ -55,7 +58,7 @@ type LocalStackParamList = {
 export function LocalMapScreen() {
   const theme = useTheme();
   useNavigation<NavigationProp<LocalStackParamList>>();
-  const route = useRoute<{ params?: { radiusMiles?: number; filters?: string[] } }>();
+  const route = useRoute<LocalMapRoute>();
   const params = route.params;
   
   const [selectedCategory, setSelectedCategory] = useState("All");
@@ -75,11 +78,11 @@ export function LocalMapScreen() {
       
       const response = await api.request<{ ideas: LocalIdea[] }>("/ideas/query", {
         method: "POST",
-        body: {
+        body: JSON.stringify({
           type: "LOCAL",
           radiusMiles: _radiusMiles,
           filters,
-        },
+        }),
       });
       
       setIdeas(response.ideas || []);

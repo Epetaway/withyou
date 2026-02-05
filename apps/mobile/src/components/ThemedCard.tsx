@@ -7,6 +7,7 @@ export type ThemedCardProps = ViewProps & {
   padding?: "none" | "xs" | "sm" | "md" | "lg" | "xl";
   radius?: "sm" | "md" | "lg" | "xl" | "pill";
   surface?: "default" | "alt" | "muted";
+  color?: "surface" | "primary" | "alt" | "muted" | string;
 };
 
 export function ThemedCard({
@@ -14,6 +15,7 @@ export function ThemedCard({
   padding = "md",
   radius = "md",
   surface = "default",
+  color,
   style,
   children,
   ...props
@@ -33,13 +35,26 @@ export function ThemedCard({
       ? theme.spacing.lg
       : theme.spacing.xl;
 
+  const resolvedColor = color
+    ? color === "surface"
+      ? theme.colors.surface
+      : color === "primary"
+      ? theme.colors.primary
+      : color === "alt"
+      ? theme.colors.surfaceAlt
+      : color === "muted"
+      ? theme.colors.surfaceMuted
+      : color
+    : undefined;
+
   const cardStyle: ViewStyle = {
     backgroundColor:
-      surface === "alt"
+      resolvedColor ??
+      (surface === "alt"
         ? theme.colors.surfaceAlt
         : surface === "muted"
         ? theme.colors.surfaceMuted
-        : theme.colors.surface,
+        : theme.colors.surface),
     borderRadius: theme.radius[radius],
     padding: paddingValue,
     ...theme.elevation[elevation],

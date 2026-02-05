@@ -39,7 +39,7 @@ export function LoginScreen() {
         const key = String(issue.path[0] ?? "form");
         if (key === "email") {
           next.email =
-            issue.code === "invalid_string"
+            issue.code === "invalid_format"
               ? c.validation.emailInvalid
               : c.validation.emailRequired;
         } else if (key === "password") {
