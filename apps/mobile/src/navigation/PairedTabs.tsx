@@ -30,6 +30,8 @@ type PairedStackParamList = {
   WorkoutGoals: undefined;
   GroceryList: undefined;
   Chat: undefined;
+  CheckIn: undefined; // Still accessible via Dashboard
+  Preferences: undefined; // Still accessible via Settings
 };
 
 function FloatingNav() {
@@ -37,6 +39,9 @@ function FloatingNav() {
   const navigation = useNavigation<NavigationProp<PairedStackParamList>>();
   const route = useRoute();
 
+  // Navigation items for the floating nav bar
+  // New features: WorkoutGoals, GroceryList, Chat replace CheckIn and Preferences in main nav
+  // Original screens (CheckIn, Preferences, Settings) are still accessible via Dashboard or Settings menu
   const navigationItems = [
     { name: "Dashboard" as const, icon: "house", label: "Home" },
     { name: "WorkoutGoals" as const, icon: "dumbbell", label: "Fitness" },
@@ -152,6 +157,21 @@ export function PairedTabs() {
         {() => (
           <ScreenWithNav>
             <ChatScreen />
+          </ScreenWithNav>
+        )}
+      </Stack.Screen>
+      {/* Keep original screens accessible, though not in main nav */}
+      <Stack.Screen name="CheckIn">
+        {() => (
+          <ScreenWithNav>
+            <CheckInScreen />
+          </ScreenWithNav>
+        )}
+      </Stack.Screen>
+      <Stack.Screen name="Preferences">
+        {() => (
+          <ScreenWithNav>
+            <PreferencesScreen />
           </ScreenWithNav>
         )}
       </Stack.Screen>
