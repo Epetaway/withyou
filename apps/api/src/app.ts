@@ -14,6 +14,9 @@ import activitiesRouter from './routes/activities.js';
 import userRouter from './routes/user.js';
 import plansRouter from './routes/plans.js';
 import qaRouter from './routes/qa.js';
+import workoutsRouter from './routes/workouts.js';
+import groceryRouter from './routes/grocery.js';
+import messagesRouter from './routes/messages.js';
 import { errorHandler } from './middleware/error-handler.js';
 import { generalLimiter, authLimiter, inviteLimiter, qaLimiter } from './middleware/rate-limit.js';
 
@@ -99,6 +102,12 @@ app.use('/ideas', ideasRouter);
 app.use(activitiesRouter);
 
 app.use('/plans', plansRouter);
+
+app.use('/workouts', workoutsRouter);
+
+app.use('/grocery', groceryRouter);
+
+app.use('/messages', messagesRouter);
 
 app.use(coreRouter);
 

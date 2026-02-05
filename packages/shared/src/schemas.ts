@@ -369,3 +369,76 @@ export const checkInPayloadSchema = z.object({
   support: z.array(z.string()).optional().default([]),
   note: z.string().max(250).optional(),
 });
+
+// Workout goal schemas
+export const goalStatusSchema = z.union([
+  z.literal("active"),
+  z.literal("completed"),
+  z.literal("failed"),
+]);
+
+export const workoutGoalCreateSchema = z.object({
+  title: z.string().min(1).max(200),
+  description: z.string().max(1000).optional(),
+  targetMetric: z.string().min(1).max(50), // e.g., "miles", "workouts", "calories"
+  targetValue: z.number().int().positive(),
+  startDate: z.string().datetime(),
+  endDate: z.string().datetime(),
+  isCouple: z.boolean().default(false), // Whether this is a couple's challenge
+});
+
+export const workoutGoalUpdateSchema = z.object({
+  title: z.string().min(1).max(200).optional(),
+  description: z.string().max(1000).optional(),
+  status: goalStatusSchema.optional(),
+});
+
+export const workoutLogCreateSchema = z.object({
+  amount: z.number().int().positive(),
+  notes: z.string().max(500).optional(),
+});
+
+export const workoutBetCreateSchema = z.object({
+  goalId: z.string().cuid(),
+  wagerDescription: z.string().min(1).max(500), // e.g., "Loser cooks dinner", "Winner gets a massage"
+});
+
+// Grocery list schemas
+export const groceryListCreateSchema = z.object({
+  name: z.string().min(1).max(100),
+});
+
+export const groceryItemCreateSchema = z.object({
+  name: z.string().min(1).max(200),
+  quantity: z.number().int().positive().default(1),
+  unit: z.string().max(20).optional(),
+});
+
+export const groceryItemUpdateSchema = z.object({
+  name: z.string().min(1).max(200).optional(),
+  quantity: z.number().int().positive().optional(),
+  unit: z.string().max(20).optional(),
+  completed: z.boolean().optional(),
+});
+
+export const groceryItemVetoSchema = z.object({
+  vetoReason: z.string().max(500).optional(),
+});
+
+// Chat message schemas
+export const messageTypeSchema = z.union([
+  z.literal("text"),
+  z.literal("image"),
+  z.literal("voice"),
+  z.literal("assistance_request"),
+]);
+
+export const chatMessageCreateSchema = z.object({
+  content: z.string().min(1).max(5000),
+  type: messageTypeSchema.default("text"),
+  mediaUrl: z.string().url().optional(),
+});
+
+export const chatMessageReadSchema = z.object({
+  messageIds: z.array(z.string().cuid()),
+});

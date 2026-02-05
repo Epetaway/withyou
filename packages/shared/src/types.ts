@@ -292,3 +292,178 @@ export type CalendarEventResponse = {
   success: boolean;
   icsUrl?: string;
 };
+
+// Workout Goal Types
+export type GoalStatus = "active" | "completed" | "failed";
+
+export type WorkoutGoal = {
+  id: UUID;
+  userId: UUID;
+  relationshipId?: UUID;
+  title: string;
+  description?: string;
+  targetMetric: string;
+  targetValue: number;
+  startDate: string;
+  endDate: string;
+  status: GoalStatus;
+  createdAt: string;
+  updatedAt: string;
+  logs?: WorkoutLog[];
+  bets?: WorkoutBet[];
+  progress?: number; // Calculated percentage
+  userProgress?: number; // For couple challenges
+  partnerProgress?: number; // For couple challenges
+};
+
+export type WorkoutLog = {
+  id: UUID;
+  goalId: UUID;
+  userId: UUID;
+  amount: number;
+  notes?: string;
+  loggedAt: string;
+};
+
+export type WorkoutBet = {
+  id: UUID;
+  relationshipId: UUID;
+  goalId: UUID;
+  wagerDescription: string;
+  createdAt: string;
+};
+
+export type WorkoutGoalCreatePayload = {
+  title: string;
+  description?: string;
+  targetMetric: string;
+  targetValue: number;
+  startDate: string;
+  endDate: string;
+  isCouple?: boolean;
+};
+
+export type WorkoutGoalResponse = {
+  goal: WorkoutGoal;
+};
+
+export type WorkoutGoalsListResponse = {
+  goals: WorkoutGoal[];
+  count: number;
+};
+
+export type WorkoutLogResponse = {
+  log: WorkoutLog;
+  goal: WorkoutGoal;
+};
+
+export type WorkoutBetResponse = {
+  bet: WorkoutBet;
+};
+
+export type WorkoutLeaderboardResponse = {
+  userProgress: number;
+  partnerProgress: number;
+  winner?: "user" | "partner" | "tie";
+};
+
+// Grocery List Types
+export type GroceryList = {
+  id: UUID;
+  relationshipId: UUID;
+  name: string;
+  createdAt: string;
+  updatedAt: string;
+  items?: GroceryItem[];
+};
+
+export type GroceryItem = {
+  id: UUID;
+  listId: UUID;
+  addedBy: UUID;
+  name: string;
+  quantity: number;
+  unit?: string;
+  vetoed: boolean;
+  vetoedBy?: UUID;
+  vetoReason?: string;
+  completedAt?: string;
+  createdAt: string;
+  updatedAt: string;
+  addedByUser?: {
+    id: UUID;
+    email: string;
+  };
+  vetoByUser?: {
+    id: UUID;
+    email: string;
+  };
+};
+
+export type GroceryListCreatePayload = {
+  name: string;
+};
+
+export type GroceryItemCreatePayload = {
+  name: string;
+  quantity?: number;
+  unit?: string;
+};
+
+export type GroceryItemUpdatePayload = {
+  name?: string;
+  quantity?: number;
+  unit?: string;
+  completed?: boolean;
+};
+
+export type GroceryListResponse = {
+  list: GroceryList;
+};
+
+export type GroceryListsResponse = {
+  lists: GroceryList[];
+  count: number;
+};
+
+export type GroceryItemResponse = {
+  item: GroceryItem;
+};
+
+// Chat Message Types
+export type MessageType = "text" | "image" | "voice" | "assistance_request";
+
+export type ChatMessage = {
+  id: UUID;
+  relationshipId: UUID;
+  senderId: UUID;
+  content: string;
+  type: MessageType;
+  mediaUrl?: string;
+  readAt?: string;
+  createdAt: string;
+  sender?: {
+    id: UUID;
+    email: string;
+  };
+};
+
+export type ChatMessageCreatePayload = {
+  content: string;
+  type?: MessageType;
+  mediaUrl?: string;
+};
+
+export type ChatMessageResponse = {
+  message: ChatMessage;
+};
+
+export type ChatMessagesResponse = {
+  messages: ChatMessage[];
+  count: number;
+  unreadCount?: number;
+};
+
+export type ChatUnreadCountResponse = {
+  unreadCount: number;
+};

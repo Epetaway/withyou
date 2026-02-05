@@ -87,6 +87,19 @@ enum OAuthProvider {
   apple
 }
 
+enum GoalStatus {
+  active
+  completed
+  failed
+}
+
+enum MessageType {
+  text
+  image
+  voice
+  assistance_request
+}
+
 model User {
   id           String      @id @default(cuid())
   email        String      @unique
@@ -113,6 +126,11 @@ model User {
   activityPreferences ActivityPreferences?
   emailVerifications EmailVerification[]
   plans        Plan[]
+  workoutGoals WorkoutGoal[]
+  workoutLogs  WorkoutLog[]
+  groceryItemsAdded GroceryItem[] @relation("ItemAddedBy")
+  groceryItemsVetoed GroceryItem[] @relation("ItemVetoed")
+  messagesSent ChatMessage[]
   
   @@index([oauthProvider, oauthId])
   @@index([isTestUser, testTag])
@@ -134,6 +152,10 @@ model Relationship {
   ideaRequests IdeaRequest[]
   notes       Note[]
   plans       Plan[]
+  workoutGoals WorkoutGoal[]
+  workoutBets  WorkoutBet[]
+  groceryLists GroceryList[]
+  chatMessages ChatMessage[]
 
   userA User @relation("UserARelationships", fields: [userAId], references: [id])
   userB User @relation("UserBRelationships", fields: [userBId], references: [id])
@@ -322,4 +344,109 @@ model Plan {
 
   @@index([userId])
   @@index([relationshipId])
+}
+
+model WorkoutGoal {
+  id              String      @id @default(cuid())
+  userId          String
+  relationshipId  String?
+  title           String
+  description     String?
+  targetMetric    String
+  targetValue     Int
+  startDate       DateTime
+  endDate         DateTime
+  status          GoalStatus  @default(active)
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+  
+  user            User         @relation(fields: [userId], references: [id])
+  relationship    Relationship? @relation(fields: [relationshipId], references: [id])
+  bets            WorkoutBet[]
+  logs            WorkoutLog[]
+
+  @@index([userId])
+  @@index([relationshipId])
+  @@index([status])
+}
+
+model WorkoutBet {
+  id              String       @id @default(cuid())
+  relationshipId  String
+  goalId          String
+  wagerDescription String
+  createdAt       DateTime     @default(now())
+  
+  relationship    Relationship @relation(fields: [relationshipId], references: [id])
+  goal            WorkoutGoal  @relation(fields: [goalId], references: [id], onDelete: Cascade)
+
+  @@index([relationshipId])
+  @@index([goalId])
+}
+
+model WorkoutLog {
+  id              String       @id @default(cuid())
+  goalId          String
+  userId          String
+  amount          Int
+  notes           String?
+  loggedAt        DateTime     @default(now())
+  
+  goal            WorkoutGoal  @relation(fields: [goalId], references: [id], onDelete: Cascade)
+  user            User         @relation(fields: [userId], references: [id])
+
+  @@index([goalId])
+  @@index([userId])
+}
+
+model GroceryList {
+  id              String       @id @default(cuid())
+  relationshipId  String
+  name            String
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+  
+  relationship    Relationship @relation(fields: [relationshipId], references: [id])
+  items           GroceryItem[]
+
+  @@index([relationshipId])
+}
+
+model GroceryItem {
+  id              String       @id @default(cuid())
+  listId          String
+  addedBy         String
+  name            String
+  quantity        Int          @default(1)
+  unit            String?
+  vetoed          Boolean      @default(false)
+  vetoedBy        String?
+  vetoReason      String?
+  completedAt     DateTime?
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+  
+  list            GroceryList  @relation(fields: [listId], references: [id], onDelete: Cascade)
+  addedByUser     User         @relation("ItemAddedBy", fields: [addedBy], references: [id])
+  vetoByUser      User?        @relation("ItemVetoed", fields: [vetoedBy], references: [id])
+
+  @@index([listId])
+  @@index([addedBy])
+}
+
+model ChatMessage {
+  id              String       @id @default(cuid())
+  relationshipId  String
+  senderId        String
+  content         String
+  type            MessageType  @default(text)
+  mediaUrl        String?
+  readAt          DateTime?
+  createdAt       DateTime     @default(now())
+  
+  relationship    Relationship @relation(fields: [relationshipId], references: [id])
+  sender          User         @relation(fields: [senderId], references: [id])
+  
+  @@index([relationshipId, createdAt])
+  @@index([senderId])
 }

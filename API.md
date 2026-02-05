@@ -1051,3 +1051,553 @@ curl -X POST http://localhost:3000/calendar/event \
   -d '{"title":"Date Night","startDate":"2026-01-20T19:00:00Z","endDate":"2026-01-20T21:00:00Z","location":"123 Main St"}' \
   --output date-night.ics
 ```
+
+---
+
+## Workout Goals
+
+### Create Workout Goal
+
+Create a new workout goal (personal or couple challenge).
+
+```http
+POST /workouts/goals
+```
+
+**Request Body**:
+
+```json
+{
+  "title": "Run 100 Miles",
+  "description": "Complete 100 miles of running this month",
+  "targetMetric": "miles",
+  "targetValue": 100,
+  "startDate": "2026-02-01T00:00:00Z",
+  "endDate": "2026-02-28T23:59:59Z",
+  "isCouple": true
+}
+```
+
+**Response (200 OK)**:
+
+```json
+{
+  "goal": {
+    "id": "goal_abc123",
+    "userId": "user_id",
+    "relationshipId": "rel_id",
+    "title": "Run 100 Miles",
+    "description": "Complete 100 miles of running this month",
+    "targetMetric": "miles",
+    "targetValue": 100,
+    "startDate": "2026-02-01T00:00:00.000Z",
+    "endDate": "2026-02-28T23:59:59.000Z",
+    "status": "active",
+    "progress": 0,
+    "createdAt": "2026-02-05T17:00:00.000Z",
+    "updatedAt": "2026-02-05T17:00:00.000Z"
+  }
+}
+```
+
+### Get All Workout Goals
+
+```http
+GET /workouts/goals
+```
+
+**Response (200 OK)**:
+
+```json
+{
+  "goals": [
+    {
+      "id": "goal_abc123",
+      "title": "Run 100 Miles",
+      "status": "active",
+      "progress": 45,
+      "userProgress": 45,
+      "partnerProgress": 38,
+      "logs": [],
+      "bets": [
+        {
+          "id": "bet_xyz",
+          "wagerDescription": "Loser cooks dinner for a week",
+          "createdAt": "2026-02-05T17:00:00.000Z"
+        }
+      ]
+    }
+  ],
+  "count": 1
+}
+```
+
+### Log Workout Progress
+
+```http
+POST /workouts/goals/:id/log
+```
+
+**Request Body**:
+
+```json
+{
+  "amount": 5,
+  "notes": "Morning run, felt great!"
+}
+```
+
+**Response (200 OK)**:
+
+```json
+{
+  "log": {
+    "id": "log_abc",
+    "goalId": "goal_abc123",
+    "userId": "user_id",
+    "amount": 5,
+    "notes": "Morning run, felt great!",
+    "loggedAt": "2026-02-05T17:00:00.000Z"
+  },
+  "goal": {
+    "id": "goal_abc123",
+    "progress": 50
+  }
+}
+```
+
+### Place a Bet on Goal
+
+```http
+POST /workouts/goals/:id/bet
+```
+
+**Request Body**:
+
+```json
+{
+  "goalId": "goal_abc123",
+  "wagerDescription": "Winner gets a massage"
+}
+```
+
+**Response (200 OK)**:
+
+```json
+{
+  "bet": {
+    "id": "bet_xyz",
+    "relationshipId": "rel_id",
+    "goalId": "goal_abc123",
+    "wagerDescription": "Winner gets a massage",
+    "createdAt": "2026-02-05T17:00:00.000Z"
+  }
+}
+```
+
+### Get Leaderboard
+
+Compare progress on couple challenges.
+
+```http
+GET /workouts/leaderboard
+```
+
+**Response (200 OK)**:
+
+```json
+{
+  "leaderboard": [
+    {
+      "goalId": "goal_abc123",
+      "goalTitle": "Run 100 Miles",
+      "userProgress": 50,
+      "partnerProgress": 45,
+      "winner": "user"
+    }
+  ]
+}
+```
+
+---
+
+## Grocery Lists
+
+### Create Grocery List
+
+```http
+POST /grocery/lists
+```
+
+**Request Body**:
+
+```json
+{
+  "name": "Weekly Groceries"
+}
+```
+
+**Response (200 OK)**:
+
+```json
+{
+  "list": {
+    "id": "list_abc",
+    "relationshipId": "rel_id",
+    "name": "Weekly Groceries",
+    "createdAt": "2026-02-05T17:00:00.000Z",
+    "updatedAt": "2026-02-05T17:00:00.000Z",
+    "items": []
+  }
+}
+```
+
+### Get All Grocery Lists
+
+```http
+GET /grocery/lists
+```
+
+**Response (200 OK)**:
+
+```json
+{
+  "lists": [
+    {
+      "id": "list_abc",
+      "name": "Weekly Groceries",
+      "items": [
+        {
+          "id": "item_123",
+          "name": "Milk",
+          "quantity": 2,
+          "unit": "gallons",
+          "vetoed": false,
+          "completedAt": null
+        }
+      ]
+    }
+  ],
+  "count": 1
+}
+```
+
+### Add Item to List
+
+```http
+POST /grocery/lists/:id/items
+```
+
+**Request Body**:
+
+```json
+{
+  "name": "Eggs",
+  "quantity": 12,
+  "unit": "count"
+}
+```
+
+**Response (200 OK)**:
+
+```json
+{
+  "item": {
+    "id": "item_456",
+    "listId": "list_abc",
+    "addedBy": "user_id",
+    "name": "Eggs",
+    "quantity": 12,
+    "unit": "count",
+    "vetoed": false,
+    "createdAt": "2026-02-05T17:00:00.000Z",
+    "addedByUser": {
+      "id": "user_id",
+      "email": "user@example.com"
+    }
+  }
+}
+```
+
+### Update Item
+
+```http
+PUT /grocery/lists/:listId/items/:itemId
+```
+
+**Request Body**:
+
+```json
+{
+  "quantity": 6,
+  "completed": true
+}
+```
+
+### Veto Item
+
+```http
+POST /grocery/lists/:listId/items/:itemId/veto
+```
+
+**Request Body**:
+
+```json
+{
+  "vetoReason": "We already have this at home"
+}
+```
+
+**Response (200 OK)**:
+
+```json
+{
+  "item": {
+    "id": "item_456",
+    "vetoed": true,
+    "vetoedBy": "partner_id",
+    "vetoReason": "We already have this at home",
+    "vetoByUser": {
+      "id": "partner_id",
+      "email": "partner@example.com"
+    }
+  }
+}
+```
+
+### Delete Item
+
+```http
+DELETE /grocery/lists/:listId/items/:itemId
+```
+
+**Response (200 OK)**:
+
+```json
+{
+  "message": "Item deleted successfully"
+}
+```
+
+---
+
+## Messages
+
+### Send Message
+
+```http
+POST /messages/send
+```
+
+**Request Body**:
+
+```json
+{
+  "content": "Hey, how was your day?",
+  "type": "text"
+}
+```
+
+**Response (200 OK)**:
+
+```json
+{
+  "message": {
+    "id": "msg_abc",
+    "relationshipId": "rel_id",
+    "senderId": "user_id",
+    "content": "Hey, how was your day?",
+    "type": "text",
+    "createdAt": "2026-02-05T17:00:00.000Z",
+    "sender": {
+      "id": "user_id",
+      "email": "user@example.com"
+    }
+  }
+}
+```
+
+### Get Conversation
+
+```http
+GET /messages?limit=50&offset=0
+```
+
+**Response (200 OK)**:
+
+```json
+{
+  "messages": [
+    {
+      "id": "msg_abc",
+      "senderId": "user_id",
+      "content": "Hey, how was your day?",
+      "type": "text",
+      "readAt": "2026-02-05T17:05:00.000Z",
+      "createdAt": "2026-02-05T17:00:00.000Z",
+      "sender": {
+        "id": "user_id",
+        "email": "user@example.com"
+      }
+    }
+  ],
+  "count": 1,
+  "unreadCount": 0
+}
+```
+
+### Get Unread Count
+
+```http
+GET /messages/unread
+```
+
+**Response (200 OK)**:
+
+```json
+{
+  "unreadCount": 3
+}
+```
+
+### Mark Messages as Read
+
+```http
+PUT /messages/read
+```
+
+**Request Body**:
+
+```json
+{
+  "messageIds": ["msg_abc", "msg_def"]
+}
+```
+
+**Response (200 OK)**:
+
+```json
+{
+  "message": "Messages marked as read"
+}
+```
+
+### Request Conversation Assistance
+
+Get AI-powered conversation starters and communication tips.
+
+```http
+POST /messages/assistance
+```
+
+**Response (200 OK)**:
+
+```json
+{
+  "suggestions": [
+    {
+      "type": "conversation_starter",
+      "title": "Check In",
+      "content": "How was your day today? Anything interesting happen?"
+    },
+    {
+      "type": "communication_tip",
+      "title": "Active Listening",
+      "content": "Try reflecting back what your partner said: 'What I hear you saying is...'"
+    }
+  ],
+  "context": {
+    "recentMessageCount": 5,
+    "timeSinceLastMessage": 3600000
+  }
+}
+```
+
+---
+
+## Example Workflows
+
+### Complete Workout Challenge Flow
+
+```bash
+# User A creates a couple workout goal
+curl -X POST http://localhost:3000/workouts/goals \
+  -H "Authorization: Bearer $TOKEN_A" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "title": "February Running Challenge",
+    "targetMetric": "miles",
+    "targetValue": 50,
+    "startDate": "2026-02-01T00:00:00Z",
+    "endDate": "2026-02-28T23:59:59Z",
+    "isCouple": true
+  }'
+
+# User A places a bet
+curl -X POST http://localhost:3000/workouts/goals/goal_id/bet \
+  -H "Authorization: Bearer $TOKEN_A" \
+  -H "Content-Type: application/json" \
+  -d '{"wagerDescription": "Loser cooks dinner for a week"}'
+
+# User A logs progress
+curl -X POST http://localhost:3000/workouts/goals/goal_id/log \
+  -H "Authorization: Bearer $TOKEN_A" \
+  -H "Content-Type: application/json" \
+  -d '{"amount": 5, "notes": "Morning run"}'
+
+# Check leaderboard
+curl http://localhost:3000/workouts/leaderboard \
+  -H "Authorization: Bearer $TOKEN_A"
+```
+
+### Shared Grocery List Flow
+
+```bash
+# Create list
+curl -X POST http://localhost:3000/grocery/lists \
+  -H "Authorization: Bearer $TOKEN_A" \
+  -H "Content-Type: application/json" \
+  -d '{"name": "Weekend Shopping"}'
+
+# User A adds items
+curl -X POST http://localhost:3000/grocery/lists/list_id/items \
+  -H "Authorization: Bearer $TOKEN_A" \
+  -H "Content-Type: application/json" \
+  -d '{"name": "Organic Kale", "quantity": 2}'
+
+# User B vetoes item
+curl -X POST http://localhost:3000/grocery/lists/list_id/items/item_id/veto \
+  -H "Authorization: Bearer $TOKEN_B" \
+  -H "Content-Type: application/json" \
+  -d '{"vetoReason": "We still have kale from last week"}'
+
+# Mark item complete
+curl -X PUT http://localhost:3000/grocery/lists/list_id/items/item_id \
+  -H "Authorization: Bearer $TOKEN_A" \
+  -H "Content-Type: application/json" \
+  -d '{"completed": true}'
+```
+
+### Messaging Flow
+
+```bash
+# Send message
+curl -X POST http://localhost:3000/messages/send \
+  -H "Authorization: Bearer $TOKEN_A" \
+  -H "Content-Type: application/json" \
+  -d '{"content": "Thinking about you ❤️"}'
+
+# Get conversation
+curl http://localhost:3000/messages \
+  -H "Authorization: Bearer $TOKEN_B"
+
+# Request assistance
+curl -X POST http://localhost:3000/messages/assistance \
+  -H "Authorization: Bearer $TOKEN_A"
+
+# Mark as read
+curl -X PUT http://localhost:3000/messages/read \
+  -H "Authorization: Bearer $TOKEN_B" \
+  -H "Content-Type: application/json" \
+  -d '{"messageIds": ["msg_abc", "msg_def"]}'
+```

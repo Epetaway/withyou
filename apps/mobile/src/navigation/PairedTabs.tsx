@@ -11,6 +11,9 @@ import { IdeasScreen } from "../screens/paired/IdeasScreen";
 import { SettingsScreen } from "../screens/shared/SettingsScreen";
 import { NoteComposeScreen } from "../screens/paired/NoteComposeScreen";
 import { NotesListScreen } from "../screens/paired/NotesListScreen";
+import { WorkoutGoalsScreen } from "../screens/paired/WorkoutGoalsScreen";
+import { GroceryListScreen } from "../screens/paired/GroceryListScreen";
+import { ChatScreen } from "../screens/paired/ChatScreen";
 import { useTheme } from "../theme/ThemeProvider";
 
 const Stack = createNativeStackNavigator();
@@ -24,6 +27,11 @@ type PairedStackParamList = {
   LocalMap: undefined;
   NoteCompose: undefined;
   NotesList: undefined;
+  WorkoutGoals: undefined;
+  GroceryList: undefined;
+  Chat: undefined;
+  CheckIn: undefined; // Still accessible via Dashboard
+  Preferences: undefined; // Still accessible via Settings
 };
 
 function FloatingNav() {
@@ -31,12 +39,15 @@ function FloatingNav() {
   const navigation = useNavigation<NavigationProp<PairedStackParamList>>();
   const route = useRoute();
 
+  // Navigation items for the floating nav bar
+  // New features: WorkoutGoals, GroceryList, Chat replace CheckIn and Preferences in main nav
+  // Original screens (CheckIn, Preferences, Settings) are still accessible via Dashboard or Settings menu
   const navigationItems = [
     { name: "Dashboard" as const, icon: "house", label: "Home" },
-    { name: "CheckIn" as const, icon: "heart", label: "Discover" },
+    { name: "WorkoutGoals" as const, icon: "dumbbell", label: "Fitness" },
     { name: "Ideas" as const, icon: "plus", label: "Ideas" },
-    { name: "Preferences" as const, icon: "handshake", label: "Connect" },
-    { name: "Settings" as const, icon: "comments", label: "Messages" },
+    { name: "GroceryList" as const, icon: "basket-shopping", label: "Grocery" },
+    { name: "Chat" as const, icon: "comments", label: "Messages" },
   ];
 
   return (
@@ -125,6 +136,42 @@ export function PairedTabs() {
         {() => (
           <ScreenWithNav>
             <SettingsScreen />
+          </ScreenWithNav>
+        )}
+      </Stack.Screen>
+      <Stack.Screen name="WorkoutGoals">
+        {() => (
+          <ScreenWithNav>
+            <WorkoutGoalsScreen />
+          </ScreenWithNav>
+        )}
+      </Stack.Screen>
+      <Stack.Screen name="GroceryList">
+        {() => (
+          <ScreenWithNav>
+            <GroceryListScreen />
+          </ScreenWithNav>
+        )}
+      </Stack.Screen>
+      <Stack.Screen name="Chat">
+        {() => (
+          <ScreenWithNav>
+            <ChatScreen />
+          </ScreenWithNav>
+        )}
+      </Stack.Screen>
+      {/* Keep original screens accessible, though not in main nav */}
+      <Stack.Screen name="CheckIn">
+        {() => (
+          <ScreenWithNav>
+            <CheckInScreen />
+          </ScreenWithNav>
+        )}
+      </Stack.Screen>
+      <Stack.Screen name="Preferences">
+        {() => (
+          <ScreenWithNav>
+            <PreferencesScreen />
           </ScreenWithNav>
         )}
       </Stack.Screen>
