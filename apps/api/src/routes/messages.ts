@@ -4,6 +4,7 @@ import { chatMessageCreateSchema, chatMessageReadSchema } from "@withyou/shared"
 import { prisma } from "../utils/prisma.js";
 import { AppError } from "../errors/app-error.js";
 import { jwtMiddleware } from "../middleware/jwt-middleware.js";
+import { emitChatEvent } from "../utils/websocket.js";
 
 const router = Router();
 type AuthedRequest = Request & { user?: { userId?: string } };
@@ -50,19 +51,22 @@ router.post("/send", jwtMiddleware, async (req: AuthedRequest, res, next) => {
       },
     });
 
-    res.json({
-      message: {
-        id: message.id,
-        relationshipId: message.relationshipId,
-        senderId: message.senderId,
-        content: message.content,
-        type: message.type,
-        mediaUrl: message.mediaUrl,
-        readAt: message.readAt?.toISOString(),
-        createdAt: message.createdAt.toISOString(),
-        sender: message.sender,
-      },
-    });
+    const messageResponse = {
+      id: message.id,
+      relationshipId: message.relationshipId,
+      senderId: message.senderId,
+      content: message.content,
+      type: message.type,
+      mediaUrl: message.mediaUrl,
+      readAt: message.readAt?.toISOString(),
+      createdAt: message.createdAt.toISOString(),
+      sender: message.sender,
+    };
+
+    // Emit real-time event
+    emitChatEvent(relationship.id, "message:created", messageResponse);
+
+    res.json({ message: messageResponse });
   } catch (error) {
     next(error);
   }
@@ -206,6 +210,13 @@ router.put("/read", jwtMiddleware, async (req: AuthedRequest, res, next) => {
       data: {
         readAt: new Date(),
       },
+    });
+
+    // Emit real-time event to notify sender that messages were read
+    emitChatEvent(relationship.id, "messages:read", {
+      messageIds: parsed.data.messageIds,
+      readBy: userId,
+      readAt: new Date().toISOString(),
     });
 
     res.json({

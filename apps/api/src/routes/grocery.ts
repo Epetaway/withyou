@@ -9,6 +9,7 @@ import {
 import { prisma } from "../utils/prisma.js";
 import { AppError } from "../errors/app-error.js";
 import { jwtMiddleware } from "../middleware/jwt-middleware.js";
+import { emitGroceryEvent } from "../utils/websocket.js";
 
 const router = Router();
 type AuthedRequest = Request & { user?: { userId?: string } };
@@ -271,23 +272,26 @@ router.post("/lists/:id/items", jwtMiddleware, async (req: AuthedRequest, res, n
       },
     });
 
-    res.json({
-      item: {
-        id: item.id,
-        listId: item.listId,
-        addedBy: item.addedBy,
-        name: item.name,
-        quantity: item.quantity,
-        unit: item.unit,
-        vetoed: item.vetoed,
-        vetoedBy: item.vetoedBy,
-        vetoReason: item.vetoReason,
-        completedAt: item.completedAt?.toISOString(),
-        createdAt: item.createdAt.toISOString(),
-        updatedAt: item.updatedAt.toISOString(),
-        addedByUser: item.addedByUser,
-      },
-    });
+    const itemResponse = {
+      id: item.id,
+      listId: item.listId,
+      addedBy: item.addedBy,
+      name: item.name,
+      quantity: item.quantity,
+      unit: item.unit,
+      vetoed: item.vetoed,
+      vetoedBy: item.vetoedBy,
+      vetoReason: item.vetoReason,
+      completedAt: item.completedAt?.toISOString(),
+      createdAt: item.createdAt.toISOString(),
+      updatedAt: item.updatedAt.toISOString(),
+      addedByUser: item.addedByUser,
+    };
+
+    // Emit real-time event
+    emitGroceryEvent(list.relationshipId, "item:added", itemResponse);
+
+    res.json({ item: itemResponse });
   } catch (error) {
     next(error);
   }
@@ -360,24 +364,27 @@ router.put("/lists/:listId/items/:itemId", jwtMiddleware, async (req: AuthedRequ
       },
     });
 
-    res.json({
-      item: {
-        id: updated.id,
-        listId: updated.listId,
-        addedBy: updated.addedBy,
-        name: updated.name,
-        quantity: updated.quantity,
-        unit: updated.unit,
-        vetoed: updated.vetoed,
-        vetoedBy: updated.vetoedBy,
-        vetoReason: updated.vetoReason,
-        completedAt: updated.completedAt?.toISOString(),
-        createdAt: updated.createdAt.toISOString(),
-        updatedAt: updated.updatedAt.toISOString(),
-        addedByUser: updated.addedByUser,
-        vetoByUser: updated.vetoByUser,
-      },
-    });
+    const itemResponse = {
+      id: updated.id,
+      listId: updated.listId,
+      addedBy: updated.addedBy,
+      name: updated.name,
+      quantity: updated.quantity,
+      unit: updated.unit,
+      vetoed: updated.vetoed,
+      vetoedBy: updated.vetoedBy,
+      vetoReason: updated.vetoReason,
+      completedAt: updated.completedAt?.toISOString(),
+      createdAt: updated.createdAt.toISOString(),
+      updatedAt: updated.updatedAt.toISOString(),
+      addedByUser: updated.addedByUser,
+      vetoByUser: updated.vetoByUser,
+    };
+
+    // Emit real-time event
+    emitGroceryEvent(list.relationshipId, "item:updated", itemResponse);
+
+    res.json({ item: itemResponse });
   } catch (error) {
     next(error);
   }
@@ -454,24 +461,27 @@ router.post("/lists/:listId/items/:itemId/veto", jwtMiddleware, async (req: Auth
       },
     });
 
-    res.json({
-      item: {
-        id: updated.id,
-        listId: updated.listId,
-        addedBy: updated.addedBy,
-        name: updated.name,
-        quantity: updated.quantity,
-        unit: updated.unit,
-        vetoed: updated.vetoed,
-        vetoedBy: updated.vetoedBy,
-        vetoReason: updated.vetoReason,
-        completedAt: updated.completedAt?.toISOString(),
-        createdAt: updated.createdAt.toISOString(),
-        updatedAt: updated.updatedAt.toISOString(),
-        addedByUser: updated.addedByUser,
-        vetoByUser: updated.vetoByUser,
-      },
-    });
+    const itemResponse = {
+      id: updated.id,
+      listId: updated.listId,
+      addedBy: updated.addedBy,
+      name: updated.name,
+      quantity: updated.quantity,
+      unit: updated.unit,
+      vetoed: updated.vetoed,
+      vetoedBy: updated.vetoedBy,
+      vetoReason: updated.vetoReason,
+      completedAt: updated.completedAt?.toISOString(),
+      createdAt: updated.createdAt.toISOString(),
+      updatedAt: updated.updatedAt.toISOString(),
+      addedByUser: updated.addedByUser,
+      vetoByUser: updated.vetoByUser,
+    };
+
+    // Emit real-time event
+    emitGroceryEvent(list.relationshipId, "item:vetoed", itemResponse);
+
+    res.json({ item: itemResponse });
   } catch (error) {
     next(error);
   }
@@ -519,6 +529,9 @@ router.delete("/lists/:listId/items/:itemId", jwtMiddleware, async (req: AuthedR
     await prisma.groceryItem.delete({
       where: { id: itemId },
     });
+
+    // Emit real-time event
+    emitGroceryEvent(list.relationshipId, "item:deleted", { itemId });
 
     res.json({
       message: "Item deleted successfully",

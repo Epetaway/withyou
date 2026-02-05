@@ -9,6 +9,7 @@ import {
 import { prisma } from "../utils/prisma.js";
 import { AppError } from "../errors/app-error.js";
 import { jwtMiddleware } from "../middleware/jwt-middleware.js";
+import { emitWorkoutEvent } from "../utils/websocket.js";
 
 const router = Router();
 type AuthedRequest = Request & { user?: { userId?: string } };
@@ -47,23 +48,28 @@ router.post("/goals", jwtMiddleware, async (req: AuthedRequest, res, next) => {
       },
     });
 
-    res.json({
-      goal: {
-        id: goal.id,
-        userId: goal.userId,
-        relationshipId: goal.relationshipId,
-        title: goal.title,
-        description: goal.description,
-        targetMetric: goal.targetMetric,
-        targetValue: goal.targetValue,
-        startDate: goal.startDate.toISOString(),
-        endDate: goal.endDate.toISOString(),
-        status: goal.status,
-        createdAt: goal.createdAt.toISOString(),
-        updatedAt: goal.updatedAt.toISOString(),
-        progress: 0,
-      },
-    });
+    const responseData = {
+      id: goal.id,
+      userId: goal.userId,
+      relationshipId: goal.relationshipId,
+      title: goal.title,
+      description: goal.description,
+      targetMetric: goal.targetMetric,
+      targetValue: goal.targetValue,
+      startDate: goal.startDate.toISOString(),
+      endDate: goal.endDate.toISOString(),
+      status: goal.status,
+      createdAt: goal.createdAt.toISOString(),
+      updatedAt: goal.updatedAt.toISOString(),
+      progress: 0,
+    };
+
+    // Emit real-time event if it's a couple goal
+    if (goal.relationshipId) {
+      emitWorkoutEvent(goal.relationshipId, "goal:created", responseData);
+    }
+
+    res.json({ goal: responseData });
   } catch (error) {
     next(error);
   }
@@ -361,26 +367,41 @@ router.post("/goals/:id/log", jwtMiddleware, async (req: AuthedRequest, res, nex
     const progress = Math.min((totalProgress / goal.targetValue) * 100, 100);
 
     // Auto-complete goal if target reached
+    let updatedStatus = goal.status;
     if (totalProgress >= goal.targetValue && goal.status === "active") {
       await prisma.workoutGoal.update({
         where: { id },
         data: { status: "completed" },
       });
+      updatedStatus = "completed";
+    }
+
+    const logResponse = {
+      id: log.id,
+      goalId: log.goalId,
+      userId: log.userId,
+      amount: log.amount,
+      notes: log.notes,
+      loggedAt: log.loggedAt.toISOString(),
+    };
+
+    const goalResponse = {
+      id: goal.id,
+      progress,
+      status: updatedStatus,
+    };
+
+    // Emit real-time event if it's a couple goal
+    if (goal.relationshipId) {
+      emitWorkoutEvent(goal.relationshipId, "log:added", {
+        log: logResponse,
+        goal: goalResponse,
+      });
     }
 
     res.json({
-      log: {
-        id: log.id,
-        goalId: log.goalId,
-        userId: log.userId,
-        amount: log.amount,
-        notes: log.notes,
-        loggedAt: log.loggedAt.toISOString(),
-      },
-      goal: {
-        id: goal.id,
-        progress,
-      },
+      log: logResponse,
+      goal: goalResponse,
     });
   } catch (error) {
     next(error);
@@ -433,15 +454,18 @@ router.post("/goals/:id/bet", jwtMiddleware, async (req: AuthedRequest, res, nex
       },
     });
 
-    res.json({
-      bet: {
-        id: bet.id,
-        relationshipId: bet.relationshipId,
-        goalId: bet.goalId,
-        wagerDescription: bet.wagerDescription,
-        createdAt: bet.createdAt.toISOString(),
-      },
-    });
+    const betResponse = {
+      id: bet.id,
+      relationshipId: bet.relationshipId,
+      goalId: bet.goalId,
+      wagerDescription: bet.wagerDescription,
+      createdAt: bet.createdAt.toISOString(),
+    };
+
+    // Emit real-time event
+    emitWorkoutEvent(goal.relationshipId, "bet:placed", betResponse);
+
+    res.json({ bet: betResponse });
   } catch (error) {
     next(error);
   }
