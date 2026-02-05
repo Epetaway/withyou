@@ -146,6 +146,9 @@ router.get("/lists/:id", jwtMiddleware, async (req: AuthedRequest, res, next) =>
     }
 
     const { id } = req.params;
+    if (!id) {
+      return next(new AppError("List ID required", 400, "INVALID_INPUT"));
+    }
 
     const list = await prisma.groceryList.findUnique({
       where: { id },
@@ -228,6 +231,10 @@ router.post("/lists/:id/items", jwtMiddleware, async (req: AuthedRequest, res, n
     }
 
     const { id } = req.params;
+    if (!id) {
+      return next(new AppError("List ID required", 400, "INVALID_INPUT"));
+    }
+
     const parsed = groceryItemCreateSchema.safeParse(req.body);
     if (!parsed.success) {
       return next(new AppError("Invalid input", 400, "VALIDATION_ERROR", parsed.error.issues));
@@ -306,6 +313,10 @@ router.put("/lists/:listId/items/:itemId", jwtMiddleware, async (req: AuthedRequ
     }
 
     const { listId, itemId } = req.params;
+    if (!listId || !itemId) {
+      return next(new AppError("List ID and Item ID required", 400, "INVALID_INPUT"));
+    }
+
     const parsed = groceryItemUpdateSchema.safeParse(req.body);
     if (!parsed.success) {
       return next(new AppError("Invalid input", 400, "VALIDATION_ERROR", parsed.error.issues));
@@ -340,14 +351,23 @@ router.put("/lists/:listId/items/:itemId", jwtMiddleware, async (req: AuthedRequ
       return next(new AppError("Forbidden", 403, "FORBIDDEN"));
     }
 
+    const updateData: {
+      name?: string;
+      quantity?: number;
+      unit?: string | null;
+      completedAt?: Date | null;
+    } = {};
+
+    if (parsed.data.name !== undefined) updateData.name = parsed.data.name;
+    if (parsed.data.quantity !== undefined) updateData.quantity = parsed.data.quantity;
+    if (parsed.data.unit !== undefined) updateData.unit = parsed.data.unit;
+    if (parsed.data.completed !== undefined) {
+      updateData.completedAt = parsed.data.completed ? new Date() : null;
+    }
+
     const updated = await prisma.groceryItem.update({
       where: { id: itemId },
-      data: {
-        name: parsed.data.name,
-        quantity: parsed.data.quantity,
-        unit: parsed.data.unit,
-        completedAt: parsed.data.completed ? new Date() : null,
-      },
+      data: updateData,
       include: {
         addedByUser: {
           select: {
@@ -399,6 +419,10 @@ router.post("/lists/:listId/items/:itemId/veto", jwtMiddleware, async (req: Auth
     }
 
     const { listId, itemId } = req.params;
+    if (!listId || !itemId) {
+      return next(new AppError("List ID and Item ID required", 400, "INVALID_INPUT"));
+    }
+
     const parsed = groceryItemVetoSchema.safeParse(req.body);
     if (!parsed.success) {
       return next(new AppError("Invalid input", 400, "VALIDATION_ERROR", parsed.error.issues));
@@ -496,6 +520,9 @@ router.delete("/lists/:listId/items/:itemId", jwtMiddleware, async (req: AuthedR
     }
 
     const { listId, itemId } = req.params;
+    if (!listId || !itemId) {
+      return next(new AppError("List ID and Item ID required", 400, "INVALID_INPUT"));
+    }
 
     const item = await prisma.groceryItem.findUnique({
       where: { id: itemId },

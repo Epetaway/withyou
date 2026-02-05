@@ -90,13 +90,17 @@ router.get("/goals", jwtMiddleware, async (req: AuthedRequest, res, next) => {
       },
     });
 
+    const whereClause = relationship
+      ? {
+          OR: [
+            { userId },
+            { relationshipId: relationship.id },
+          ],
+        }
+      : { userId };
+
     const goals = await prisma.workoutGoal.findMany({
-      where: {
-        OR: [
-          { userId },
-          { relationshipId: relationship?.id ?? undefined },
-        ],
-      },
+      where: whereClause,
       include: {
         logs: true,
         bets: true,
@@ -111,7 +115,7 @@ router.get("/goals", jwtMiddleware, async (req: AuthedRequest, res, next) => {
       const totalProgress = userLogs.reduce((sum, log) => sum + log.amount, 0);
       const progress = Math.min((totalProgress / goal.targetValue) * 100, 100);
 
-      let userProgress = progress;
+      const userProgress = progress;
       let partnerProgress = 0;
 
       if (goal.relationshipId && relationship) {
@@ -173,6 +177,9 @@ router.get("/goals/:id", jwtMiddleware, async (req: AuthedRequest, res, next) =>
     }
 
     const { id } = req.params;
+    if (!id) {
+      return next(new AppError("Goal ID required", 400, "INVALID_INPUT"));
+    }
 
     const goal = await prisma.workoutGoal.findUnique({
       where: { id },
@@ -203,7 +210,7 @@ router.get("/goals/:id", jwtMiddleware, async (req: AuthedRequest, res, next) =>
     const totalProgress = userLogs.reduce((sum, log) => sum + log.amount, 0);
     const progress = Math.min((totalProgress / goal.targetValue) * 100, 100);
 
-    let userProgress = progress;
+    const userProgress = progress;
     let partnerProgress = 0;
 
     if (goal.relationshipId && relationship) {
@@ -261,6 +268,10 @@ router.put("/goals/:id", jwtMiddleware, async (req: AuthedRequest, res, next) =>
     }
 
     const { id } = req.params;
+    if (!id) {
+      return next(new AppError("Goal ID required", 400, "INVALID_INPUT"));
+    }
+
     const parsed = workoutGoalUpdateSchema.safeParse(req.body);
     if (!parsed.success) {
       return next(new AppError("Invalid input", 400, "VALIDATION_ERROR", parsed.error.issues));
@@ -278,13 +289,19 @@ router.put("/goals/:id", jwtMiddleware, async (req: AuthedRequest, res, next) =>
       return next(new AppError("Forbidden", 403, "FORBIDDEN"));
     }
 
+    const updateData: {
+      title?: string;
+      description?: string | null;
+      status?: "active" | "completed" | "failed";
+    } = {};
+
+    if (parsed.data.title !== undefined) updateData.title = parsed.data.title;
+    if (parsed.data.description !== undefined) updateData.description = parsed.data.description;
+    if (parsed.data.status !== undefined) updateData.status = parsed.data.status;
+
     const updated = await prisma.workoutGoal.update({
       where: { id },
-      data: {
-        title: parsed.data.title,
-        description: parsed.data.description,
-        status: parsed.data.status,
-      },
+      data: updateData,
     });
 
     res.json({
@@ -317,6 +334,10 @@ router.post("/goals/:id/log", jwtMiddleware, async (req: AuthedRequest, res, nex
     }
 
     const { id } = req.params;
+    if (!id) {
+      return next(new AppError("Goal ID required", 400, "INVALID_INPUT"));
+    }
+
     const parsed = workoutLogCreateSchema.safeParse(req.body);
     if (!parsed.success) {
       return next(new AppError("Invalid input", 400, "VALIDATION_ERROR", parsed.error.issues));
@@ -417,6 +438,10 @@ router.post("/goals/:id/bet", jwtMiddleware, async (req: AuthedRequest, res, nex
     }
 
     const { id } = req.params;
+    if (!id) {
+      return next(new AppError("Goal ID required", 400, "INVALID_INPUT"));
+    }
+
     const parsed = workoutBetCreateSchema.safeParse(req.body);
     if (!parsed.success) {
       return next(new AppError("Invalid input", 400, "VALIDATION_ERROR", parsed.error.issues));

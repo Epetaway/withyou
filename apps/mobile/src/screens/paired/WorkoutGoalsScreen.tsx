@@ -34,8 +34,9 @@ export function WorkoutGoalsScreen() {
         url: "/workouts/goals",
       });
       setGoals(response.goals);
-    } catch (error: any) {
-      Alert.alert("Error", error.message || "Failed to load workout goals");
+    } catch (error) {
+      const err = error as { message?: string };
+      Alert.alert("Error", err.message || "Failed to load workout goals");
     } finally {
       setLoading(false);
       setRefreshing(false);

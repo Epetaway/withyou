@@ -26,7 +26,11 @@ export function ChatScreen() {
   const [messageText, setMessageText] = useState("");
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
   const [showAssistance, setShowAssistance] = useState(false);
-  const [assistanceSuggestions, setAssistanceSuggestions] = useState<any[]>([]);
+  const [assistanceSuggestions, setAssistanceSuggestions] = useState<Array<{
+    type: string;
+    title: string;
+    content: string;
+  }>>([]);
 
   useEffect(() => {
     loadCurrentUser();
@@ -67,8 +71,9 @@ export function ChatScreen() {
           body: { messageIds: unreadIds },
         });
       }
-    } catch (error: any) {
-      if (error.code !== "NO_RELATIONSHIP") {
+    } catch (error) {
+      const err = error as { code?: string };
+      if (err.code !== "NO_RELATIONSHIP") {
         console.error("Failed to load messages:", error);
       }
     } finally {
@@ -108,8 +113,9 @@ export function ChatScreen() {
 
       // Replace temp message with real message
       setMessages(prev => prev.map(m => m.id === tempMessage.id ? response.message : m));
-    } catch (error: any) {
-      Alert.alert("Error", error.message || "Failed to send message");
+    } catch (error) {
+      const err = error as { message?: string };
+      Alert.alert("Error", err.message || "Failed to send message");
       // Remove temp message on error
       setMessages(prev => prev.filter(m => m.id !== tempMessage.id));
     } finally {
@@ -118,18 +124,30 @@ export function ChatScreen() {
   };
 
   const requestAssistance = async () => {
+    interface AssistanceSuggestion {
+      type: string;
+      title: string;
+      content: string;
+    }
+
+    interface AssistanceContext {
+      recentMessageCount: number;
+      timeSinceLastMessage: number | null;
+    }
+
     try {
       const response = await apiClient.request<{
-        suggestions: any[];
-        context: any;
+        suggestions: AssistanceSuggestion[];
+        context: AssistanceContext;
       }>({
         method: "POST",
         url: "/messages/assistance",
       });
       setAssistanceSuggestions(response.suggestions);
       setShowAssistance(true);
-    } catch (error: any) {
-      Alert.alert("Error", error.message || "Failed to get assistance");
+    } catch (error) {
+      const err = error as { message?: string };
+      Alert.alert("Error", err.message || "Failed to get assistance");
     }
   };
 

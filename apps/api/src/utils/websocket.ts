@@ -1,10 +1,10 @@
-import { Server as SocketIOServer } from "socket.io";
+import { Server as SocketIOServer, Socket } from "socket.io";
 import type { Server as HTTPServer } from "http";
 import jwt from "jsonwebtoken";
 import { env } from "../config/env.js";
 import { prisma } from "./prisma.js";
 
-export interface AuthenticatedSocket extends SocketIOServer {
+export interface AuthenticatedSocket extends Socket {
   userId?: string;
   relationshipId?: string;
 }
@@ -21,7 +21,7 @@ export function initializeWebSocket(httpServer: HTTPServer) {
   });
 
   // Authentication middleware
-  io.use(async (socket, next) => {
+  io.use(async (socket: Socket, next) => {
     try {
       const token = socket.handshake.auth.token || socket.handshake.headers.authorization?.replace("Bearer ", "");
       
@@ -36,7 +36,7 @@ export function initializeWebSocket(httpServer: HTTPServer) {
       }
 
       // Attach user info to socket
-      (socket as any).userId = decoded.userId;
+      (socket as AuthenticatedSocket).userId = decoded.userId;
 
       // Find the user's active relationship
       const relationship = await prisma.relationship.findFirst({
@@ -47,18 +47,19 @@ export function initializeWebSocket(httpServer: HTTPServer) {
       });
 
       if (relationship) {
-        (socket as any).relationshipId = relationship.id;
+        (socket as AuthenticatedSocket).relationshipId = relationship.id;
       }
 
       next();
-    } catch (error) {
+    } catch (_error) {
       next(new Error("Invalid token"));
     }
   });
 
-  io.on("connection", (socket) => {
-    const userId = (socket as any).userId;
-    const relationshipId = (socket as any).relationshipId;
+  io.on("connection", (socket: Socket) => {
+    const authSocket = socket as AuthenticatedSocket;
+    const userId = authSocket.userId;
+    const relationshipId = authSocket.relationshipId;
 
     console.log(`User ${userId} connected via WebSocket`);
 
@@ -98,28 +99,28 @@ export function initializeWebSocket(httpServer: HTTPServer) {
 }
 
 // Helper function to emit events to a specific relationship
-export function emitToRelationship(relationshipId: string, event: string, data: any) {
+export function emitToRelationship(relationshipId: string, event: string, data: unknown) {
   if (io) {
     io.to(`relationship:${relationshipId}`).emit(event, data);
   }
 }
 
 // Helper function to emit workout events
-export function emitWorkoutEvent(relationshipId: string, event: string, data: any) {
+export function emitWorkoutEvent(relationshipId: string, event: string, data: unknown) {
   if (io) {
     io.to(`workout:${relationshipId}`).emit(event, data);
   }
 }
 
 // Helper function to emit grocery events
-export function emitGroceryEvent(relationshipId: string, event: string, data: any) {
+export function emitGroceryEvent(relationshipId: string, event: string, data: unknown) {
   if (io) {
     io.to(`grocery:${relationshipId}`).emit(event, data);
   }
 }
 
 // Helper function to emit chat events
-export function emitChatEvent(relationshipId: string, event: string, data: any) {
+export function emitChatEvent(relationshipId: string, event: string, data: unknown) {
   if (io) {
     io.to(`chat:${relationshipId}`).emit(event, data);
   }

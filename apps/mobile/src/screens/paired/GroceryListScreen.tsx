@@ -10,7 +10,6 @@ import {
   Alert,
 } from "react-native";
 import { FontAwesome6 } from "@expo/vector-icons";
-import { useNavigation, NavigationProp } from "@react-navigation/native";
 import { useTheme } from "../../theme/ThemeProvider";
 import { apiClient } from "../../lib/appState";
 import type { GroceryList, GroceryItem } from "@withyou/shared";
@@ -33,11 +32,12 @@ export function GroceryListScreen() {
       if (response.lists.length > 0 && !activeListId) {
         setActiveListId(response.lists[0].id);
       }
-    } catch (error: any) {
-      if (error.code === "NO_RELATIONSHIP") {
+    } catch (error) {
+      const err = error as { code?: string; message?: string };
+      if (err.code === "NO_RELATIONSHIP") {
         Alert.alert("Not Paired", "You need to be in a relationship to use grocery lists");
       } else {
-        Alert.alert("Error", error.message || "Failed to load grocery lists");
+        Alert.alert("Error", err.message || "Failed to load grocery lists");
       }
     } finally {
       setLoading(false);
@@ -62,8 +62,9 @@ export function GroceryListScreen() {
           });
           setLists([response.list, ...lists]);
           setActiveListId(response.list.id);
-        } catch (error: any) {
-          Alert.alert("Error", error.message || "Failed to create list");
+        } catch (error) {
+          const err = error as { message?: string };
+          Alert.alert("Error", err.message || "Failed to create list");
         }
       }
     );
@@ -92,8 +93,9 @@ export function GroceryListScreen() {
       }));
       
       setNewItemName("");
-    } catch (error: any) {
-      Alert.alert("Error", error.message || "Failed to add item");
+    } catch (error) {
+      const err = error as { message?: string };
+      Alert.alert("Error", err.message || "Failed to add item");
     } finally {
       setAddingItem(false);
     }
@@ -119,8 +121,9 @@ export function GroceryListScreen() {
         }
         return list;
       }));
-    } catch (error: any) {
-      Alert.alert("Error", error.message || "Failed to update item");
+    } catch (error) {
+      const err = error as { message?: string };
+      Alert.alert("Error", err.message || "Failed to update item");
     }
   };
 
@@ -148,8 +151,9 @@ export function GroceryListScreen() {
             }
             return list;
           }));
-        } catch (error: any) {
-          Alert.alert("Error", error.message || "Failed to veto item");
+        } catch (error) {
+          const err = error as { message?: string };
+          Alert.alert("Error", err.message || "Failed to veto item");
         }
       },
       "plain-text",
@@ -185,8 +189,9 @@ export function GroceryListScreen() {
                 }
                 return list;
               }));
-            } catch (error: any) {
-              Alert.alert("Error", error.message || "Failed to delete item");
+            } catch (error) {
+              const err = error as { message?: string };
+              Alert.alert("Error", err.message || "Failed to delete item");
             }
           },
         },
