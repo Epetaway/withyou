@@ -51,6 +51,114 @@ async function main() {
 
   console.log(`Created active relationship: ${devRelationship.id}`);
 
+  // Create wearable devices for development
+  const wearable1 = await prisma.wearableDevice.create({
+    data: {
+      userId: dev1.id,
+      deviceType: "apple_watch",
+      deviceName: "Apple Watch Series 8",
+      accessToken: "dev-apple-token-1",
+      isActive: true,
+    },
+  });
+
+  const wearable2 = await prisma.wearableDevice.create({
+    data: {
+      userId: dev2.id,
+      deviceType: "google_watch",
+      deviceName: "Galaxy Watch 6",
+      accessToken: "dev-google-token-1",
+      isActive: true,
+    },
+  });
+
+  console.log(`Created wearable devices: ${wearable1.id}, ${wearable2.id}`);
+
+  // Create health metrics for the last 7 days
+  const today = new Date();
+  const healthData = [];
+
+  for (let i = 0; i < 7; i++) {
+    const date = new Date(today);
+    date.setDate(date.getDate() - i);
+    date.setHours(0, 0, 0, 0);
+
+    healthData.push(
+      {
+        userId: dev1.id,
+        date,
+        steps: 8000 + Math.floor(Math.random() * 3000),
+        heartRate: 65 + Math.floor(Math.random() * 20),
+        activeMinutes: 45 + Math.floor(Math.random() * 30),
+        calories: 2000 + Math.floor(Math.random() * 500),
+        sleepDuration: 7 + Math.floor(Math.random() * 2),
+        syncedFrom: "apple_watch",
+      },
+      {
+        userId: dev2.id,
+        date,
+        steps: 10000 + Math.floor(Math.random() * 4000),
+        heartRate: 70 + Math.floor(Math.random() * 15),
+        activeMinutes: 50 + Math.floor(Math.random() * 35),
+        calories: 2200 + Math.floor(Math.random() * 600),
+        sleepDuration: 7.5 + Math.floor(Math.random() * 2),
+        syncedFrom: "google_watch",
+      }
+    );
+  }
+
+  for (const metric of healthData) {
+    await prisma.healthMetric.create({
+      data: metric,
+    });
+  }
+
+  console.log(`Created ${healthData.length} health metrics (7 days × 2 users)`);
+
+  // Create an activity challenge between the two users
+  const challenge = await prisma.activityChallenge.create({
+    data: {
+      challengeType: "steps",
+      relationshipId: devRelationship.id,
+      initiatorId: dev1.id,
+      participantId: dev2.id,
+      title: "Daily Steps Challenge",
+      description: "Challenge each other to reach 10,000 steps per day",
+      targetValue: 10000,
+      duration: 30,
+      status: "active",
+      startDate: new Date(),
+      endDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+      reward: "Victory bragging rights! 🏆",
+    },
+  });
+
+  // Create challenge progress for both users
+  await prisma.challengeProgress.create({
+    data: {
+      challengeId: challenge.id,
+      userId: dev1.id,
+      totalSteps: 60000, // 7 days worth
+      avgHeartRate: 72,
+      daysCompleted: 6,
+      maxMetricValue: 10500,
+    },
+  });
+
+  await prisma.challengeProgress.create({
+    data: {
+      challengeId: challenge.id,
+      userId: dev2.id,
+      totalSteps: 75000, // 7 days worth
+      avgHeartRate: 74,
+      daysCompleted: 7,
+      maxMetricValue: 12000,
+    },
+  });
+
+  console.log(`Created activity challenge: ${challenge.id}`);
+
+
   // Create minimal curated ideas
   const ideas = [
     {

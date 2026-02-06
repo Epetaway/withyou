@@ -30,8 +30,6 @@ type PairedStackParamList = {
   WorkoutGoals: undefined;
   GroceryList: undefined;
   Chat: undefined;
-  CheckIn: undefined; // Still accessible via Dashboard
-  Preferences: undefined; // Still accessible via Settings
 };
 
 function FloatingNav() {

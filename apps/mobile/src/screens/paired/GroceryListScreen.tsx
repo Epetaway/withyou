@@ -11,7 +11,7 @@ import {
 } from "react-native";
 import { FontAwesome6 } from "@expo/vector-icons";
 import { useTheme } from "../../theme/ThemeProvider";
-import { apiClient } from "../../lib/appState";
+import { api } from "../../state/appState";
 import type { GroceryList, GroceryItem } from "@withyou/shared";
 
 export function GroceryListScreen() {
@@ -24,10 +24,10 @@ export function GroceryListScreen() {
 
   const fetchLists = async () => {
     try {
-      const response = await apiClient.request<{ lists: GroceryList[]; count: number }>({
-        method: "GET",
-        url: "/grocery/lists",
-      });
+      const response = await api.request<{ lists: GroceryList[]; count: number }>(
+        "/grocery/lists",
+        { method: "GET" }
+      );
       setLists(response.lists);
       if (response.lists.length > 0 && !activeListId) {
         setActiveListId(response.lists[0].id);
@@ -55,11 +55,13 @@ export function GroceryListScreen() {
       async (text) => {
         if (!text || text.trim() === "") return;
         try {
-          const response = await apiClient.request<{ list: GroceryList }>({
-            method: "POST",
-            url: "/grocery/lists",
-            body: { name: text.trim() },
-          });
+          const response = await api.request<{ list: GroceryList }>(
+            "/grocery/lists",
+            {
+              method: "POST",
+              body: JSON.stringify({ name: text.trim() }),
+            }
+          );
           setLists([response.list, ...lists]);
           setActiveListId(response.list.id);
         } catch (error) {
@@ -75,11 +77,13 @@ export function GroceryListScreen() {
     
     setAddingItem(true);
     try {
-      const response = await apiClient.request<{ item: GroceryItem }>({
-        method: "POST",
-        url: `/grocery/lists/${activeListId}/items`,
-        body: { name: newItemName.trim() },
-      });
+      const response = await api.request<{ item: GroceryItem }>(
+        `/grocery/lists/${activeListId}/items`,
+        {
+          method: "POST",
+          body: JSON.stringify({ name: newItemName.trim() }),
+        }
+      );
       
       // Update the list with the new item
       setLists(lists.map(list => {
@@ -105,11 +109,13 @@ export function GroceryListScreen() {
     if (!activeListId) return;
     
     try {
-      const response = await apiClient.request<{ item: GroceryItem }>({
-        method: "PUT",
-        url: `/grocery/lists/${activeListId}/items/${item.id}`,
-        body: { completed: !item.completedAt },
-      });
+      const response = await api.request<{ item: GroceryItem }>(
+        `/grocery/lists/${activeListId}/items/${item.id}`,
+        {
+          method: "PUT",
+          body: JSON.stringify({ completed: !item.completedAt }),
+        }
+      );
       
       // Update the list
       setLists(lists.map(list => {
@@ -135,11 +141,13 @@ export function GroceryListScreen() {
       "Why do you want to veto this item? (optional)",
       async (reason) => {
         try {
-          const response = await apiClient.request<{ item: GroceryItem }>({
-            method: "POST",
-            url: `/grocery/lists/${activeListId}/items/${item.id}/veto`,
-            body: { vetoReason: reason || undefined },
-          });
+          const response = await api.request<{ item: GroceryItem }>(
+            `/grocery/lists/${activeListId}/items/${item.id}/veto`,
+            {
+              method: "POST",
+              body: JSON.stringify({ vetoReason: reason || undefined }),
+            }
+          );
           
           // Update the list
           setLists(lists.map(list => {
@@ -174,9 +182,8 @@ export function GroceryListScreen() {
           style: "destructive",
           onPress: async () => {
             try {
-              await apiClient.request({
+              await api.request(`/grocery/lists/${activeListId}/items/${item.id}`, {
                 method: "DELETE",
-                url: `/grocery/lists/${activeListId}/items/${item.id}`,
               });
               
               // Update the list

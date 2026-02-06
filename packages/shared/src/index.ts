@@ -71,6 +71,21 @@ export type {
 	ChatMessagesResponse,
 	ChatUnreadCountResponse,
 	MessageType,
+	DeviceType,
+	WearableDevice,
+	HealthMetric,
+	DeviceConnectionPayload,
+	WearableDeviceResponse,
+	HealthMetricsResponse,
+	ChallengeType,
+	ChallengeStatus,
+	ActivityChallenge,
+	ChallengeProgress,
+	ActivityChallengeCreatePayload,
+	ActivityChallengeResponse,
+	ActivityChallengesListResponse,
+	ChallengeProgressResponse,
+	ActivityLeaderboardResponse,
 } from "./types.js";
 
 export {
@@ -129,6 +144,12 @@ export {
 	messageTypeSchema,
 	chatMessageCreateSchema,
 	chatMessageReadSchema,
-} from "./schemas.js";
+	deviceTypeSchema,
+	deviceConnectionSchema,
+	challengeTypeSchema,
+	challengeStatusSchema,
+	healthMetricsQuerySchema,
+	activityChallengeCreateSchema,
+	activityChallengeUpdateStatusSchema,} from "./schemas.js";
 
 export { CONTENT } from "./content.js";

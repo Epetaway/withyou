@@ -93,6 +93,27 @@ enum GoalStatus {
   failed
 }
 
+enum DeviceType {
+  apple_watch
+  google_watch
+  apple_health
+  google_fit
+}
+
+enum ChallengeType {
+  steps
+  heart_rate
+  combined
+  daily_active_minutes
+}
+
+enum ChallengeStatus {
+  pending
+  active
+  completed
+  declined
+}
+
 enum MessageType {
   text
   image
@@ -131,6 +152,11 @@ model User {
   groceryItemsAdded GroceryItem[] @relation("ItemAddedBy")
   groceryItemsVetoed GroceryItem[] @relation("ItemVetoed")
   messagesSent ChatMessage[]
+  wearableDevices WearableDevice[]
+  healthMetrics HealthMetric[]
+  activitiesInitiated ActivityChallenge[] @relation("Initiator")
+  activitiesInvolved ActivityChallenge[] @relation("Participant")
+  challengeProgress ChallengeProgress[]
   
   @@index([oauthProvider, oauthId])
   @@index([isTestUser, testTag])
@@ -156,6 +182,7 @@ model Relationship {
   workoutBets  WorkoutBet[]
   groceryLists GroceryList[]
   chatMessages ChatMessage[]
+  activityChallenges ActivityChallenge[]
 
   userA User @relation("UserARelationships", fields: [userAId], references: [id])
   userB User @relation("UserBRelationships", fields: [userBId], references: [id])
@@ -450,3 +477,91 @@ model ChatMessage {
   @@index([relationshipId, createdAt])
   @@index([senderId])
 }
+
+model WearableDevice {
+  id              String       @id @default(cuid())
+  userId          String
+  deviceType      DeviceType
+  deviceName      String
+  accessToken     String       // Encrypted in production
+  refreshToken    String?      // For services that require it
+  expiresAt       DateTime?    // Token expiration
+  isActive        Boolean      @default(true)
+  lastSyncedAt    DateTime?
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+  
+  user            User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@index([userId])
+  @@index([deviceType])
+  @@unique([userId, deviceType])
+}
+
+model HealthMetric {
+  id              String       @id @default(cuid())
+  userId          String
+  date            DateTime
+  steps           Int?
+  heartRate       Int?         // BPM
+  activeMinutes   Int?         // Minutes of active movement
+  calories        Int?         // Calories burned
+  sleepDuration   Int?         // Minutes
+  rawData         String?      // JSON for additional metrics
+  syncedFrom      DeviceType?
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+  
+  user            User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@index([userId, date])
+  @@index([date])
+  @@unique([userId, date])
+}
+
+model ActivityChallenge {
+  id              String       @id @default(cuid())
+  relationshipId  String
+  initiatorId     String
+  participantId   String
+  challengeType   ChallengeType
+  status          ChallengeStatus @default(pending)
+  title           String
+  description     String?
+  targetValue     Int          // Target steps, heart rate zones, etc.
+  duration        Int          // Days
+  reward          String?      // What's at stake/prize
+  startDate       DateTime     @default(now())
+  endDate         DateTime
+  declinedAt      DateTime?
+  completedAt     DateTime?
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+  
+  relationship    Relationship @relation(fields: [relationshipId], references: [id], onDelete: Cascade)
+  initiator       User         @relation("Initiator", fields: [initiatorId], references: [id])
+  participant     User         @relation("Participant", fields: [participantId], references: [id])
+  progress        ChallengeProgress[]
+  
+  @@index([relationshipId])
+  @@index([status])
+  @@index([initiatorId, participantId])
+}
+
+model ChallengeProgress {
+  id              String       @id @default(cuid())
+  challengeId     String
+  userId          String
+  totalSteps      Int          @default(0)
+  avgHeartRate    Int?
+  daysCompleted   Int          @default(0)
+  maxMetricValue  Int?         // Best single day score
+  lastUpdatedAt   DateTime     @default(now())
+  
+  challenge       ActivityChallenge @relation(fields: [challengeId], references: [id], onDelete: Cascade)
+  user            User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@unique([challengeId, userId])
+  @@index([challengeId])
+}
+

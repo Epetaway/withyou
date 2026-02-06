@@ -442,3 +442,36 @@ export const chatMessageCreateSchema = z.object({
 export const chatMessageReadSchema = z.object({
   messageIds: z.array(z.string().cuid()),
 });
+// ===== Wearable Device & Health Schemas =====
+
+export const deviceTypeSchema = z.enum(['apple_watch', 'google_watch', 'apple_health', 'google_fit']);
+
+export const deviceConnectionSchema = z.object({
+  deviceType: deviceTypeSchema,
+  deviceName: z.string().min(1).max(100),
+  authCode: z.string().min(1),
+});
+
+export const challengeTypeSchema = z.enum(['steps', 'heart_rate', 'combined', 'daily_active_minutes']);
+
+export const challengeStatusSchema = z.enum(['pending', 'active', 'completed', 'declined']);
+
+export const healthMetricsQuerySchema = z.object({
+  startDate: z.string().datetime().optional(),
+  endDate: z.string().datetime().optional(),
+  deviceType: deviceTypeSchema.optional(),
+});
+
+export const activityChallengeCreateSchema = z.object({
+  participantId: z.string().cuid(),
+  challengeType: challengeTypeSchema,
+  title: z.string().min(5).max(100),
+  description: z.string().max(500).optional(),
+  targetValue: z.number().int().positive(),
+  duration: z.number().int().min(1).max(90),
+  reward: z.string().max(200).optional(),
+});
+
+export const activityChallengeUpdateStatusSchema = z.object({
+  status: z.enum(['active', 'declined']),
+});

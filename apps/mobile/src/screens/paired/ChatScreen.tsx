@@ -13,8 +13,8 @@ import {
 } from "react-native";
 import { FontAwesome6 } from "@expo/vector-icons";
 import { useTheme } from "../../theme/ThemeProvider";
-import { apiClient } from "../../lib/appState";
-import { getSession } from "../../lib/session";
+import { api } from "../../state/appState";
+import { getSession } from "../../state/session";
 import type { ChatMessage } from "@withyou/shared";
 
 export function ChatScreen() {
@@ -49,14 +49,11 @@ export function ChatScreen() {
 
   const fetchMessages = async () => {
     try {
-      const response = await apiClient.request<{
-        messages: ChatMessage[];
-        count: number;
-        unreadCount: number;
-      }>({
-        method: "GET",
-        url: "/messages",
-      });
+        const response = await api.request<{
+          messages: ChatMessage[];
+          count: number;
+          unreadCount: number;
+        }>("/messages", { method: "GET" });
       setMessages(response.messages);
       
       // Mark messages as read
@@ -65,11 +62,10 @@ export function ChatScreen() {
         .map(m => m.id);
       
       if (unreadIds.length > 0) {
-        await apiClient.request({
-          method: "PUT",
-          url: "/messages/read",
-          body: { messageIds: unreadIds },
-        });
+          await api.request("/messages/read", {
+            method: "PUT",
+            body: JSON.stringify({ messageIds: unreadIds }),
+          });
       }
     } catch (error) {
       const err = error as { code?: string };
@@ -102,14 +98,13 @@ export function ChatScreen() {
     }, 100);
 
     try {
-      const response = await apiClient.request<{ message: ChatMessage }>({
-        method: "POST",
-        url: "/messages/send",
-        body: {
-          content: tempMessage.content,
-          type: "text",
-        },
-      });
+        const response = await api.request<{ message: ChatMessage }>("/messages/send", {
+          method: "POST",
+          body: JSON.stringify({
+            content: tempMessage.content,
+            type: "text",
+          }),
+        });
 
       // Replace temp message with real message
       setMessages(prev => prev.map(m => m.id === tempMessage.id ? response.message : m));
@@ -136,13 +131,12 @@ export function ChatScreen() {
     }
 
     try {
-      const response = await apiClient.request<{
-        suggestions: AssistanceSuggestion[];
-        context: AssistanceContext;
-      }>({
-        method: "POST",
-        url: "/messages/assistance",
-      });
+        const response = await api.request<{
+          suggestions: AssistanceSuggestion[];
+          context: AssistanceContext;
+        }>("/messages/assistance", {
+          method: "POST",
+        });
       setAssistanceSuggestions(response.suggestions);
       setShowAssistance(true);
     } catch (error) {

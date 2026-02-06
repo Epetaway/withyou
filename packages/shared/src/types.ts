@@ -467,3 +467,131 @@ export type ChatMessagesResponse = {
 export type ChatUnreadCountResponse = {
   unreadCount: number;
 };
+// ===== Wearable Devices & Health Tracking =====
+
+export type DeviceType = 'apple_watch' | 'google_watch' | 'apple_health' | 'google_fit';
+
+export type WearableDevice = {
+  id: UUID;
+  userId: UUID;
+  deviceType: DeviceType;
+  deviceName: string;
+  isActive: boolean;
+  lastSyncedAt?: string;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type HealthMetric = {
+  id: UUID;
+  userId: UUID;
+  date: string;
+  steps?: number;
+  heartRate?: number; // BPM
+  activeMinutes?: number; // Minutes of activity
+  calories?: number;
+  sleepDuration?: number; // Minutes
+  syncedFrom?: DeviceType;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type DeviceConnectionPayload = {
+  deviceType: DeviceType;
+  deviceName: string;
+  authCode: string; // From OAuth flow
+};
+
+export type WearableDeviceResponse = {
+  device: WearableDevice;
+};
+
+export type HealthMetricsResponse = {
+  metrics: HealthMetric[];
+  dateRange: {
+    from: string;
+    to: string;
+  };
+};
+
+// ===== Activity Challenges =====
+
+export type ChallengeType = 'steps' | 'heart_rate' | 'combined' | 'daily_active_minutes';
+export type ChallengeStatus = 'pending' | 'active' | 'completed' | 'declined';
+
+export type ActivityChallenge = {
+  id: UUID;
+  relationshipId: UUID;
+  initiatorId: UUID;
+  participantId: UUID;
+  challengeType: ChallengeType;
+  status: ChallengeStatus;
+  title: string;
+  description?: string;
+  targetValue: number; // Daily target (steps, bpm, minutes, etc.)
+  duration: number; // Days
+  reward?: string; // What's at stake
+  startDate: string;
+  endDate: string;
+  declinedAt?: string;
+  completedAt?: string;
+  createdAt: string;
+  updatedAt: string;
+  progress?: ChallengeProgress[];
+};
+
+export type ChallengeProgress = {
+  id: UUID;
+  challengeId: UUID;
+  userId: UUID;
+  totalSteps: number;
+  avgHeartRate?: number;
+  daysCompleted: number;
+  maxMetricValue?: number;
+  lastUpdatedAt: string;
+};
+
+export type ActivityChallengeCreatePayload = {
+  participantId: UUID;
+  challengeType: ChallengeType;
+  title: string;
+  description?: string;
+  targetValue: number;
+  duration: number; // Days
+  reward?: string;
+};
+
+export type ActivityChallengeResponse = {
+  challenge: ActivityChallenge;
+};
+
+export type ActivityChallengesListResponse = {
+  challenges: ActivityChallenge[];
+  count: number;
+};
+
+export type ChallengeProgressResponse = {
+  progress: ChallengeProgress[];
+  leaderboard: Array<{
+    userId: UUID;
+    displayName?: string;
+    totalSteps: number;
+    avgHeartRate?: number;
+    daysCompleted: number;
+    ranking: number;
+  }>;
+};
+
+export type ActivityLeaderboardResponse = {
+  challengeId: UUID;
+  participants: Array<{
+    userId: UUID;
+    displayName?: string;
+    totalSteps: number;
+    avgHeartRate?: number;
+    daysCompleted: number;
+    ranking: number;
+    percentageComplete: number;
+  }>;
+  currentUserRanking: number;
+};

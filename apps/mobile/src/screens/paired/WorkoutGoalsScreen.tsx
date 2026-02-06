@@ -7,11 +7,12 @@ import {
   Pressable,
   ActivityIndicator,
   Alert,
+  RefreshControl,
 } from "react-native";
 import { FontAwesome6 } from "@expo/vector-icons";
 import { useNavigation, NavigationProp } from "@react-navigation/native";
 import { useTheme } from "../../theme/ThemeProvider";
-import { apiClient } from "../../lib/appState";
+import { api } from "../../state/appState";
 import type { WorkoutGoal } from "@withyou/shared";
 
 type WorkoutGoalsStackParamList = {
@@ -29,10 +30,10 @@ export function WorkoutGoalsScreen() {
 
   const fetchGoals = async () => {
     try {
-      const response = await apiClient.request<{ goals: WorkoutGoal[]; count: number }>({
-        method: "GET",
-        url: "/workouts/goals",
-      });
+      const response = await api.request<{ goals: WorkoutGoal[]; count: number }>(
+        "/workouts/goals",
+        { method: "GET" }
+      );
       setGoals(response.goals);
     } catch (error) {
       const err = error as { message?: string };
@@ -171,8 +172,13 @@ export function WorkoutGoalsScreen() {
         style={styles.scrollView}
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
-        refreshing={refreshing}
-        onRefresh={handleRefresh}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={handleRefresh}
+            tintColor={theme.colors.primary}
+          />
+        }
       >
         {goals.length === 0 ? (
           <View style={styles.emptyState}>
